@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import { PageHeader } from '../../components/PageHeader';
 
 interface SignalBreakdown {
   sig_stars_10: boolean;
@@ -123,7 +124,7 @@ export default function FYPRecommendationsPage() {
           const matchName = item.name.toLowerCase().includes(q);
           const matchDesc = item.description?.toLowerCase().includes(q) || false;
           const matchTopics = item.topics.some((t) => t.toLowerCase().includes(q));
-          const matchLang = item.language.toLowerCase().includes(q);
+          const matchLang = item.language?.toLowerCase().includes(q) || false;
           if (!matchName && !matchDesc && !matchTopics && !matchLang) {
             return false;
           }
@@ -153,42 +154,43 @@ export default function FYPRecommendationsPage() {
   }, [filteredItems, page]);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 pb-20">
-      {/* Header Banner */}
-      <header className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border-b border-indigo-900/50 py-12 px-4 sm:px-8 shadow-md">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-400/20 text-indigo-300 text-xs font-semibold tracking-wide uppercase mb-3">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              Real GitHub-Vetted Projects
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              FYP Project Recommendations
-            </h1>
-            <p className="mt-2 text-slate-300 text-sm sm:text-base max-w-2xl leading-relaxed">
-              Curated, real-world repositories scored for <strong className="text-white">CS vs CSE alignment</strong> and <strong className="text-white">industry-readiness</strong>. Proven architectures you can actually build and defend.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/"
-              className="px-4 py-2 text-sm font-medium rounded-lg bg-slate-800 text-slate-200 hover:bg-slate-700 transition"
-            >
-              Back to EduCompass
-            </Link>
-          </div>
-        </div>
-      </header>
+    <div className="inner-page">
+      {/* Standardized Page Header */}
+      <PageHeader
+        title="FYP Project Recommendations"
+        breadcrumbs={[{ label: 'Recommendations' }]}
+        badge="Real GitHub Vetted"
+        description="Curated repositories scored for CS vs CSE curriculum alignment and industry readiness (10-signal heuristic breakdown)."
+        accent="var(--cyan)"
+        actions={
+          <Link href="/fyp" className="button button-secondary text-xs">
+            <span>Browse FYP Archive</span>
+            <span>&rarr;</span>
+          </Link>
+        }
+      />
 
       {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-8 mt-8">
+      <main className="inner-page-body space-y-6">
+        {/* Rule #13 Advisory Notice Banner */}
+        <div className="p-3.5 rounded-xl bg-[rgba(225,185,125,0.08)] border border-[rgba(225,185,125,0.25)] text-xs text-[#e1b97d] flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span>⚠️</span>
+            <span>
+              <strong>Rule 7 &amp; 13 Compliance:</strong> Industry scores and alignment percentages are heuristic estimates derived from repository metadata. Official FYP approval rests with CISE committee.
+            </span>
+          </div>
+          <Link href="/terms" className="underline hover:text-white shrink-0 text-[11px]">
+            Terms &amp; Disclaimer
+          </Link>
+        </div>
+
         {/* Filter Controls Bar */}
-        <section className="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 mb-8">
+        <section className="p-5 rounded-2xl bg-[#14212c]/90 border border-[rgba(213,228,236,0.12)] shadow-xl backdrop-blur-md space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {/* Search Input */}
             <div className="lg:col-span-2">
-              <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
                 Search Keyword or Tech
               </label>
               <input
@@ -196,19 +198,19 @@ export default function FYPRecommendationsPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="e.g. YOLO, Docker, IoT, Resume..."
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                className="w-full h-10 px-3.5 rounded-lg bg-[#0f1823] border border-[rgba(213,228,236,0.15)] text-slate-100 text-sm focus:outline-none focus:border-[#9bcbd0] transition placeholder:text-slate-500"
               />
             </div>
 
             {/* Degree Filter */}
             <div>
-              <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
                 Target Degree
               </label>
               <select
                 value={degreeFilter}
                 onChange={(e) => setDegreeFilter(e.target.value as any)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                className="w-full h-10 px-3 rounded-lg bg-[#0f1823] border border-[rgba(213,228,236,0.15)] text-slate-200 text-sm focus:outline-none focus:border-[#9bcbd0] transition"
               >
                 <option value="all">All Degrees</option>
                 <option value="CS">Computer Science (CS)</option>
@@ -219,13 +221,13 @@ export default function FYPRecommendationsPage() {
 
             {/* Industry Ready */}
             <div>
-              <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
                 Industry Readiness
               </label>
               <select
                 value={industryFilter}
                 onChange={(e) => setIndustryFilter(e.target.value as any)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                className="w-full h-10 px-3 rounded-lg bg-[#0f1823] border border-[rgba(213,228,236,0.15)] text-slate-200 text-sm focus:outline-none focus:border-[#9bcbd0] transition"
               >
                 <option value="all">All Ratings</option>
                 <option value="ready">Industry-Ready (Score ≥ 6)</option>
@@ -235,13 +237,13 @@ export default function FYPRecommendationsPage() {
 
             {/* Domain Filter */}
             <div>
-              <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
                 Specialized Domain
               </label>
               <select
                 value={domainFilter}
                 onChange={(e) => setDomainFilter(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                className="w-full h-10 px-3 rounded-lg bg-[#0f1823] border border-[rgba(213,228,236,0.15)] text-slate-200 text-sm focus:outline-none focus:border-[#9bcbd0] transition"
               >
                 {Object.entries(DOMAIN_LABELS).map(([key, label]) => (
                   <option key={key} value={key}>
@@ -253,20 +255,20 @@ export default function FYPRecommendationsPage() {
           </div>
 
           {/* Secondary Filter Row: Min Score & Clear */}
-          <div className="mt-4 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4">
+          <div className="pt-3 border-t border-[rgba(213,228,236,0.08)] flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
-                Min Industry Score:
+              <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                Min Score (Estimate):
               </span>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 {[0, 3, 5, 7].map((s) => (
                   <button
                     key={s}
                     onClick={() => setMinScore(s)}
-                    className={`px-3 py-1 rounded-lg text-xs font-medium transition ${
+                    className={`px-2.5 py-1 rounded-md text-xs font-semibold transition ${
                       minScore === s
-                        ? 'bg-indigo-600 text-white shadow-sm'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        ? 'bg-[rgba(155,203,208,0.2)] text-[#9bcbd0] border border-[#9bcbd0]'
+                        : 'bg-[#0f1823] text-slate-400 border border-[rgba(213,228,236,0.1)] hover:text-white'
                     }`}
                   >
                     {s}+ pts
@@ -275,8 +277,8 @@ export default function FYPRecommendationsPage() {
               </div>
             </div>
 
-            <div className="text-xs text-slate-500">
-              Showing <strong className="text-slate-800">{filteredItems.length}</strong> matching projects (capped at {MAX_RESULTS})
+            <div className="text-xs text-slate-400">
+              Showing <strong className="text-white font-mono">{filteredItems.length}</strong> matching projects (capped at {MAX_RESULTS})
             </div>
           </div>
         </section>
@@ -284,19 +286,19 @@ export default function FYPRecommendationsPage() {
         {/* Loading State */}
         {loading && (
           <div className="py-20 text-center">
-            <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-slate-500 text-sm font-medium">Loading recommendations dataset...</p>
+            <div className="w-8 h-8 border-3 border-[#9bcbd0] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+            <p className="text-slate-400 text-xs font-medium">Loading recommendations dataset...</p>
           </div>
         )}
 
         {/* Empty State */}
         {!loading && filteredItems.length === 0 && (
-          <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center max-w-xl mx-auto shadow-sm">
-            <div className="w-12 h-12 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4 text-xl">
+          <div className="p-12 rounded-2xl bg-[#14212c]/80 border border-[rgba(213,228,236,0.12)] text-center max-w-xl mx-auto">
+            <div className="w-12 h-12 bg-amber-500/10 text-[#e1b97d] rounded-full flex items-center justify-center mx-auto mb-4 text-xl">
               🔍
             </div>
-            <h3 className="text-lg font-bold text-slate-800 mb-1">No Matching Projects Found</h3>
-            <p className="text-sm text-slate-500 mb-6">
+            <h3 className="text-base font-bold text-white mb-1">No Matching Projects Found</h3>
+            <p className="text-xs text-slate-400 mb-6">
               Try lowering the minimum score filter or clearing the search keyword.
             </p>
             <button
@@ -307,7 +309,7 @@ export default function FYPRecommendationsPage() {
                 setDomainFilter('all');
                 setMinScore(0);
               }}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-semibold hover:bg-indigo-700 transition"
+              className="button button-primary text-xs"
             >
               Reset All Filters
             </button>
@@ -316,7 +318,7 @@ export default function FYPRecommendationsPage() {
 
         {/* Project Card Grid */}
         {!loading && currentSlice.length > 0 && (
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 gap-5">
             {currentSlice.map((repo) => {
               const isExpanded = expandedCard === repo.id;
               const isCse = repo.degree_tag === 'CSE';
@@ -325,7 +327,7 @@ export default function FYPRecommendationsPage() {
               return (
                 <div
                   key={repo.id}
-                  className="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-md transition-all duration-200 p-6 flex flex-col justify-between"
+                  className="p-6 rounded-2xl bg-[#111b26] border border-[rgba(213,228,236,0.1)] hover:border-[rgba(155,203,208,0.3)] transition-all duration-200 flex flex-col justify-between"
                 >
                   <div>
                     {/* Top Badges */}
@@ -335,51 +337,50 @@ export default function FYPRecommendationsPage() {
                         <span
                           className={`px-2.5 py-1 rounded-md text-xs font-bold tracking-wide uppercase ${
                             isCse
-                              ? 'bg-purple-100 text-purple-800 border border-purple-200'
+                              ? 'bg-[rgba(182,172,230,0.15)] text-[#b6ace6] border border-[rgba(182,172,230,0.3)]'
                               : isCs
-                              ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                              : 'bg-slate-100 text-slate-700 border border-slate-200'
+                              ? 'bg-[rgba(120,148,189,0.15)] text-[#7894bd] border border-[rgba(120,148,189,0.3)]'
+                              : 'bg-slate-800/60 text-slate-300 border border-slate-700/60'
                           }`}
                         >
                           {repo.degree_tag} Focus
                         </span>
 
                         {/* Domain Badge */}
-                        <span className="px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                        <span className="px-2.5 py-1 rounded-md text-xs font-medium bg-[#0f1823] text-slate-300 border border-[rgba(213,228,236,0.12)]">
                           {DOMAIN_LABELS[repo.domain] || repo.domain}
                         </span>
 
                         {/* Language */}
                         {repo.language && (
-                          <span className="px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          <span className="px-2.5 py-1 rounded-md text-xs font-medium bg-[rgba(154,195,169,0.12)] text-[#9ac3a9] border border-[rgba(154,195,169,0.3)]">
                             {repo.language}
                           </span>
                         )}
                       </div>
 
-                      {/* Industry Score Pill */}
+                      {/* Industry Score Pill with Estimate Label (Rule #7) */}
                       <div className="flex items-center gap-2">
                         <span
                           className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
                             repo.is_industry_ready
-                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                              : 'bg-amber-100 text-amber-800 border border-amber-300'
+                              ? 'bg-[rgba(154,195,169,0.15)] text-[#9ac3a9] border border-[rgba(154,195,169,0.3)]'
+                              : 'bg-[rgba(225,185,125,0.15)] text-[#e1b97d] border border-[rgba(225,185,125,0.3)]'
                           }`}
                         >
                           <span
-                            className={`w-2 h-2 rounded-full ${
-                              repo.is_industry_ready ? 'bg-emerald-600' : 'bg-amber-600'
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              repo.is_industry_ready ? 'bg-[#9ac3a9]' : 'bg-[#e1b97d]'
                             }`}
-                          ></span>
-                          Industry Score: {repo.industry_score}/10 (
-                          {repo.industry_label === 'Yes' ? 'Industry-Ready' : 'Developing'})
+                          />
+                          Industry Score: {repo.industry_score}/10 (Estimate &bull; {repo.industry_label === 'Yes' ? 'Ready' : 'Developing'})
                         </span>
                       </div>
                     </div>
 
                     {/* Title & Link */}
                     <div className="flex items-start justify-between gap-4 mb-2">
-                      <h2 className="text-xl font-bold text-slate-900 hover:text-indigo-600 transition">
+                      <h2 className="text-lg font-bold text-white hover:text-[#9bcbd0] transition">
                         <a href={repo.html_url} target="_blank" rel="noopener noreferrer">
                           {repo.name}
                         </a>
@@ -388,20 +389,20 @@ export default function FYPRecommendationsPage() {
                         href={repo.html_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-800 underline shrink-0 mt-1"
+                        className="inline-flex items-center gap-1 text-xs font-bold text-[#9bcbd0] hover:underline shrink-0 mt-1"
                       >
                         GitHub Repo ↗
                       </a>
                     </div>
 
                     {/* Description */}
-                    <p className="text-sm text-slate-600 leading-relaxed mb-4">
+                    <p className="text-xs text-slate-300 leading-relaxed mb-4">
                       {repo.description || 'No repository summary provided.'}
                     </p>
 
                     {/* README Excerpt */}
                     {repo.readme_excerpt && (
-                      <div className="bg-slate-50 rounded-xl p-3 text-xs text-slate-500 border border-slate-100 mb-4 font-mono leading-relaxed line-clamp-2">
+                      <div className="bg-[#0b1119] rounded-xl p-3 text-xs text-slate-400 border border-[rgba(213,228,236,0.08)] mb-4 font-mono leading-relaxed line-clamp-2">
                         &quot;{repo.readme_excerpt}&quot;
                       </div>
                     )}
@@ -412,7 +413,7 @@ export default function FYPRecommendationsPage() {
                         {repo.topics.map((t) => (
                           <span
                             key={t}
-                            className="px-2 py-0.5 rounded text-[11px] bg-slate-100 text-slate-600"
+                            className="px-2 py-0.5 rounded text-[11px] bg-[#0f1823] text-slate-300 border border-[rgba(213,228,236,0.08)]"
                           >
                             #{t}
                           </span>
@@ -422,8 +423,8 @@ export default function FYPRecommendationsPage() {
                   </div>
 
                   {/* Footer & Signal Accordion */}
-                  <div className="pt-4 border-t border-slate-100 flex flex-col gap-3">
-                    <div className="flex flex-wrap items-center justify-between text-xs text-slate-500">
+                  <div className="pt-4 border-t border-[rgba(213,228,236,0.08)] flex flex-col gap-3">
+                    <div className="flex flex-wrap items-center justify-between text-xs text-slate-400">
                       <div className="flex items-center gap-4">
                         <span>⭐ {repo.stars.toLocaleString()} stars</span>
                         <span>🍴 {repo.forks.toLocaleString()} forks</span>
@@ -432,36 +433,36 @@ export default function FYPRecommendationsPage() {
 
                       <button
                         onClick={() => setExpandedCard(isExpanded ? null : repo.id)}
-                        className="text-xs font-semibold text-slate-700 hover:text-indigo-600 flex items-center gap-1 transition"
+                        className="text-xs font-bold text-[#9bcbd0] hover:underline flex items-center gap-1 transition"
                       >
-                        {isExpanded ? 'Hide Signal Breakdown ▲' : 'View Scoring Breakdown ▼'}
+                        {isExpanded ? 'Hide Signal Breakdown ▲' : 'View Scoring Breakdown (Estimate) ▼'}
                       </button>
                     </div>
 
                     {/* Detailed Signals Breakdown Drawer */}
                     {isExpanded && (
-                      <div className="mt-2 bg-slate-50 rounded-xl p-4 border border-slate-200/80 animate-in fade-in duration-200">
-                        <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                      <div className="mt-2 bg-[#0b1119] rounded-xl p-4 border border-[rgba(213,228,236,0.1)]">
+                        <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider mb-2">
                           Industry-Readiness Evaluation Checklist ({repo.industry_score}/10 points)
                         </h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                           {Object.entries(repo.signals).map(([key, val]) => (
                             <div
                               key={key}
-                              className={`flex items-center gap-2 p-1.5 rounded-lg ${
+                              className={`flex items-center gap-2 p-2 rounded-lg ${
                                 val
-                                  ? 'bg-emerald-50 text-emerald-900 border border-emerald-100'
-                                  : 'bg-slate-100 text-slate-400'
+                                  ? 'bg-[rgba(154,195,169,0.12)] text-[#9ac3a9] border border-[rgba(154,195,169,0.25)]'
+                                  : 'bg-[#0f1823] text-slate-500 border border-[rgba(213,228,236,0.05)]'
                               }`}
                             >
                               <span>{val ? '✅' : '⚪'}</span>
-                              <span className={val ? 'font-medium' : ''}>
+                              <span className={val ? 'font-semibold' : ''}>
                                 {SIGNAL_LABELS[key as keyof SignalBreakdown] || key}
                               </span>
                             </div>
                           ))}
                         </div>
-                        <div className="mt-3 pt-2 border-t border-slate-200 text-[11px] text-slate-500">
+                        <div className="mt-3 pt-2 border-t border-[rgba(213,228,236,0.08)] text-[11px] text-slate-400">
                           Degree classification: <strong>{repo.degree_tag}</strong> (CS keyword hits: {repo.cs_hits}, CSE keyword hits: {repo.cse_hits})
                         </div>
                       </div>
@@ -479,30 +480,23 @@ export default function FYPRecommendationsPage() {
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="px-4 py-2 rounded-xl border border-slate-300 text-xs font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 transition"
+              className="button button-secondary text-xs disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Previous Page
             </button>
-            <span className="text-xs text-slate-600 font-medium">
+            <span className="text-xs text-slate-400 font-medium">
               Page {page} of {totalPages}
             </span>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="px-4 py-2 rounded-xl border border-slate-300 text-xs font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 transition"
+              className="button button-secondary text-xs disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Next Page
             </button>
           </div>
         )}
       </main>
-
-      {/* Footer Disclaimer Notice */}
-      <footer className="mt-20 border-t border-slate-200 py-6 text-center text-xs text-slate-500">
-        <p>
-          EduCompass guidance estimates and scores are algorithmic heuristics based on open-source metadata. They do not constitute official university approval.
-        </p>
-      </footer>
     </div>
   );
 }

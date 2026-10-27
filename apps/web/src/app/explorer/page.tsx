@@ -23,6 +23,7 @@ import {
   Button,
   Modal,
 } from '@educompass/ui';
+import { PageHeader } from '../../components/PageHeader';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -375,44 +376,30 @@ export default function ExplorerPage() {
   }, [selectedCourse]);
 
   return (
-    <div className="h-screen w-screen bg-slate-950 text-slate-100 flex flex-col overflow-hidden">
-      {/* Top Header Bar */}
-      <header className="border-b border-slate-800 bg-slate-900/90 backdrop-blur z-20 px-4 py-3 shrink-0">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <Link
-              href="/dashboard"
-              className="text-xs text-slate-400 hover:text-slate-200 transition-colors flex items-center gap-1"
-            >
-              ← Dashboard
-            </Link>
-            <span className="text-slate-600">|</span>
-            <div className="flex items-center gap-2">
-              <span className="inline-block w-2 h-2 rounded-full bg-emerald-400" />
-              <h1 className="text-sm font-semibold text-white">NED CISE Prerequisite Explorer</h1>
-              <Badge variant="outline" className="text-[10px] text-slate-400 border-slate-700">Batch 2018 Onwards</Badge>
-            </div>
-          </div>
-
-          {/* Action Toolbar */}
-          <div className="flex items-center gap-3 flex-wrap text-xs">
+    <div className="h-screen w-screen bg-[#0b1119] text-slate-100 flex flex-col overflow-hidden">
+      {/* Standardized Page Header */}
+      <PageHeader
+        title="Prerequisite DAG Explorer"
+        breadcrumbs={[{ label: 'Prerequisite Explorer' }]}
+        badge="Batch 2018 Onwards"
+        description="Directed acyclic graph of NED CISE degree requirements, critical paths, and failure cascades."
+        accent="var(--cyan)"
+        actions={
+          <div className="flex items-center gap-2.5 flex-wrap text-xs">
             {/* Search Box */}
             <input
               type="text"
               placeholder="Search code/title..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-blue-500 w-36 sm:w-44"
+              className="bg-[#0f1823] border border-[rgba(213,228,236,0.15)] rounded-lg px-2.5 py-1 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-[#9bcbd0] w-36 sm:w-44"
             />
 
             {/* Critical Path Toggle */}
             <button
               onClick={() => setShowCriticalPath(!showCriticalPath)}
-              className={`px-3 py-1 rounded-lg border font-medium transition-all ${
-                showCriticalPath
-                  ? 'border-amber-500 bg-amber-500/20 text-amber-300'
-                  : 'border-slate-700 bg-slate-800 text-slate-300 hover:border-slate-600'
-              }`}
+              className={`button ${showCriticalPath ? 'button-primary' : 'button-secondary'}`}
+              style={showCriticalPath ? { background: 'var(--amber)', color: '#0b1119' } : {}}
             >
               ⭐ Critical Path
             </button>
@@ -423,11 +410,8 @@ export default function ExplorerPage() {
                 setIsSimulationMode(!isSimulationMode);
                 if (isSimulationMode) setSimulatedFailedSet(new Set());
               }}
-              className={`px-3 py-1 rounded-lg border font-medium transition-all flex items-center gap-1.5 ${
-                isSimulationMode
-                  ? 'border-rose-500 bg-rose-500/20 text-rose-300 animate-pulse'
-                  : 'border-slate-700 bg-slate-800 text-slate-300 hover:border-slate-600'
-              }`}
+              className={`button ${isSimulationMode ? 'button-primary' : 'button-secondary'}`}
+              style={isSimulationMode ? { background: 'var(--coral)', color: '#fff' } : {}}
             >
               <span>⚠️</span>
               <span>{isSimulationMode ? 'Exit Simulation' : 'What-If Failure Sim'}</span>
@@ -436,14 +420,14 @@ export default function ExplorerPage() {
             {isSimulationMode && simulatedFailedSet.size > 0 && (
               <button
                 onClick={() => setSimulatedFailedSet(new Set())}
-                className="text-xs text-rose-400 hover:text-rose-300 underline"
+                className="text-xs text-[#d9a29d] hover:underline"
               >
                 Reset
               </button>
             )}
           </div>
-        </div>
-      </header>
+        }
+      />
 
       {/* Advisory Banner (Rule #13) */}
       <div className="bg-amber-950/20 border-b border-amber-500/20 px-4 py-1.5 text-[11px] text-amber-200/90 flex items-center justify-between shrink-0">

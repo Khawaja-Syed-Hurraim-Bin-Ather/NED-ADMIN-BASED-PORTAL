@@ -31,11 +31,7 @@ describe('Chat API Route (Card H3, Rules #3, #4, #5, #6, #13, #15)', () => {
   });
 
   describe('GET /api/v1/chat/suggestions', () => {
-    it('returns suggested academic prompt chips', async () => {
-      const res = await fetch('http://localhost:3000/api/v1/chat/suggestions', {
-        // We'll test handler structure directly through express stack
-      }).catch(() => null);
-
+    it('returns suggested academic prompt chips', () => {
       expect(chatRouter.stack.some((layer) => layer.route?.path === '/suggestions')).toBe(true);
     });
   });

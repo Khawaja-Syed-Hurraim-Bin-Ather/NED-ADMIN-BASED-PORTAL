@@ -14,6 +14,7 @@ import {
   Modal,
   Alert,
 } from '@educompass/ui';
+import { PageHeader } from '../../components/PageHeader';
 
 interface Course {
   code: string;
@@ -286,56 +287,40 @@ export default function StudentPlannerPage() {
   const totalViolations = validation?.allViolations.length ?? 0;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
-      {/* ── Top Header / Breadcrumb ─────────────────────────────────────── */}
-      <div className="border-b border-slate-800 bg-slate-900/60 backdrop-blur-md sticky top-0 z-30 px-4 lg:px-8 py-3.5">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Link
-              href="/dashboard"
-              className="text-xs text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1"
-            >
-              ← Dashboard
-            </Link>
-            <span className="text-slate-600">/</span>
-            <div className="flex items-center gap-2">
-              <span className="text-xl">📅</span>
-              <h1 className="text-base lg:text-lg font-bold text-white tracking-tight">Student Degree Planner</h1>
-              <Badge variant="info">Card M3</Badge>
-            </div>
-          </div>
-
+    <div className="inner-page">
+      {/* ── Standardized Page Header ─────────────────────────────────────── */}
+      <PageHeader
+        title="Student Degree Planner"
+        breadcrumbs={[{ label: 'Degree Planner' }]}
+        badge={`${totalDegreeCredits}/${targetCredits} Credits`}
+        description="Plan your 8-semester course sequence, balance workload, and validate prerequisite compliance under NED CISE regulations."
+        accent="var(--cyan)"
+        actions={
           <div className="flex items-center gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
+            <button
               onClick={handleResetToOfficial}
-              className="text-xs border-slate-700 hover:bg-slate-800"
+              className="button button-secondary"
             >
               🔄 Reset to Official
-            </Button>
-            <Button
-              variant="secondary"
-              size="sm"
+            </button>
+            <button
               onClick={() => setShowExportModal(true)}
-              className="text-xs border-slate-700 hover:bg-slate-800"
+              className="button button-secondary"
             >
               📄 Export Summary
-            </Button>
-            <Button
-              variant="primary"
-              size="sm"
+            </button>
+            <button
               onClick={handleSavePlan}
               disabled={isSaving}
-              className="text-xs bg-cyan-600 hover:bg-cyan-500 text-white"
+              className="button button-primary"
             >
               {isSaving ? 'Saving...' : '💾 Save Plan'}
-            </Button>
+            </button>
           </div>
-        </div>
-      </div>
+        }
+      />
 
-      <div className="max-w-7xl mx-auto w-full px-4 lg:px-8 py-6 space-y-6 flex-1">
+      <div className="inner-page-body space-y-6">
         {/* ── Rule #13 Legal Disclaimer Banner ────────────────────────────── */}
         <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 text-xs text-amber-200/90 flex items-start gap-2.5">
           <span className="text-base flex-shrink-0">⚠️</span>

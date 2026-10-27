@@ -22,6 +22,7 @@ import {
   Input,
   Alert,
 } from '@educompass/ui';
+import { PageHeader } from '../../components/PageHeader';
 
 interface CourseRow {
   id: string;
@@ -114,60 +115,33 @@ export default function GPACalculatorPage() {
   }, [currentCGPA, completedCredits, targetCGPA, remainingCredits]);
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 p-6 md:p-10">
-      <div className="max-w-4xl mx-auto space-y-8">
-        {/* Navigation & Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-800">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold text-white tracking-tight">
-                GPA Calculator &amp; What-If Planner
-              </h1>
-              <Badge variant="info">NED Official Scale</Badge>
-            </div>
-            <p className="text-xs text-slate-400 mt-1">
-              Precision academic GPA engine &bull; 4.0 Scale &bull; Retake Policies
-            </p>
-          </div>
-          <Link href="/dashboard">
-            <Button variant="outline" size="sm">
-              &larr; Back to Dashboard
-            </Button>
-          </Link>
-        </div>
+    <div className="inner-page">
+      <PageHeader
+        title="GPA Calculator &amp; What-If Planner"
+        badge="E4"
+        breadcrumbs={[{ label: 'GPA Calculator' }]}
+        description="Semester GPA · Cumulative CGPA · Retake policies · Graduation target modeller. NED official 4.0 scale."
+        accent="var(--sage)"
+      />
 
-        {/* Tab Selector */}
-        <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
-          <button
-            onClick={() => setActiveTab('calculator')}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-              activeTab === 'calculator'
-                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
-            }`}
-          >
-            Semester GPA Calculator
-          </button>
-          <button
-            onClick={() => setActiveTab('whatif')}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-              activeTab === 'whatif'
-                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
-            }`}
-          >
-            What-If Target Planner
-          </button>
-          <button
-            onClick={() => setActiveTab('upload')}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-              activeTab === 'upload'
-                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
-            }`}
-          >
-            Paste / Import Transcript
-          </button>
+      <div className="inner-page-body">
+        {/* Tab selector */}
+        <div style={{ marginBottom: 24 }}>
+          <div className="toolbar-tabs" style={{ display: 'inline-flex' }}>
+            {[
+              { key: 'calculator', label: '📊 Semester GPA' },
+              { key: 'whatif',     label: '🎯 What-If Target' },
+              { key: 'upload',     label: '📋 Import Transcript' },
+            ].map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => setActiveTab(key as 'calculator' | 'whatif' | 'upload')}
+                className={`toolbar-tab${activeTab === key ? ' active' : ''}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* TAB 1: Semester GPA Calculator */}
@@ -550,6 +524,6 @@ export default function GPACalculatorPage() {
           </div>
         )}
       </div>
-    </main>
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 interface BreadcrumbItem {
@@ -14,7 +14,43 @@ interface PageHeaderProps {
   badge?: string;
   description?: string;
   actions?: React.ReactNode;
+  /** Page accent colour token, e.g. 'var(--cyan)' */
+  accent?: string;
 }
+
+/** Inline SVG icons — no external dependency */
+const Ic = {
+  compass: (
+    <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="9.5"/>
+      <path d="m15.5 8.5-2.7 4.3-4.3 2.7 2.7-4.3 4.3-2.7Z"/>
+    </svg>
+  ),
+  dashboard: (
+    <svg className="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3.5" y="3.5" width="7" height="7" rx="1"/>
+      <rect x="13.5" y="3.5" width="7" height="7" rx="1"/>
+      <rect x="3.5" y="13.5" width="7" height="7" rx="1"/>
+      <rect x="13.5" y="13.5" width="7" height="7" rx="1"/>
+    </svg>
+  ),
+  sun: (
+    <svg className="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="4"/>
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/>
+    </svg>
+  ),
+  moon: (
+    <svg className="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M20.8 15.2A8.5 8.5 0 0 1 8.8 3.2 8.5 8.5 0 1 0 20.8 15.2Z"/>
+    </svg>
+  ),
+  chevron: (
+    <svg className="icon-sm" style={{width:12,height:12,display:'inline-block',stroke:'currentColor',fill:'none',strokeWidth:2.2,strokeLinecap:'round',strokeLinejoin:'round'}} viewBox="0 0 24 24" aria-hidden="true">
+      <path d="m9 18 6-6-6-6"/>
+    </svg>
+  ),
+};
 
 export function PageHeader({
   title,
@@ -22,76 +58,88 @@ export function PageHeader({
   badge,
   description,
   actions,
+  accent = 'var(--cyan)',
 }: PageHeaderProps) {
-  return (
-    <header className="border-b border-[rgba(213,228,236,0.12)] bg-[#0b1119]/80 backdrop-blur-md sticky top-0 z-30 px-4 sm:px-6 md:px-10 py-3.5">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-        {/* Left: Breadcrumbs + Title */}
-        <div>
-          <nav className="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1">
-            <Link
-              href="/"
-              className="inline-flex items-center gap-1.5 hover:text-white transition-colors"
-            >
-              <span className="w-5 h-5 rounded-md bg-[rgba(155,203,208,0.15)] border border-[rgba(155,203,208,0.4)] flex items-center justify-center text-[#9bcbd0] font-bold text-[10px]">
-                EC
-              </span>
-              <span>EduCompass</span>
-            </Link>
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
+  useEffect(() => {
+    const stored = localStorage.getItem('educompass-theme') as 'dark' | 'light' | null;
+    if (stored) setTheme(stored);
+  }, []);
+
+  function toggleTheme() {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem('educompass-theme', next);
+  }
+
+  return (
+    <header className="page-header">
+      <div className="page-header-inner">
+        {/* ── Left: Brand + Crumbs + Title ── */}
+        <div className="page-header-left">
+          {/* Brand mark */}
+          <Link href="/" className="brand page-header-brand" aria-label="EduCompass home">
+            <span className="brand-mark">{Ic.compass}</span>
+            <span className="brand-word">Edu<em>Compass</em></span>
+          </Link>
+
+          {/* Breadcrumb trail */}
+          <nav className="page-crumbs" aria-label="Breadcrumb">
+            <Link href="/dashboard" className="page-crumb-link">Dashboard</Link>
             {breadcrumbs.map((crumb, idx) => (
               <React.Fragment key={crumb.label}>
-                <span className="text-slate-600">/</span>
+                <span className="page-crumb-sep" aria-hidden="true">{Ic.chevron}</span>
                 {crumb.href ? (
-                  <Link href={crumb.href} className="hover:text-white transition-colors">
-                    {crumb.label}
-                  </Link>
+                  <Link href={crumb.href} className="page-crumb-link">{crumb.label}</Link>
                 ) : (
-                  <span className="text-[#9bcbd0] font-bold">{crumb.label}</span>
+                  <span className="page-crumb-active">{crumb.label}</span>
                 )}
               </React.Fragment>
             ))}
           </nav>
 
-          <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-xl md:text-2xl font-extrabold text-white tracking-tight">
-              {title}
-            </h1>
+          {/* Page title row */}
+          <div className="page-header-title-row">
+            <h1 className="page-title">{title}</h1>
             {badge && (
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[rgba(155,203,208,0.12)] text-[#9bcbd0] border border-[rgba(155,203,208,0.3)]">
-                {badge}
-              </span>
+              <span className="pill pill-cyan page-badge">{badge}</span>
             )}
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Engine Online
+            {/* Live status pill */}
+            <span className="page-status-pill">
+              <span className="live-dot" style={{ background: 'var(--sage)', boxShadow: '0 0 0 4px rgba(154,195,169,.15)' }} />
+              Guidance engine online
             </span>
           </div>
 
           {description && (
-            <p className="text-xs text-slate-400 mt-0.5 max-w-2xl leading-relaxed">
-              {description}
-            </p>
+            <p className="page-header-desc">{description}</p>
           )}
         </div>
 
-        {/* Right: Actions */}
-        <div className="flex items-center gap-2.5 self-start md:self-auto">
+        {/* ── Right: Actions + Theme toggle + Dashboard ── */}
+        <div className="page-header-right">
           {actions}
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[rgba(213,228,236,0.15)] bg-[#14212c] hover:bg-[#1a2c3a] hover:border-[rgba(155,203,208,0.4)] text-xs font-bold text-slate-200 transition-all shadow-sm"
+
+          <button
+            className="button button-icon"
+            onClick={toggleTheme}
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            title="Toggle theme"
           >
-            <svg className="w-3.5 h-3.5 text-[#91accb]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3.5" y="3.5" width="7" height="7" rx="1" />
-              <rect x="13.5" y="3.5" width="7" height="7" rx="1" />
-              <rect x="3.5" y="13.5" width="7" height="7" rx="1" />
-              <rect x="13.5" y="13.5" width="7" height="7" rx="1" />
-            </svg>
+            {theme === 'dark' ? Ic.sun : Ic.moon}
+          </button>
+
+          <Link href="/dashboard" className="button button-secondary page-dashboard-btn">
+            {Ic.dashboard}
             <span>Dashboard</span>
           </Link>
         </div>
       </div>
+
+      {/* Accent underline */}
+      <div className="page-header-accent" style={{ background: accent }} aria-hidden="true" />
     </header>
   );
 }

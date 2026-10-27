@@ -501,16 +501,17 @@ export default function ProfessorDirectoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0b1119] text-slate-100 flex flex-col">
+    <div className="inner-page">
       {/* Shared Page Header */}
       <PageHeader
         title="Professor Directory"
         breadcrumbs={[{ label: 'Professor Directory' }]}
         badge={`${filtered.length} Faculty Members`}
         description="Browse NED CISE faculty profiles, research areas, supervised FYDPs, and calculate alignment with your FYP interests."
+        accent="var(--lavender)"
       />
 
-      <main className="flex-1 p-4 sm:p-6 md:p-10 max-w-7xl w-full mx-auto space-y-6">
+      <main className="inner-page-body space-y-6">
         {/* Filter & Alignment Toolbar Panel */}
         <div className="p-5 rounded-2xl bg-[#14212c]/90 border border-[rgba(213,228,236,0.12)] shadow-xl backdrop-blur-md space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">

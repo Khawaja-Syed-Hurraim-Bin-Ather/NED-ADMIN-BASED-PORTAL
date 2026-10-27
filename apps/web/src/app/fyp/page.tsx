@@ -398,53 +398,42 @@ export default function FYPPortalPage() {
   }, [teamIdeas, teamSearchQuery, teamStatusFilter]);
 
   return (
-    <div className="min-h-screen bg-[#0b1119] text-slate-100 flex flex-col">
+    <div className="inner-page">
       {/* Shared Page Header */}
       <PageHeader
-        title="NED Final Year Projects Portal"
-        breadcrumbs={[{ label: 'FYP Archive' }]}
-        badge={`${projects.length} Official Records`}
-        description="Explore 68 reviewed NED CISE final year projects, calculate semantic similarity matches, and connect on the student team board."
+        title="FYP Archive &amp; Team Board"
+        breadcrumbs={[{ label: 'FYP Portal' }]}
+        badge="M1"
+        description="68 reviewed NED CISE final year projects. Semantic similarity search, domain filters, and student team formation board."
+        accent="var(--cyan)"
         actions={
-          <Link
-            href="/recommendations"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[rgba(155,203,208,0.3)] bg-[rgba(155,203,208,0.1)] hover:bg-[rgba(155,203,208,0.18)] text-xs font-bold text-[#9bcbd0] transition-all"
-          >
-            <span>GitHub Ideas</span>
-            <span>&rarr;</span>
+          <Link href="/recommendations" className="button button-secondary" style={{ minHeight: 34, padding: '0 12px', fontSize: 11 }}>
+            GitHub Ideas →
           </Link>
         }
       />
 
-      <main className="flex-1 p-4 sm:p-6 md:p-10 max-w-7xl w-full mx-auto space-y-6">
-        {/* Sleek Segmented Tab Selector */}
-        <div className="inline-flex p-1.5 rounded-xl bg-[#14212c] border border-[rgba(213,228,236,0.12)] shadow-md">
-          <button
-            onClick={() => setActiveTab('archive')}
-            className={`px-4 py-2 rounded-lg text-xs font-extrabold transition-all flex items-center gap-2 ${
-              activeTab === 'archive'
-                ? 'bg-[#1b2b3a] text-[#9bcbd0] shadow-sm border border-[rgba(155,203,208,0.3)]'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <span>📚 Browse FYP Archive</span>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#0b1119] text-slate-300 font-mono">
-              {projects.length}
-            </span>
-          </button>
-          <button
-            onClick={() => setActiveTab('teamboard')}
-            className={`px-4 py-2 rounded-lg text-xs font-extrabold transition-all flex items-center gap-2 ${
-              activeTab === 'teamboard'
-                ? 'bg-[#1b2b3a] text-[#9bcbd0] shadow-sm border border-[rgba(155,203,208,0.3)]'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <span>🤝 Team Formation Board</span>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#0b1119] text-[#91accb] font-mono border border-[rgba(145,172,203,0.3)]">
-              Card M1
-            </span>
-          </button>
+      <main className="inner-page-body" style={{ maxWidth: 1280 }}>
+        {/* Tab selector — design system toolbar-tabs */}
+        <div style={{ marginBottom: 24 }}>
+          <div className="toolbar-tabs" style={{ display: 'inline-flex' }}>
+            <button
+              onClick={() => setActiveTab('archive')}
+              className={`toolbar-tab${activeTab === 'archive' ? ' active' : ''}`}
+            >
+              📚 FYP Archive
+              <span className="pill pill-cyan" style={{ marginLeft: 8, minHeight: 18, padding: '0 7px', fontSize: 9 }}>
+                {projects.length}
+              </span>
+            </button>
+            <button
+              onClick={() => setActiveTab('teamboard')}
+              className={`toolbar-tab${activeTab === 'teamboard' ? ' active' : ''}`}
+            >
+              🤝 Team Board
+              <span className="demo-chip" style={{ marginLeft: 8 }}>M1</span>
+            </button>
+          </div>
         </div>
 
         {errorMsg && (

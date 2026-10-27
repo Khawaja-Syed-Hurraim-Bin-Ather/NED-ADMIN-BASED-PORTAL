@@ -8,6 +8,7 @@ import {
   Card, CardHeader, CardTitle, CardDescription, CardContent,
   Button, Badge, Input, Alert, Modal,
 } from '@educompass/ui';
+import { PageHeader } from '../../components/PageHeader';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -239,22 +240,16 @@ export default function AdminConsolePage() {
   const totalPages = Math.ceil(totalCount / 25);
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 p-6 md:p-10">
-      <div className="mx-auto max-w-7xl space-y-6">
+    <div className="inner-page">
+      <PageHeader
+        title="Admin Console & Review Queue"
+        breadcrumbs={[{ label: 'Admin Console' }]}
+        badge="Rule 2 Enforced"
+        description="Offline ETL ingestion queue, peer review approval pipeline, audit logs, and user data requests."
+        accent="var(--coral)"
+      />
 
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-800">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold text-white">Admin Console</h1>
-              <Badge variant="danger">Admin Only</Badge>
-            </div>
-            <p className="text-xs text-slate-400 mt-1">FYP review queue · Audit log · Deletion requests</p>
-          </div>
-          <Link href="/dashboard">
-            <Button variant="outline" size="sm">← Dashboard</Button>
-          </Link>
-        </div>
+      <main className="inner-page-body space-y-6">
 
         {/* Alerts */}
         {error && <Alert variant="danger" onClose={() => setError(null)}>{error}</Alert>}
@@ -500,7 +495,6 @@ export default function AdminConsolePage() {
             </CardContent>
           </Card>
         )}
-      </div>
 
       {/* Edit Record Modal */}
       <Modal
@@ -564,6 +558,7 @@ export default function AdminConsolePage() {
           </div>
         )}
       </Modal>
-    </main>
+      </main>
+    </div>
   );
 }

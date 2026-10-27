@@ -229,17 +229,18 @@ export default function CareerHubPage() {
   }, [search, activeCategory]);
 
   return (
-    <div className="min-h-screen bg-[#0b1119] text-slate-100 flex flex-col">
+    <div className="inner-page">
       {/* Shared Page Header */}
       <PageHeader
         title="Career Hub &amp; Technology Tracks"
         breadcrumbs={[{ label: 'Career Hub' }]}
         badge="12 Curated Tracks"
         description="Explore 12 industry career paths aligned with your NED CISE curriculum. Discover essential skills, job roles, and recommended coursework."
+        accent="var(--lavender)"
         actions={
           <Link
             href="/fyp"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[rgba(155,203,208,0.3)] bg-[rgba(155,203,208,0.1)] hover:bg-[rgba(155,203,208,0.18)] text-xs font-bold text-[#9bcbd0] transition-all"
+            className="button button-secondary text-xs"
           >
             <span>Browse FYPs</span>
             <span>&rarr;</span>
@@ -247,7 +248,7 @@ export default function CareerHubPage() {
         }
       />
 
-      <main className="flex-1 p-4 sm:p-6 md:p-10 max-w-7xl w-full mx-auto space-y-6">
+      <main className="inner-page-body space-y-6">
         {/* Search & Category Filter Toolbar */}
         <div className="p-5 rounded-2xl bg-[#14212c]/90 border border-[rgba(213,228,236,0.12)] shadow-xl backdrop-blur-md space-y-4">
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
