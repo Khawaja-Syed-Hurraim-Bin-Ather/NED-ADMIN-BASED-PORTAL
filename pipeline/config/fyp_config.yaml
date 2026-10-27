@@ -1,0 +1,156 @@
+# FYP Recommender Configuration
+topics:
+  - final-year-project
+  - fyp
+  - capstone-project
+  - student-project
+
+filters:
+  min_stars: 4
+  max_months_since_update: 36
+  allow_forks: true
+  exclude_archived: true
+  require_readme: true
+
+limits:
+  fetch_per_topic: 50  # reasonable initial fetch count to prevent rate limit starvation
+  display_page_size: 10
+  display_max_results: 50
+
+scoring:
+  industry_ready_threshold: 6
+
+keywords:
+  cse:
+    - arduino
+    - esp32
+    - esp8266
+    - raspberry pi
+    - iot
+    - fpga
+    - embedded
+    - sensor
+    - microcontroller
+    - stm32
+    - verilog
+    - vhdl
+    - robotics
+    - rtos
+    - plc
+  cs:
+    - django
+    - flask
+    - react
+    - node
+    - nlp
+    - machine learning
+    - deep learning
+    - web app
+    - android
+    - flutter
+    - api
+    - database
+    - recommendation
+
+domains:
+  ai_ml:
+    - machine learning
+    - deep learning
+    - nlp
+    - computer vision
+    - neural
+    - tensorflow
+    - pytorch
+    - yolo
+    - opencv
+    - llm
+    - classification
+  iot_embedded:
+    - arduino
+    - esp32
+    - raspberry pi
+    - iot
+    - sensor
+    - microcontroller
+    - stm32
+    - embedded
+    - robotics
+  web_dev:
+    - react
+    - nextjs
+    - vue
+    - node
+    - django
+    - flask
+    - fastapi
+    - express
+    - fullstack
+    - frontend
+    - backend
+    - web app
+  mobile_dev:
+    - android
+    - flutter
+    - react native
+    - ios
+    - swift
+    - kotlin
+    - mobile app
+  cybersecurity:
+    - security
+    - cryptography
+    - encryption
+    - firewall
+    - vulnerability
+    - malware
+    - penetration
+    - blockchain
+  healthcare_tech:
+    - healthcare
+    - medical
+    - health
+    - hospital
+    - patient
+    - diagnosis
+    - clinical
+    - retinopathy
+    - diabetic
+    - screening
+
+industry_signals:
+  docker:
+    - docker
+    - dockerfile
+    - docker-compose
+  tests:
+    - tests
+    - pytest
+    - unit test
+    - unittest
+    - jest
+    - test suite
+  ci_cd:
+    - ci/cd
+    - github actions
+    - workflows
+    - travis
+    - circleci
+  deployment:
+    - deploy
+    - deployment
+    - live demo
+    - hosted at
+    - vercel
+    - heroku
+    - netlify
+    - aws
+  auth_db:
+    - authentication
+    - auth
+    - postgres
+    - mysql
+    - sqlite
+    - mongodb
+    - database
+    - jwt
+    - oauth

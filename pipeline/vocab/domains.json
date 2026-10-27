@@ -1,0 +1,43 @@
+{
+  "_comment": "Controlled domain vocabulary for FYP tag classification. Add new domains here, never inline.",
+  "domains": [
+    "ai-ml",
+    "computer-vision",
+    "nlp",
+    "web",
+    "mobile",
+    "iot",
+    "embedded",
+    "cybersecurity",
+    "data",
+    "networks",
+    "blockchain",
+    "ar-vr",
+    "games",
+    "robotics",
+    "healthcare-tech",
+    "agriculture-tech",
+    "fintech",
+    "education-tech"
+  ],
+  "domain_keywords": {
+    "ai-ml": ["machine learning", "deep learning", "neural network", "ai", "artificial intelligence", "llm", "generative", "classification", "regression", "prediction", "reinforcement"],
+    "computer-vision": ["image recognition", "object detection", "yolo", "opencv", "face detection", "segmentation", "video analysis", "visual"],
+    "nlp": ["natural language", "nlp", "text classification", "sentiment analysis", "chatbot", "speech recognition", "language model", "bert", "gpt"],
+    "web": ["web application", "web app", "website", "react", "angular", "vue", "html", "css", "django", "flask", "laravel", "rest api", "graphql"],
+    "mobile": ["android", "ios", "flutter", "react native", "mobile app", "smartphone", "kotlin", "swift"],
+    "iot": ["iot", "internet of things", "sensor", "smart home", "smart city", "mqtt", "arduino", "esp32", "raspberry pi", "embedded system"],
+    "embedded": ["embedded", "microcontroller", "fpga", "rtos", "firmware", "microprocessor", "real-time"],
+    "cybersecurity": ["security", "cybersecurity", "penetration testing", "encryption", "authentication", "vulnerability", "malware", "firewall", "ids", "ips"],
+    "data": ["data analytics", "data science", "dashboard", "visualization", "etl", "pipeline", "pandas", "tableau", "power bi", "big data", "hadoop", "spark"],
+    "networks": ["networking", "network", "protocol", "tcp/ip", "routing", "wireless", "5g", "vpn", "sdn", "nfv"],
+    "blockchain": ["blockchain", "smart contract", "cryptocurrency", "ethereum", "solidity", "nft", "defi"],
+    "ar-vr": ["augmented reality", "virtual reality", "ar", "vr", "mixed reality", "metaverse", "unity 3d"],
+    "games": ["game", "gaming", "game development", "unity", "unreal engine", "2d game", "3d game"],
+    "robotics": ["robot", "robotics", "autonomous", "drone", "path planning", "ros"],
+    "healthcare-tech": ["healthcare", "medical", "health", "hospital", "patient", "diagnosis", "clinical", "telemedicine", "retinopathy", "diabetic", "screening", "icu", "rehabilitation", "wearable"],
+    "agriculture-tech": ["agriculture", "farming", "crop", "precision farming", "agri", "plant disease"],
+    "fintech": ["finance", "fintech", "banking", "payment", "trading", "stock market", "loan", "insurance"],
+    "education-tech": ["education", "e-learning", "learning management", "lms", "edtech", "student", "course management", "quiz"]
+  }
+}

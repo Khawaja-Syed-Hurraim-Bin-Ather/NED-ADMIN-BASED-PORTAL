@@ -1,0 +1,288 @@
+{
+  "schema_version": 1,
+  "note": "Course codes refer to ned_cse_course_chart.json. Links are suggestions based on course titles; confirm against course outlines. Each track needs two roadmap variants (6 to 12 months and 2 to 4 years) and stage plans (first year, second year, third year, final year).",
+  "tracks": [
+    {
+      "slug": "ai-ml-engineering",
+      "title": "AI and Machine Learning Engineering",
+      "srs_basis": "SRS: AI/ML engineering",
+      "summary": "Build, train, and ship machine-learning systems, including applications built on large language models.",
+      "relevant_courses": [
+        "CS-323",
+        "CS-324",
+        "CS-436",
+        "MT-335",
+        "MT-222",
+        "MT-442",
+        "CS-218",
+        "CS-117"
+      ],
+      "roadmap_variants": [
+        "6-12-months",
+        "2-4-years"
+      ],
+      "stages": [
+        "first-year",
+        "second-year",
+        "third-year",
+        "final-year"
+      ]
+    },
+    {
+      "slug": "data-science",
+      "title": "Data Science and Analytics",
+      "srs_basis": "SRS: data science",
+      "summary": "Turn data into decisions with statistics, SQL, visualisation, and basic modelling.",
+      "relevant_courses": [
+        "MT-335",
+        "CS-222",
+        "CS-324",
+        "CS-434",
+        "CS-218"
+      ],
+      "roadmap_variants": [
+        "6-12-months",
+        "2-4-years"
+      ],
+      "stages": [
+        "first-year",
+        "second-year",
+        "third-year",
+        "final-year"
+      ]
+    },
+    {
+      "slug": "frontend-development",
+      "title": "Front-End Development",
+      "srs_basis": "SRS: web development (split)",
+      "summary": "Build fast, accessible, well-designed interfaces for the web.",
+      "relevant_courses": [
+        "CS-115",
+        "CS-116",
+        "CS-326",
+        "CS-325",
+        "CS-433"
+      ],
+      "roadmap_variants": [
+        "6-12-months",
+        "2-4-years"
+      ],
+      "stages": [
+        "first-year",
+        "second-year",
+        "third-year",
+        "final-year"
+      ]
+    },
+    {
+      "slug": "backend-development",
+      "title": "Back-End Development",
+      "srs_basis": "SRS: web development (split)",
+      "summary": "Design APIs, databases, and server logic that scale and stay secure.",
+      "relevant_courses": [
+        "CS-222",
+        "CS-329",
+        "CS-327",
+        "CS-433",
+        "CS-432",
+        "CS-326",
+        "CS-218"
+      ],
+      "roadmap_variants": [
+        "6-12-months",
+        "2-4-years"
+      ],
+      "stages": [
+        "first-year",
+        "second-year",
+        "third-year",
+        "final-year"
+      ]
+    },
+    {
+      "slug": "mobile-development",
+      "title": "Mobile App Development",
+      "srs_basis": "SRS: mobile development",
+      "summary": "Build Android and iOS apps, native or cross-platform.",
+      "relevant_courses": [
+        "CS-116",
+        "CS-326",
+        "CS-325",
+        "CS-433"
+      ],
+      "roadmap_variants": [
+        "6-12-months",
+        "2-4-years"
+      ],
+      "stages": [
+        "first-year",
+        "second-year",
+        "third-year",
+        "final-year"
+      ]
+    },
+    {
+      "slug": "cybersecurity",
+      "title": "Cybersecurity",
+      "srs_basis": "SRS: cybersecurity",
+      "summary": "Find and fix weaknesses in software, networks, and systems.",
+      "relevant_courses": [
+        "CS-426",
+        "CS-327",
+        "CS-329",
+        "CS-222"
+      ],
+      "roadmap_variants": [
+        "6-12-months",
+        "2-4-years"
+      ],
+      "stages": [
+        "first-year",
+        "second-year",
+        "third-year",
+        "final-year"
+      ]
+    },
+    {
+      "slug": "devops-cloud",
+      "title": "DevOps and Cloud Engineering",
+      "srs_basis": "SRS: DevOps/cloud engineering",
+      "summary": "Automate builds, deployments, and infrastructure on the cloud.",
+      "relevant_courses": [
+        "CS-329",
+        "CS-327",
+        "CS-432",
+        "CS-325",
+        "CS-435"
+      ],
+      "roadmap_variants": [
+        "6-12-months",
+        "2-4-years"
+      ],
+      "stages": [
+        "first-year",
+        "second-year",
+        "third-year",
+        "final-year"
+      ]
+    },
+    {
+      "slug": "embedded-iot",
+      "title": "Embedded Systems and IoT",
+      "srs_basis": "SRS: embedded/IoT engineering",
+      "summary": "Program microcontrollers and connected devices close to the hardware.",
+      "relevant_courses": [
+        "CS-301",
+        "CS-221",
+        "CS-219",
+        "CS-328",
+        "CS-431",
+        "EE-120",
+        "EL-103",
+        "CS-220"
+      ],
+      "roadmap_variants": [
+        "6-12-months",
+        "2-4-years"
+      ],
+      "stages": [
+        "first-year",
+        "second-year",
+        "third-year",
+        "final-year"
+      ]
+    },
+    {
+      "slug": "game-development",
+      "title": "Game Development",
+      "srs_basis": "SRS: game development",
+      "summary": "Build games and interactive experiences with real-time graphics and physics.",
+      "relevant_courses": [
+        "CS-116",
+        "CS-218",
+        "CS-437",
+        "MT-222",
+        "CS-436"
+      ],
+      "roadmap_variants": [
+        "6-12-months",
+        "2-4-years"
+      ],
+      "stages": [
+        "first-year",
+        "second-year",
+        "third-year",
+        "final-year"
+      ]
+    },
+    {
+      "slug": "software-testing-qa",
+      "title": "Software Testing and QA",
+      "srs_basis": "SRS: software testing",
+      "summary": "Make software reliable through test design, automation, and quality processes.",
+      "relevant_courses": [
+        "CS-325",
+        "CS-326",
+        "CS-435"
+      ],
+      "roadmap_variants": [
+        "6-12-months",
+        "2-4-years"
+      ],
+      "stages": [
+        "first-year",
+        "second-year",
+        "third-year",
+        "final-year"
+      ]
+    },
+    {
+      "slug": "entrepreneurship",
+      "title": "Entrepreneurship",
+      "srs_basis": "SRS: entrepreneurship",
+      "summary": "Turn a technical idea into a product, a team, and a business.",
+      "relevant_courses": [
+        "CS-425",
+        "EF-305",
+        "MG-482",
+        "CS-435"
+      ],
+      "roadmap_variants": [
+        "6-12-months",
+        "2-4-years"
+      ],
+      "stages": [
+        "first-year",
+        "second-year",
+        "third-year",
+        "final-year"
+      ]
+    },
+    {
+      "slug": "systems-hardware-design",
+      "title": "Systems, Networks and Hardware Design",
+      "srs_basis": "Added for a Computer Systems degree (not named in the SRS)",
+      "summary": "Work on digital design, FPGAs, signal processing, networks, and low-level systems.",
+      "relevant_courses": [
+        "CS-220",
+        "CS-431",
+        "CS-419",
+        "CS-328",
+        "CS-221",
+        "CS-301",
+        "CS-215",
+        "CS-327"
+      ],
+      "roadmap_variants": [
+        "6-12-months",
+        "2-4-years"
+      ],
+      "stages": [
+        "first-year",
+        "second-year",
+        "third-year",
+        "final-year"
+      ]
+    }
+  ]
+}

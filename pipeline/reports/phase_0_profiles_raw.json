@@ -1,0 +1,1392 @@
+[
+  {
+    "filename": "FYP 2022.pdf",
+    "category": "fyp",
+    "year": 2022,
+    "page_count": 5,
+    "tables": [
+      {
+        "page": 1,
+        "columns": [
+          {
+            "raw_header": "Group ID",
+            "is_pii_risk": false,
+            "sample_values": [
+              "1"
+            ]
+          },
+          {
+            "raw_header": "Name",
+            "is_pii_risk": true,
+            "sample_values": []
+          },
+          {
+            "raw_header": "Roll No.",
+            "is_pii_risk": true,
+            "sample_values": []
+          },
+          {
+            "raw_header": "Project Title",
+            "is_pii_risk": false,
+            "sample_values": [
+              "IoT Based Air Pollution Monitoring & Alert\nSystem"
+            ]
+          },
+          {
+            "raw_header": "Internal Advisor(s)",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Dr. Syed Zaffar Qasim"
+            ]
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": []
+          }
+        ],
+        "row_count_approx": 24,
+        "pii_flags": [
+          "PII columns detected (will be dropped): ['Name', 'Roll No.']"
+        ]
+      },
+      {
+        "page": 2,
+        "columns": [
+          {
+            "raw_header": "7",
+            "is_pii_risk": false,
+            "sample_values": []
+          },
+          {
+            "raw_header": "Syed Maaz Hassan",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Musab Bin Javed",
+              "Faiza",
+              "Javeria Arif"
+            ]
+          },
+          {
+            "raw_header": "CS-18054",
+            "is_pii_risk": false,
+            "sample_values": [
+              "[ROLL_REDACTED]",
+              "[ROLL_REDACTED]",
+              "[ROLL_REDACTED]"
+            ]
+          },
+          {
+            "raw_header": "Point Pay (Track & Pay on the go!)",
+            "is_pii_risk": false,
+            "sample_values": []
+          },
+          {
+            "raw_header": "Dr. Asad Arfeen",
+            "is_pii_risk": false,
+            "sample_values": []
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": []
+          }
+        ],
+        "row_count_approx": 31,
+        "pii_flags": []
+      },
+      {
+        "page": 3,
+        "columns": [
+          {
+            "raw_header": "15",
+            "is_pii_risk": false,
+            "sample_values": []
+          },
+          {
+            "raw_header": "Syed Saad Hasan Emaad",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Muhammad Fahad Alam",
+              "Syed Umair Hasan",
+              "Muhammad Hamiz Habib"
+            ]
+          },
+          {
+            "raw_header": "CS-18039",
+            "is_pii_risk": false,
+            "sample_values": [
+              "[ROLL_REDACTED]",
+              "[ROLL_REDACTED]",
+              "[ROLL_REDACTED]"
+            ]
+          },
+          {
+            "raw_header": "Visualri - Image and Video Fores Toolkit",
+            "is_pii_risk": false,
+            "sample_values": []
+          },
+          {
+            "raw_header": "Dr. Syed Abbas Ali",
+            "is_pii_risk": false,
+            "sample_values": []
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": []
+          }
+        ],
+        "row_count_approx": 27,
+        "pii_flags": []
+      },
+      {
+        "page": 4,
+        "columns": [
+          {
+            "raw_header": "22",
+            "is_pii_risk": false,
+            "sample_values": []
+          },
+          {
+            "raw_header": "Abdullah Abrar",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Dua Zehra",
+              "Areeba Ayub",
+              "Shehrose Arshad"
+            ]
+          },
+          {
+            "raw_header": "CS-18063",
+            "is_pii_risk": false,
+            "sample_values": [
+              "[ROLL_REDACTED]",
+              "[ROLL_REDACTED]",
+              "[ROLL_REDACTED]"
+            ]
+          },
+          {
+            "raw_header": "Dynamic Chatbot",
+            "is_pii_risk": false,
+            "sample_values": []
+          },
+          {
+            "raw_header": "Dr. Maria Waqas",
+            "is_pii_risk": false,
+            "sample_values": []
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": []
+          }
+        ],
+        "row_count_approx": 31,
+        "pii_flags": []
+      },
+      {
+        "page": 5,
+        "columns": [
+          {
+            "raw_header": "30",
+            "is_pii_risk": false,
+            "sample_values": []
+          },
+          {
+            "raw_header": "Insiyah Talib Hussain",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Arouba Mushtaq",
+              "Raheen Ahmed",
+              "Saima Ali"
+            ]
+          },
+          {
+            "raw_header": "CS-18044",
+            "is_pii_risk": false,
+            "sample_values": [
+              "[ROLL_REDACTED]",
+              "[ROLL_REDACTED]",
+              "[ROLL_REDACTED]"
+            ]
+          },
+          {
+            "raw_header": "\"Air Writing with finger Detection\"",
+            "is_pii_risk": false,
+            "sample_values": []
+          },
+          {
+            "raw_header": "Mr. Umar Iftikhar",
+            "is_pii_risk": false,
+            "sample_values": []
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": []
+          }
+        ],
+        "row_count_approx": 28,
+        "pii_flags": []
+      }
+    ],
+    "full_text_pii_flags": [
+      "Roll-number pattern detected (140 matches, e.g. CS-18071) — must be discarded at extraction time."
+    ],
+    "notes": []
+  },
+  {
+    "filename": "SOP FYDP list-2022.pdf",
+    "category": "fyp",
+    "year": 2022,
+    "page_count": 5,
+    "tables": [
+      {
+        "page": 1,
+        "columns": [
+          {
+            "raw_header": "S.No.",
+            "is_pii_risk": false,
+            "sample_values": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "raw_header": "Project Title",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Design and implement an expert system to\nanalyze plant health",
+              "Active speaker detection",
+              "Automated interview analysis of interview\ncandidates"
+            ]
+          },
+          {
+            "raw_header": "Student Name",
+            "is_pii_risk": true,
+            "sample_values": []
+          },
+          {
+            "raw_header": "Supervisor/Co-Supervisor",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Dr. Aqeel Haider",
+              "Dr. Urooj Ainuddin",
+              "Dr. Urooj Ainuddin"
+            ]
+          },
+          {
+            "raw_header": "Industry",
+            "is_pii_risk": false,
+            "sample_values": []
+          }
+        ],
+        "row_count_approx": 8,
+        "pii_flags": [
+          "PII columns detected (will be dropped): ['Student Name']"
+        ]
+      },
+      {
+        "page": 2,
+        "columns": [
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "9",
+              "10",
+              "11"
+            ]
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Resolution enhancement of Low Quality\nImages",
+              "Smart SQL query generator",
+              "Artificial intelligence based depression\ndetection system"
+            ]
+          },
+          {
+            "raw_header": "3. Ghazia Hashmi\n4. Sawera Ansari",
+            "is_pii_risk": false,
+            "sample_values": [
+              "1. Hasnain Ali Arain\n2. Sadaf Jawed Farooqui\n3. Bisma Ibrahim\n4. Ibrahim Rehman",
+              "1. Izma Aziz\n2. Ayesha Aamir\n3. Eesha Ansari\n4. Heba Naveed",
+              "1. Abdullah Ahmed Khan\n2. Muhammad Taimoor Jawaid\n3. Syed Jahanzaib Ali Zaidi\n4."
+            ]
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Dr. Maria Waqas",
+              "Dr. Shahab Tahzeeb",
+              "Dr. Shahab Tahzeeb"
+            ]
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": []
+          }
+        ],
+        "row_count_approx": 8,
+        "pii_flags": []
+      },
+      {
+        "page": 3,
+        "columns": [
+          {
+            "raw_header": "17",
+            "is_pii_risk": false,
+            "sample_values": [
+              "18",
+              "19",
+              "20"
+            ]
+          },
+          {
+            "raw_header": "Optimal robotic arm gripper",
+            "is_pii_risk": false,
+            "sample_values": [
+              "DeepFai (Intelligence for audio deepfake)",
+              "Design of structural health monitoring system\non FPGA",
+              "Deep learning based automated quality\nassurance for detecting surface defects"
+            ]
+          },
+          {
+            "raw_header": "1. Owais Ahmed\n2. Hamza Ali Khan\n3. Muhammad Huzaifa\n4. Muhammad Areeb",
+            "is_pii_risk": false,
+            "sample_values": [
+              "1. Syed Saad Ali\n2. Muhammad Arham Khan\n3. Mina Baig\n4. Rida Saleem",
+              "1. Muhammad Umar\n2. Mir Shahnawaz Abbasi\n3. Aiman\n4. Shakeel Ahmad",
+              "1. Kaenaat Samad\n2. Iqra Imran\n3. Neha Fatima\n4. Rana Junaid"
+            ]
+          },
+          {
+            "raw_header": "Ms. Anita Ali",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Ms. Anita Ali",
+              "Ms. Fakhra Aftab/ Dr. Majida\nKazmi",
+              "Ms. Fakhra Aftab/ Dr. Majida\nKazmi"
+            ]
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Mohammad Saqlain, team\nlead at P&G"
+            ]
+          }
+        ],
+        "row_count_approx": 7,
+        "pii_flags": []
+      },
+      {
+        "page": 4,
+        "columns": [
+          {
+            "raw_header": "25",
+            "is_pii_risk": false,
+            "sample_values": [
+              "26",
+              "27",
+              "28"
+            ]
+          },
+          {
+            "raw_header": "Real time IT skills recommender and\npredictor",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Smart performance appraisal analyzer",
+              "Smart recommender for process optimization\nin pharmaceutical industry",
+              "Polarity detection of bi-lingual data from\nonline source"
+            ]
+          },
+          {
+            "raw_header": "1. Sana Parveen\n2. Sidra Fatima\n3. Wasia Mukhtar Khan\n4. Maryam Bashir",
+            "is_pii_risk": false,
+            "sample_values": [
+              "1. Khadija\n2. Ayesha Farooq\n3. Uzma Aijaz\n4. Faryal Rana",
+              "1. Rahaab Nadeem\n2. Rida Ul Fatima\n3. Amna Aslam\n4. Anas Ahmed Khan",
+              "1. Zobia Khan\n2. Muqadas Ashraf\n3. Wajiha Khan\n4. Hafiza Javeria Adil"
+            ]
+          },
+          {
+            "raw_header": "Mr. Kashif Asrar",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Mr. Umar Iftikhar/ Mr. Kashif\nAsrar",
+              "Mr. Umar Iftikhar/ Mr. Kashif\nAsrar",
+              "Mr. Kashif Asrar"
+            ]
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Mr. Ehtisham Ul Haq, director\nat VisBizGlobal",
+              "Mr. Ehtisham Ul Haq, director\nat VisBizGlobal"
+            ]
+          }
+        ],
+        "row_count_approx": 7,
+        "pii_flags": []
+      },
+      {
+        "page": 5,
+        "columns": [
+          {
+            "raw_header": "33",
+            "is_pii_risk": false,
+            "sample_values": [
+              "34",
+              "35",
+              "36"
+            ]
+          },
+          {
+            "raw_header": "Phoenix data security platform (discover,\nprotect, and control static and transit data\nusing vulnerability assessment, data\nencryption, and tokenization)",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Security orchestration and automation\nresponse (SOAR)",
+              "Fractional ownership of real estate using\nasset tokenization in blockchain",
+              "Attack eye-External cyber attack surface\nmonitoring solution"
+            ]
+          },
+          {
+            "raw_header": "1. Arham Ahmed Siddiqui\n2. Syed Khurram Abbas Rizvi\n3. Shafay Azeem\n4. Ahmer Waqar",
+            "is_pii_risk": false,
+            "sample_values": [
+              "1. Dawood Arshad\n2. Javeria Jameel\n3. Neha Akhter\n4. Maheen Khan",
+              "1. Hamza Junaid\n2. Mohsin Iqbal\n3. Mehdi Zafar\n4. Muhammad Shayan",
+              "1. Muhammad Hamza\n2. Muhtashim Malick\n3. Muhammad Ebadullah\n4. Muhammad Shayan"
+            ]
+          },
+          {
+            "raw_header": "Ms. Ibshar Ishrat/ Dr. Asad Arfeen",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Dr. Asad Arfeen",
+              "Ms. Ibshar Ishrat/ Dr. Asad Arfeen",
+              "Dr. Asad Arfeen"
+            ]
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": []
+          }
+        ],
+        "row_count_approx": 6,
+        "pii_flags": []
+      }
+    ],
+    "full_text_pii_flags": [],
+    "notes": []
+  },
+  {
+    "filename": "SOP FYDP list-2023.pdf",
+    "category": "fyp",
+    "year": 2023,
+    "page_count": 6,
+    "tables": [
+      {
+        "page": 1,
+        "columns": [
+          {
+            "raw_header": "S.No.",
+            "is_pii_risk": false,
+            "sample_values": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "raw_header": "Project Title",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Deepwriter: Enhancing integrity in industrial\nhandwritten document recognition",
+              "Deep learning-based voice cloning for local\nlanguages with a focus on Urdu",
+              "Seamless recognition: FPGA powered Urdu\ncard reader"
+            ]
+          },
+          {
+            "raw_header": "Student Name",
+            "is_pii_risk": true,
+            "sample_values": []
+          },
+          {
+            "raw_header": "Supervisor/Co-Supervisor",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Ms. Fauzia Yasir/ Dr. Majida Kazmi",
+              "Ms. Fauzia Yasir/ Dr. Majida Kazmi",
+              "Ms. Fauzia Yasir/ Dr. Majida Kazmi"
+            ]
+          },
+          {
+            "raw_header": "Industry",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Lucky Motors",
+              "Anjuman Taraqqi-e-Urdu\nPakistan",
+              "-"
+            ]
+          }
+        ],
+        "row_count_approx": 8,
+        "pii_flags": [
+          "PII columns detected (will be dropped): ['Student Name']"
+        ]
+      },
+      {
+        "page": 2,
+        "columns": [
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "9",
+              "10",
+              "11"
+            ]
+          },
+          {
+            "raw_header": "using deep learning framework",
+            "is_pii_risk": false,
+            "sample_values": [
+              "PersonifyU: A deep dive into personalities",
+              "LogiSync-Streamlining last mile logistic1s.\nthrough map matching based tracking ",
+              "Therapy AI- An AI powered tool for\nempathetic support and self-care plans"
+            ]
+          },
+          {
+            "raw_header": "3. Hassan farooqui",
+            "is_pii_risk": false,
+            "sample_values": [
+              "1. Muhammad Anas Ansari\n2. Bilal\n3. Haris Ahmed\n4. Waleed Ahmed",
+              "1. Abdul Raffay\n2. Syed Ali Salar\n3. Askari Abbas\n4. Syed Ibrahim Noman",
+              "1. Waseela\n2. Syeda Laiba Azam\n3. Abdur Rehman\n4. Syed Osama shad"
+            ]
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Dr. Shahab Tahzeeb",
+              "Dr. Shahab Tahzeeb",
+              "Dr. Shahab Tahzeeb"
+            ]
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "ICAN",
+              "Bazaar Technologies",
+              "ICAN"
+            ]
+          }
+        ],
+        "row_count_approx": 8,
+        "pii_flags": []
+      },
+      {
+        "page": 3,
+        "columns": [
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "17",
+              "18",
+              "19"
+            ]
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Image captioning for visually impaired people",
+              "Interview EQ analyzer",
+              "AutoTag media manager"
+            ]
+          },
+          {
+            "raw_header": "4. Mohsin Ali",
+            "is_pii_risk": false,
+            "sample_values": [
+              "1. Muhammad Huzaifa Inshal\n2. Muhammad Zain ul Abedin\n3. Muhammad Huzaifa\n4. Sye",
+              "1. Muhammad Usman Yousuf\n2. Syed Yasoob Raza Naqvi\n3. Muhammad Jahanzaib Khan\n4.",
+              "1. Mufeeza Khan\n2. Faiqa Haider\n3. Rimsha Nadeem\n4. Aqsa Aslam"
+            ]
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Dr. Syed Zaffar Qasim",
+              "Dr. Syed Zaffar Qasim",
+              "Mr. Kashif Asrar"
+            ]
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "-",
+              "-",
+              "-"
+            ]
+          }
+        ],
+        "row_count_approx": 8,
+        "pii_flags": []
+      },
+      {
+        "page": 4,
+        "columns": [
+          {
+            "raw_header": "25",
+            "is_pii_risk": false,
+            "sample_values": [
+              "26",
+              "27",
+              "28"
+            ]
+          },
+          {
+            "raw_header": "Rice grain variety classification through deep\nlearning",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Neuroball: Embedded system-based cricket\nball tracking",
+              "Custom SIEM log parser generator to\nenhance the security of open source and\nente",
+              "Personal protective equipment (PPE)\nmonitoring and violation alert system for\nfa"
+            ]
+          },
+          {
+            "raw_header": "1. Romaisa Manzoor\n2. Fareha Ahmed\n3. Kaneez Sukaina\n4. Bisma Aleem",
+            "is_pii_risk": false,
+            "sample_values": [
+              "1. Farrukh Ahmed Siddiqui\n2. Syed Muhammad Hamza\nNaveed\n3. Aleena Fatima\n4. Ifra",
+              "1. Ifra Bint-e-Khalid\n2. Werdah Hashmi\n3. Muhammad Hamza Hussain\n4. Syed Muhamma",
+              "1. Muhammad Maaz Zahid\n2. Hassan Hussain Merchant\n3. Muhammad Khubaib\n4. Taha Am"
+            ]
+          },
+          {
+            "raw_header": "Ms. Fakhra Aftab/ Dr. Majida Kazmi",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Ms. Fakhra Aftab/ Dr. Majida Kazmi",
+              "Dr. Asad Arfeen",
+              "Ms. Mehwish Raza/ Dr. Majida\nKazmi"
+            ]
+          },
+          {
+            "raw_header": "Matco Foods Limited",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Rashid Latif Academy",
+              "-",
+              "Agriauto Industries Limited"
+            ]
+          }
+        ],
+        "row_count_approx": 7,
+        "pii_flags": []
+      },
+      {
+        "page": 5,
+        "columns": [
+          {
+            "raw_header": "33",
+            "is_pii_risk": false,
+            "sample_values": [
+              "34",
+              "35",
+              "36"
+            ]
+          },
+          {
+            "raw_header": "Dialogify: Intelligent chat interface for\nsimplified cloud orchestration and\nmonitoring",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Salesforce files connect: Sync data from\nsalesforce to cloud storage",
+              "ServiceSwift:\nUniversal Plug-n-Play OEM support and\npersonalized assistance chat",
+              "SmartServe360 - A comprehensive\naccelerator for F&B industry"
+            ]
+          },
+          {
+            "raw_header": "1. M. Hayyan Khan\n2. Umair Ali\n3. Hasnain Ahmed\n4. Sibtain Ahmed",
+            "is_pii_risk": false,
+            "sample_values": [
+              "1. Bilal Arif\n2. Muhammad Ali\n3. Hubban Khan\n4. Muhammad Huzaifa",
+              "1. Rimsha Ishtiaq\n2. Syeda Zobia Irshad\n3. Habiba Asif\n4. Vandana",
+              "1. Yumna Khan\n2. Hamza Ahad Akhtar\n3. Hammad Khan\n4. Muhammad Mudasir Alam"
+            ]
+          },
+          {
+            "raw_header": "Dr. Hameeza Ahmed",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Dr. Hameeza Ahmed",
+              "Dr. Asad Arfeen",
+              "Dr. Asad Arfeen"
+            ]
+          },
+          {
+            "raw_header": "Aus Pro Experts",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Cloud Junction Advisors Inc.",
+              "Empiric Technology",
+              "Empiric Technology"
+            ]
+          }
+        ],
+        "row_count_approx": 6,
+        "pii_flags": []
+      }
+    ],
+    "full_text_pii_flags": [],
+    "notes": []
+  },
+  {
+    "filename": "SOP FYDP list-2024.pdf",
+    "category": "fyp",
+    "year": 2024,
+    "page_count": 5,
+    "tables": [
+      {
+        "page": 1,
+        "columns": [
+          {
+            "raw_header": "S.No.",
+            "is_pii_risk": false,
+            "sample_values": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "raw_header": "Project Title",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Link2Insight: AI-Driven Optimization Tool for Website\nAnalysis and Strategic Enh",
+              "Egocentric Event Coverage: Automatic Highlighting\nand Summarization of Everyday ",
+              "Insightful Horizons: AI-Powered Predictive Analytics\nand Visualization for Busin"
+            ]
+          },
+          {
+            "raw_header": "Student Name",
+            "is_pii_risk": true,
+            "sample_values": []
+          },
+          {
+            "raw_header": "Supervisor/Co-Supervisor",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Dr. Maria Waqas",
+              "Dr. Maria Waqas",
+              "Dr. Maria Waqas"
+            ]
+          },
+          {
+            "raw_header": "Industry",
+            "is_pii_risk": false,
+            "sample_values": [
+              "-",
+              "-",
+              "Data and Dashboards\nLtd"
+            ]
+          }
+        ],
+        "row_count_approx": 8,
+        "pii_flags": [
+          "PII columns detected (will be dropped): ['Student Name']"
+        ]
+      },
+      {
+        "page": 2,
+        "columns": [
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "9",
+              "10",
+              "11"
+            ]
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "RetinoVision– Generalizable Diabetic Retinopathy\nDetection through Anatomical an",
+              "Design and Analysis of AXI-MM Integrated Set\nAssociative Cache in Modern SoC Arc",
+              "Privacy-Centric AI for Diabetic Retinopathy Screening\nusing Federated Learning"
+            ]
+          },
+          {
+            "raw_header": "3. Muhammad Usaid Siddiqui\n4. Muhammad Azher",
+            "is_pii_risk": false,
+            "sample_values": [
+              "1. Sameen Baig\n2. Shumaila Zafar\n3. Fatima Ejaz\n4. Zoha Fatima",
+              "1. Abdhullah\n2. Ahamed Safnas\n3. Farwes Musharraf\n4. Ahamed Najman",
+              "1. Syeda Rumaisa Saeed\n2. Tahira Aurangzeb"
+            ]
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Dr. Majida Kazmi",
+              "Dr. Majida Kazmi",
+              "Dr. Majida Kazmi"
+            ]
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "A-Eye Diagnostics",
+              "DreamBig\nSemiconductor Inc.",
+              "A-Eye Diagnostics"
+            ]
+          }
+        ],
+        "row_count_approx": 8,
+        "pii_flags": []
+      },
+      {
+        "page": 3,
+        "columns": [
+          {
+            "raw_header": "17",
+            "is_pii_risk": false,
+            "sample_values": [
+              "18",
+              "19",
+              "20"
+            ]
+          },
+          {
+            "raw_header": "Development of Low-Power Vision Sensor Node for\nVehicle Detection using FPGA",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Next-Gen Philanthropy: Blockchain-Enhanced\nTracking and Reporting for Charitable",
+              "Precision Plant Care: A System for Identifying and\nTreating Plant Diseases",
+              "Smart Asset Tracking and Predictive Maintenance\nSystem for Flight Catering"
+            ]
+          },
+          {
+            "raw_header": "1. Rooman\n2. Syed Maarij\n3. Usama Khalid\n4. Faizan Khan",
+            "is_pii_risk": false,
+            "sample_values": [
+              "1. Maha Zubair\n2. Yusra Shahnawaz\n3. Hadia Mehmood\n4. Hafiza Warisha Aftab",
+              "1. Muhammad Faizan Soomro\n2. Muhammad Subhan Sohair\n3. Shehryar Nasir\n4. Muhamma",
+              "1. Huzaifa Naseer Khan\n2. Sheikh Muhammad Farrukh Niaz\n3. Syed Wahaj Raza Zaidi\n"
+            ]
+          },
+          {
+            "raw_header": "Ms. Mehwish Raza, Dr. Majida\nKazmi",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Dr. Syed Zaffar Qasim",
+              "Dr. Syed Zaffar Qasim",
+              "Dr. Shahab Tahzeeb"
+            ]
+          },
+          {
+            "raw_header": "DreamBig\nsemiconductor",
+            "is_pii_risk": false,
+            "sample_values": [
+              "-",
+              "-",
+              "Ephlux"
+            ]
+          }
+        ],
+        "row_count_approx": 7,
+        "pii_flags": []
+      },
+      {
+        "page": 4,
+        "columns": [
+          {
+            "raw_header": "25",
+            "is_pii_risk": false,
+            "sample_values": [
+              "26",
+              "27",
+              "28"
+            ]
+          },
+          {
+            "raw_header": "Main Campus QuickServe: Streamlined Ordering,\nPersonalized Recommendations, and Departmental\nDelivery for Main University Cafeteria",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Automated Anti-Theft Parking with Vision-Based\nLicense Plate Verification",
+              "FashionFusion: AI-Driven Apparel Design Generator\nfor Personalized Styles and In",
+              "SmartDoc Assistant: AI Chatbot for Optimized\nDocument Assistance and Website Sup"
+            ]
+          },
+          {
+            "raw_header": "1. Fatima Siddiqui\n2. Aqsa Asif\n3. Barira Babar\n4. Syeda Maria",
+            "is_pii_risk": false,
+            "sample_values": [
+              "1. Mirza Taha Hassan\n2. Shayan Zahid\n3. Ibrahim\n4. Muhammad Abdurrahman",
+              "1. Syed Muhammad Baqar Hussain\nRizvi\n2. Meerab Shabeeh\n3. Aania Tasleem Imam\n4. ",
+              "1. Muhammad Asim\n2. Rasib Hassan\n3. Maaz Mansoor\n4. Mazhar Ahmad Khan"
+            ]
+          },
+          {
+            "raw_header": "Mr. Kashif Asrar, Dr. Ali Hasan\nMahmood",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Mr. Kashif Asrar",
+              "Mr. Kashif Asrar",
+              "Ms. Sumayya Zafar"
+            ]
+          },
+          {
+            "raw_header": "-",
+            "is_pii_risk": false,
+            "sample_values": [
+              "-",
+              "-",
+              "-"
+            ]
+          }
+        ],
+        "row_count_approx": 7,
+        "pii_flags": []
+      },
+      {
+        "page": 5,
+        "columns": [
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "33",
+              "34",
+              "35"
+            ]
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Machine Vision Pipeline for Steel Surface Defects\nDetection using FPGA SoC",
+              "Automated Surveillance and Security System using\nMotion Transfer Technology for ",
+              "Procedural Modelling using Large Language Models\nfor Intelligent 3D Model Synthe"
+            ]
+          },
+          {
+            "raw_header": "4. Muhammad Asad Shahab",
+            "is_pii_risk": false,
+            "sample_values": [
+              "1. Aaliyan Mansoor\n2. Muhammad Maaz Khan\n3. Mohib Ud Din\n4. Muhammad Babar Ali",
+              "1. Khola Binte Sultan\n2. Khansa Asif\n3. Hafsa Najam\n4. Muhammad Bilal Zubairi",
+              "1. Usman\n2. Vinodh Kumar Nihallani\n3. Zubair Akhtar"
+            ]
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Ms. Fakhra Aftab, Dr. Majida\nKazmi",
+              "Mr. Ali Akhtar",
+              "Mr. Ali Akhtar"
+            ]
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "DreamBig\nSemiconductor &\nAgriauto",
+              "-",
+              "-"
+            ]
+          }
+        ],
+        "row_count_approx": 7,
+        "pii_flags": []
+      }
+    ],
+    "full_text_pii_flags": [],
+    "notes": []
+  },
+  {
+    "filename": "SOP FYDP list-2025.pdf",
+    "category": "fyp",
+    "year": 2025,
+    "page_count": 6,
+    "tables": [
+      {
+        "page": 1,
+        "columns": [
+          {
+            "raw_header": "S.No.",
+            "is_pii_risk": false,
+            "sample_values": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          {
+            "raw_header": "Project Title",
+            "is_pii_risk": false,
+            "sample_values": [
+              "INSPIRE - Innovation Support Platform for Ideas,\nResearch, & Evaluation",
+              "Human Capital Management System",
+              "Smart Stock Manager: AI-Powered Smart Retail\nEcosystem with Stock Analysis, Faul"
+            ]
+          },
+          {
+            "raw_header": "Student Name",
+            "is_pii_risk": true,
+            "sample_values": []
+          },
+          {
+            "raw_header": "Supervisor/Co-Supervisor",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Dr. Kashif Asrar",
+              "Dr. Kashif Asrar",
+              "Dr. Kashif Asrar"
+            ]
+          },
+          {
+            "raw_header": "Industry",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Elahi Group of\nCompanies"
+            ]
+          }
+        ],
+        "row_count_approx": 8,
+        "pii_flags": [
+          "PII columns detected (will be dropped): ['Student Name']"
+        ]
+      },
+      {
+        "page": 2,
+        "columns": [
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "9",
+              "10",
+              "11"
+            ]
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "RoboComm: A Smart Interactive Campus Assistant",
+              "Virtual Chemistry Tutor",
+              "SEE BEYOND - Guided by sound empowered by\ntouch"
+            ]
+          },
+          {
+            "raw_header": "3. Fiza Farzand",
+            "is_pii_risk": false,
+            "sample_values": [
+              "1. Shayan Hussain\n2. S.M. Hashaam Hasan\n3. Ali Hyder\n4. Abdul Moiz",
+              "1. Fatima Hafsa\n2. Mohammad Ashfi Uzama\n3. Fathima Amna",
+              "1. Sheikh Malaika Mustafa\n2. Sumaika Imran\n3. Qurratul Ain\n4. Urooj Fatima"
+            ]
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Dr. Urooj Ain Uddin",
+              "Dr. Urooj Ain Uddin",
+              "Dr. Urooj Ain Uddin"
+            ]
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": []
+          }
+        ],
+        "row_count_approx": 8,
+        "pii_flags": []
+      },
+      {
+        "page": 3,
+        "columns": [
+          {
+            "raw_header": "17",
+            "is_pii_risk": false,
+            "sample_values": [
+              "18",
+              "19",
+              "20"
+            ]
+          },
+          {
+            "raw_header": "Predicting Hemodynamic Instability in ICU Patients\nUsing Time-Series Clinical Data",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Vocaris - Your Intelligent Meeting Partner for\nSeamless Conversation and Smart C",
+              "AI Powered Logs Anomaly Detection System for\nNetwork Infrastructure",
+              "FINSURE- Financial Insight & Secure Reporting\nPlatform"
+            ]
+          },
+          {
+            "raw_header": "1. Muhammad Owais Alam\n2. Hussain Raza\n3. Mudasir Shaikh",
+            "is_pii_risk": false,
+            "sample_values": [
+              "1. Hafsa Ahmed\n2. Fatima Mansoor\n3. Zobia Nasim\n4. Muhammad Awab Shuja",
+              "1. Syeda Zainab Fatima\n2. Syeda Samana Zehra Naqvi\n3. Anum Azam",
+              "1. Hamza Nasir\n2. Abdus Samad\n3. Talha Bin Sajid\n4. Bilal Ahmed Sheikh"
+            ]
+          },
+          {
+            "raw_header": "Dr. Syed Zaffar Qasim",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Dr. Shahab Tahzeeb",
+              "D r . Shahab Tahzeeb",
+              "Dr. Shahab Tahzeeb"
+            ]
+          },
+          {
+            "raw_header": "SIUT",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Ephlux"
+            ]
+          }
+        ],
+        "row_count_approx": 8,
+        "pii_flags": []
+      },
+      {
+        "page": 4,
+        "columns": [
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "26",
+              "27",
+              "28"
+            ]
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "KHIVISION: Smart AI-Powered Accident Detection\nand Emergency Response System",
+              "AI Powered Crypto Automation and Analysis",
+              "Early Diagnosis of Diabetic Retinopathy on Edge"
+            ]
+          },
+          {
+            "raw_header": "3. Hamza Hussain\n4. Wania Khan",
+            "is_pii_risk": false,
+            "sample_values": [
+              "1. Irza Salahuddin\n2. Summiaya Fatimah\n3. M. Hadi Raza\n4. Roshik Adil",
+              "1. Huzaifa Daniyal\n2. Konoz Bin Rashid\n3. Syed Tehsheem Abdul Wasay\n4. Hamza Nav",
+              "1. Muhammad Ubaid\n2. Syeda Hibra Tariq\n3. Alishba Gul Ahmed\n4. Muhammad Ahmed Kh"
+            ]
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Dr. Asad Arfeen",
+              "Ms. Fauzia Yasir",
+              "Dr. Majida Kazmi"
+            ]
+          },
+          {
+            "raw_header": "",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Urban Department\nNEDUET",
+              "Beenco Labs",
+              "A-Eye Diagnostics Ltd"
+            ]
+          }
+        ],
+        "row_count_approx": 7,
+        "pii_flags": []
+      },
+      {
+        "page": 5,
+        "columns": [
+          {
+            "raw_header": "33",
+            "is_pii_risk": false,
+            "sample_values": [
+              "34",
+              "35",
+              "36"
+            ]
+          },
+          {
+            "raw_header": "iura: Design & Implementation of a bilingual Agentic\nAI Legal Assistant for Pakistani Law",
+            "is_pii_risk": false,
+            "sample_values": [
+              "AI-Driven Wearable Assistive Device for Navigation\nand Fall Detection: Combining",
+              "REVIVE-Rehabilitation and Evaluation via IoT for\nVital Exercises",
+              "W.H.I.S.P.E.R Waveform Heart Intelligence Signal\nProcessing & Early Recognition "
+            ]
+          },
+          {
+            "raw_header": "1. Abdullah Athar\n2. Ahzam Rehan\n3. Muneeb Ahmed\n4. Sardar Abdul Moiz Khan",
+            "is_pii_risk": false,
+            "sample_values": [
+              "1. Zainab Raza\n2. Doa Ahmed\n3. Hiba Mahboob\n4. Affaf Arif",
+              "1. Usman Faizyab\n2. Muhammad Owais\n3. Zuhaib Noor\n4. Muhammad Zunain",
+              "1. Sanya Sajid\n2. Fatima Kashif\n3. Farzam Nasir\n4. Hamza Ali"
+            ]
+          },
+          {
+            "raw_header": "Mr. Muhammad Ali Akhtar",
+            "is_pii_risk": false,
+            "sample_values": [
+              "Mr. Muhammad Ali Akhtar",
+              "Mr. Muhammad Ali Akhtar",
+              "Mr. Muhammad Ali Akhtar"
+            ]
+          },
+          {
+            "raw_header": "High Court",
+            "is_pii_risk": false,
+            "sample_values": []
+          }
+        ],
+        "row_count_approx": 6,
+        "pii_flags": []
+      }
+    ],
+    "full_text_pii_flags": [],
+    "notes": []
+  },
+  {
+    "filename": "ai-engineer.pdf",
+    "category": "roadmap",
+    "year": null,
+    "page_count": 1,
+    "tables": [],
+    "full_text_pii_flags": [],
+    "notes": [
+      "Extracted ~146 text lines; ~146 candidate topic-node labels",
+      "No PII signals detected."
+    ]
+  },
+  {
+    "filename": "backend.pdf",
+    "category": "roadmap",
+    "year": null,
+    "page_count": 1,
+    "tables": [],
+    "full_text_pii_flags": [],
+    "notes": [
+      "Extracted ~158 text lines; ~158 candidate topic-node labels",
+      "No PII signals detected."
+    ]
+  },
+  {
+    "filename": "computer-science.pdf",
+    "category": "roadmap",
+    "year": null,
+    "page_count": 1,
+    "tables": [],
+    "full_text_pii_flags": [],
+    "notes": [
+      "Extracted ~187 text lines; ~185 candidate topic-node labels",
+      "No PII signals detected."
+    ]
+  },
+  {
+    "filename": "cyber-security.pdf",
+    "category": "roadmap",
+    "year": null,
+    "page_count": 1,
+    "tables": [],
+    "full_text_pii_flags": [],
+    "notes": [
+      "Extracted ~242 text lines; ~241 candidate topic-node labels",
+      "No PII signals detected."
+    ]
+  },
+  {
+    "filename": "data-engineer.pdf",
+    "category": "roadmap",
+    "year": null,
+    "page_count": 1,
+    "tables": [],
+    "full_text_pii_flags": [],
+    "notes": [
+      "Extracted ~207 text lines; ~203 candidate topic-node labels",
+      "No PII signals detected."
+    ]
+  },
+  {
+    "filename": "devops.pdf",
+    "category": "roadmap",
+    "year": null,
+    "page_count": 1,
+    "tables": [],
+    "full_text_pii_flags": [],
+    "notes": [
+      "Extracted ~136 text lines; ~136 candidate topic-node labels",
+      "No PII signals detected."
+    ]
+  },
+  {
+    "filename": "frontend.pdf",
+    "category": "roadmap",
+    "year": null,
+    "page_count": 1,
+    "tables": [],
+    "full_text_pii_flags": [],
+    "notes": [
+      "Extracted ~124 text lines; ~124 candidate topic-node labels",
+      "No PII signals detected."
+    ]
+  },
+  {
+    "filename": "qa.pdf",
+    "category": "roadmap",
+    "year": null,
+    "page_count": 1,
+    "tables": [],
+    "full_text_pii_flags": [],
+    "notes": [
+      "Extracted ~129 text lines; ~129 candidate topic-node labels",
+      "No PII signals detected."
+    ]
+  },
+  {
+    "filename": "system-design.pdf",
+    "category": "roadmap",
+    "year": null,
+    "page_count": 1,
+    "tables": [],
+    "full_text_pii_flags": [],
+    "notes": [
+      "Extracted ~166 text lines; ~163 candidate topic-node labels",
+      "No PII signals detected."
+    ]
+  }
+]

@@ -1,0 +1,1168 @@
+{
+  "schema_version": 1,
+  "program": {
+    "university": "NED University of Engineering & Technology, Karachi",
+    "department": "Computer & Information Systems Engineering",
+    "degree": "Bachelor of Engineering in Computer Systems Engineering",
+    "source": "Course Dependency Chart (image)"
+  },
+  "how_to_read": {
+    "layout": "4 year columns (First to Fourth) by 2 term bands (Fall on top, Spring below). Semester = (year-1)*2 + (1 for Fall, 2 for Spring).",
+    "arrow_meaning": "An arrow points from a prerequisite course to the course that depends on it.",
+    "slash_boxes": "A box with two courses separated by a slash is an either-or slot (variants, rule one_of).",
+    "elective_boxes": "Elective 1, 2 and 3 are group boxes; arrows into a group box are assumed to apply to all members until verified.",
+    "no_arrow": "A box with no arrow touching it shows no prerequisite in the chart; do not assume the Scheme of Studies agrees.",
+    "credits": "Not shown in the image; take from the Scheme of Studies."
+  },
+  "image_issues": [
+    "The bottom of the image is cropped: the last rows of First Year Spring (HS-205 / HS-209) and Second Year Spring (HS-200) are cut off, and rows may be missing below them.",
+    "Many arrows are long, cross each other, or pass behind boxes; at this resolution not every arrow can be traced to a source."
+  ],
+  "nodes": [
+    {
+      "id": "CS-114",
+      "code": "CS-114",
+      "title": "Fundamentals of Computer Engineering",
+      "type": "course",
+      "year": 1,
+      "term": "fall",
+      "semester": 1,
+      "category": "core_computing",
+      "slot": {
+        "col": 0,
+        "band": "fall",
+        "row": 0
+      },
+      "credits": 4,
+      "theory_credits": 3,
+      "practical_credits": 1
+    },
+    {
+      "id": "CS-115",
+      "code": "CS-115",
+      "title": "Computer Programming",
+      "type": "course",
+      "year": 1,
+      "term": "fall",
+      "semester": 1,
+      "category": "core_computing",
+      "slot": {
+        "col": 0,
+        "band": "fall",
+        "row": 1
+      },
+      "credits": 4,
+      "theory_credits": 3,
+      "practical_credits": 1
+    },
+    {
+      "id": "EE-120",
+      "code": "EE-120",
+      "title": "Basic Electrical Engineering",
+      "type": "course",
+      "year": 1,
+      "term": "fall",
+      "semester": 1,
+      "category": "core_computing",
+      "slot": {
+        "col": 0,
+        "band": "fall",
+        "row": 2
+      },
+      "credits": 4,
+      "note": "hardware core",
+      "theory_credits": 3,
+      "practical_credits": 1
+    },
+    {
+      "id": "MT-114",
+      "code": "MT-114",
+      "title": "Calculus",
+      "type": "course",
+      "year": 1,
+      "term": "fall",
+      "semester": 1,
+      "category": "mathematics",
+      "slot": {
+        "col": 0,
+        "band": "fall",
+        "row": 3
+      },
+      "credits": 3,
+      "theory_credits": 3,
+      "practical_credits": 0
+    },
+    {
+      "id": "HS-111",
+      "code": "HS-111",
+      "title": "Functional English",
+      "type": "course",
+      "year": 1,
+      "term": "fall",
+      "semester": 1,
+      "category": "language",
+      "slot": {
+        "col": 0,
+        "band": "fall",
+        "row": 4
+      },
+      "credits": 2,
+      "theory_credits": 2,
+      "practical_credits": 0
+    },
+    {
+      "id": "HS-106",
+      "code": "HS-106",
+      "title": "Pakistan Studies",
+      "type": "course",
+      "year": 1,
+      "term": "fall",
+      "semester": 1,
+      "category": "general_education",
+      "slot": {
+        "col": 0,
+        "band": "fall",
+        "row": 5
+      },
+      "credits": 1,
+      "variants": [
+        {
+          "code": "HS-106",
+          "title": "Pakistan Studies"
+        },
+        {
+          "code": "HS-107",
+          "title": "Pakistan Studies (for Foreigners)"
+        }
+      ],
+      "variant_rule": "one_of",
+      "theory_credits": 1,
+      "practical_credits": 0
+    },
+    {
+      "id": "CS-218",
+      "code": "CS-218",
+      "title": "Data Structures & Algorithms",
+      "type": "course",
+      "year": 2,
+      "term": "fall",
+      "semester": 3,
+      "category": "core_computing",
+      "slot": {
+        "col": 1,
+        "band": "fall",
+        "row": 0
+      },
+      "credits": 4,
+      "theory_credits": 3,
+      "practical_credits": 1
+    },
+    {
+      "id": "CS-220",
+      "code": "CS-220",
+      "title": "Digital Logic Design",
+      "type": "course",
+      "year": 2,
+      "term": "fall",
+      "semester": 3,
+      "category": "core_computing",
+      "slot": {
+        "col": 1,
+        "band": "fall",
+        "row": 1
+      },
+      "credits": 4,
+      "theory_credits": 3,
+      "practical_credits": 1
+    },
+    {
+      "id": "CS-219",
+      "code": "CS-219",
+      "title": "Computer Engineering Workshop",
+      "type": "course",
+      "year": 2,
+      "term": "fall",
+      "semester": 3,
+      "category": "core_computing",
+      "slot": {
+        "col": 1,
+        "band": "fall",
+        "row": 2
+      },
+      "credits": 1,
+      "theory_credits": 0,
+      "practical_credits": 1
+    },
+    {
+      "id": "MT-224",
+      "code": "MT-224",
+      "title": "Complex Variable & Fourier Analysis",
+      "type": "course",
+      "year": 2,
+      "term": "fall",
+      "semester": 3,
+      "category": "mathematics",
+      "slot": {
+        "col": 1,
+        "band": "fall",
+        "row": 3
+      },
+      "credits": 3,
+      "theory_credits": 3,
+      "practical_credits": 0
+    },
+    {
+      "id": "EE-217",
+      "code": "EE-217",
+      "title": "Circuit Theory",
+      "type": "course",
+      "year": 2,
+      "term": "fall",
+      "semester": 3,
+      "category": "core_computing",
+      "slot": {
+        "col": 1,
+        "band": "fall",
+        "row": 4
+      },
+      "credits": 2,
+      "note": "hardware core",
+      "theory_credits": 2,
+      "practical_credits": 0
+    },
+    {
+      "id": "HS-218",
+      "code": "HS-218",
+      "title": "Business Communication",
+      "type": "course",
+      "year": 2,
+      "term": "fall",
+      "semester": 3,
+      "category": "general_education",
+      "slot": {
+        "col": 1,
+        "band": "fall",
+        "row": 5
+      },
+      "credits": 3,
+      "theory_credits": 2,
+      "practical_credits": 1
+    },
+    {
+      "id": "HSK-II",
+      "code": "HSK-II",
+      "title": "Chinese Language II",
+      "type": "course",
+      "year": 2,
+      "term": "fall",
+      "semester": 3,
+      "category": "language",
+      "slot": {
+        "col": 1,
+        "band": "fall",
+        "row": 6
+      },
+      "credits": 3,
+      "variants": [
+        {
+          "code": "HSK-II",
+          "title": "Chinese Language"
+        },
+        {
+          "code": "HS-232",
+          "title": "Turkish Language"
+        }
+      ],
+      "variant_rule": "one_of",
+      "theory_credits": 3,
+      "practical_credits": 0
+    },
+    {
+      "id": "CS-323",
+      "code": "CS-323",
+      "title": "Artificial Intelligence",
+      "type": "course",
+      "year": 3,
+      "term": "fall",
+      "semester": 5,
+      "category": "core_computing",
+      "slot": {
+        "col": 2,
+        "band": "fall",
+        "row": 0
+      },
+      "credits": 4,
+      "theory_credits": 3,
+      "practical_credits": 1
+    },
+    {
+      "id": "CS-326",
+      "code": "CS-326",
+      "title": "Software Engineering",
+      "type": "course",
+      "year": 3,
+      "term": "fall",
+      "semester": 5,
+      "category": "core_computing",
+      "slot": {
+        "col": 2,
+        "band": "fall",
+        "row": 1
+      },
+      "credits": 4,
+      "theory_credits": 3,
+      "practical_credits": 1
+    },
+    {
+      "id": "CS-327",
+      "code": "CS-327",
+      "title": "Computer Communication Networks",
+      "type": "course",
+      "year": 3,
+      "term": "fall",
+      "semester": 5,
+      "category": "core_computing",
+      "slot": {
+        "col": 2,
+        "band": "fall",
+        "row": 2
+      },
+      "credits": 4,
+      "theory_credits": 3,
+      "practical_credits": 1
+    },
+    {
+      "id": "CS-328",
+      "code": "CS-328",
+      "title": "Computer Architecture",
+      "type": "course",
+      "year": 3,
+      "term": "fall",
+      "semester": 5,
+      "category": "core_computing",
+      "slot": {
+        "col": 2,
+        "band": "fall",
+        "row": 3
+      },
+      "credits": 3,
+      "theory_credits": 3,
+      "practical_credits": 0
+    },
+    {
+      "id": "MT-335",
+      "code": "MT-335",
+      "title": "Probability & Statistics",
+      "type": "course",
+      "year": 3,
+      "term": "fall",
+      "semester": 5,
+      "category": "mathematics",
+      "slot": {
+        "col": 2,
+        "band": "fall",
+        "row": 4
+      },
+      "credits": 3,
+      "theory_credits": 3,
+      "practical_credits": 0
+    },
+    {
+      "id": "CS-431",
+      "code": "CS-431",
+      "title": "Digital System Design",
+      "type": "course",
+      "year": 4,
+      "term": "fall",
+      "semester": 7,
+      "category": "core_computing",
+      "slot": {
+        "col": 3,
+        "band": "fall",
+        "row": 0
+      },
+      "credits": 4,
+      "theory_credits": 3,
+      "practical_credits": 1
+    },
+    {
+      "id": "CS-419",
+      "code": "CS-419",
+      "title": "Digital Signal Processing",
+      "type": "course",
+      "year": 4,
+      "term": "fall",
+      "semester": 7,
+      "category": "core_computing",
+      "slot": {
+        "col": 3,
+        "band": "fall",
+        "row": 1
+      },
+      "credits": 4,
+      "theory_credits": 3,
+      "practical_credits": 1
+    },
+    {
+      "id": "CS-425",
+      "code": "CS-425",
+      "title": "Entrepreneurship for Computer Engineers",
+      "type": "course",
+      "year": 4,
+      "term": "fall",
+      "semester": 7,
+      "category": "core_computing",
+      "slot": {
+        "col": 3,
+        "band": "fall",
+        "row": 2
+      },
+      "credits": 3,
+      "note": "compulsory CS-coded course; could also be tagged general_education",
+      "theory_credits": 3,
+      "practical_credits": 0
+    },
+    {
+      "id": "ELEC-2",
+      "code": "ELEC-2",
+      "title": "Elective 2",
+      "type": "elective_group",
+      "year": 4,
+      "term": "fall",
+      "semester": 7,
+      "category": "elective",
+      "slot": {
+        "col": 3,
+        "band": "fall",
+        "row": 3
+      },
+      "credits": 3,
+      "members": [
+        "CS-433",
+        "CS-434",
+        "CS-435"
+      ],
+      "theory_credits": 3,
+      "practical_credits": 0
+    },
+    {
+      "id": "CS-433",
+      "code": "CS-433",
+      "title": "Internet Computing",
+      "type": "course",
+      "year": 4,
+      "term": "fall",
+      "semester": 7,
+      "category": "elective",
+      "elective_group": "ELEC-2",
+      "slot": {
+        "col": 3,
+        "band": "fall",
+        "row": 3,
+        "member_index": 0
+      },
+      "credits": 2,
+      "theory_credits": 2,
+      "practical_credits": 0
+    },
+    {
+      "id": "CS-434",
+      "code": "CS-434",
+      "title": "Bioinformatics",
+      "type": "course",
+      "year": 4,
+      "term": "fall",
+      "semester": 7,
+      "category": "elective",
+      "elective_group": "ELEC-2",
+      "slot": {
+        "col": 3,
+        "band": "fall",
+        "row": 3,
+        "member_index": 1
+      },
+      "credits": 2,
+      "theory_credits": 2,
+      "practical_credits": 0
+    },
+    {
+      "id": "CS-435",
+      "code": "CS-435",
+      "title": "Software Project Management",
+      "type": "course",
+      "year": 4,
+      "term": "fall",
+      "semester": 7,
+      "category": "elective",
+      "elective_group": "ELEC-2",
+      "slot": {
+        "col": 3,
+        "band": "fall",
+        "row": 3,
+        "member_index": 2
+      },
+      "credits": 2,
+      "theory_credits": 2,
+      "practical_credits": 0
+    },
+    {
+      "id": "HSK-1",
+      "code": "HSK-1",
+      "title": "Chinese Language I",
+      "type": "course",
+      "year": 1,
+      "term": "spring",
+      "semester": 2,
+      "category": "language",
+      "slot": {
+        "col": 0,
+        "band": "spring",
+        "row": 0
+      },
+      "credits": 3,
+      "variants": [
+        {
+          "code": "HSK-1",
+          "title": "Chinese Language"
+        },
+        {
+          "code": "HS-231",
+          "title": "Turkish Language"
+        }
+      ],
+      "variant_rule": "one_of",
+      "theory_credits": 3,
+      "practical_credits": 0
+    },
+    {
+      "id": "CS-116",
+      "code": "CS-116",
+      "title": "Object Oriented Programming",
+      "type": "course",
+      "year": 1,
+      "term": "spring",
+      "semester": 2,
+      "category": "core_computing",
+      "slot": {
+        "col": 0,
+        "band": "spring",
+        "row": 1
+      },
+      "credits": 4,
+      "theory_credits": 3,
+      "practical_credits": 1
+    },
+    {
+      "id": "CS-117",
+      "code": "CS-117",
+      "title": "Discrete Structures",
+      "type": "course",
+      "year": 1,
+      "term": "spring",
+      "semester": 2,
+      "category": "core_computing",
+      "slot": {
+        "col": 0,
+        "band": "spring",
+        "row": 2
+      },
+      "credits": 3,
+      "theory_credits": 3,
+      "practical_credits": 0
+    },
+    {
+      "id": "EL-103",
+      "code": "EL-103",
+      "title": "Basic Electronics",
+      "type": "course",
+      "year": 1,
+      "term": "spring",
+      "semester": 2,
+      "category": "core_computing",
+      "slot": {
+        "col": 0,
+        "band": "spring",
+        "row": 3
+      },
+      "credits": 4,
+      "note": "hardware core",
+      "theory_credits": 3,
+      "practical_credits": 1
+    },
+    {
+      "id": "PH-122",
+      "code": "PH-122",
+      "title": "Applied Physics",
+      "type": "course",
+      "year": 1,
+      "term": "spring",
+      "semester": 2,
+      "category": "science",
+      "slot": {
+        "col": 0,
+        "band": "spring",
+        "row": 4
+      },
+      "credits": 4,
+      "theory_credits": 3,
+      "practical_credits": 1
+    },
+    {
+      "id": "HS-205",
+      "code": "HS-205",
+      "title": "Islamic Studies",
+      "type": "course",
+      "year": 1,
+      "term": "spring",
+      "semester": 2,
+      "category": "general_education",
+      "slot": {
+        "col": 0,
+        "band": "spring",
+        "row": 5
+      },
+      "credits": 2,
+      "variants": [
+        {
+          "code": "HS-205",
+          "title": "Islamic Studies"
+        },
+        {
+          "code": "HS-209",
+          "title": null
+        }
+      ],
+      "variant_rule": "one_of",
+      "needs_verification": "Bottom of image is cropped; HS-209 title is cut off.",
+      "theory_credits": 2,
+      "practical_credits": 0
+    },
+    {
+      "id": "CS-221",
+      "code": "CS-221",
+      "title": "Computer Organization & Design",
+      "type": "course",
+      "year": 2,
+      "term": "spring",
+      "semester": 4,
+      "category": "core_computing",
+      "slot": {
+        "col": 1,
+        "band": "spring",
+        "row": 0
+      },
+      "credits": 4,
+      "theory_credits": 3,
+      "practical_credits": 1
+    },
+    {
+      "id": "CS-215",
+      "code": "CS-215",
+      "title": "Signals & Systems",
+      "type": "course",
+      "year": 2,
+      "term": "spring",
+      "semester": 4,
+      "category": "core_computing",
+      "slot": {
+        "col": 1,
+        "band": "spring",
+        "row": 1
+      },
+      "credits": 3,
+      "theory_credits": 2,
+      "practical_credits": 1
+    },
+    {
+      "id": "CS-222",
+      "code": "CS-222",
+      "title": "Database Management Systems",
+      "type": "course",
+      "year": 2,
+      "term": "spring",
+      "semester": 4,
+      "category": "core_computing",
+      "slot": {
+        "col": 1,
+        "band": "spring",
+        "row": 2
+      },
+      "credits": 4,
+      "theory_credits": 3,
+      "practical_credits": 1
+    },
+    {
+      "id": "HS-219",
+      "code": "HS-219",
+      "title": "Professional Ethics",
+      "type": "course",
+      "year": 2,
+      "term": "spring",
+      "semester": 4,
+      "category": "general_education",
+      "slot": {
+        "col": 1,
+        "band": "spring",
+        "row": 3
+      },
+      "credits": 2,
+      "theory_credits": 2,
+      "practical_credits": 0
+    },
+    {
+      "id": "MT-222",
+      "code": "MT-222",
+      "title": "Linear Algebra & Ordinary Differential Equations",
+      "type": "course",
+      "year": 2,
+      "term": "spring",
+      "semester": 4,
+      "category": "mathematics",
+      "slot": {
+        "col": 1,
+        "band": "spring",
+        "row": 4
+      },
+      "credits": 3,
+      "theory_credits": 3,
+      "practical_credits": 0
+    },
+    {
+      "id": "HS-200",
+      "code": "HS-200",
+      "title": "Community Service",
+      "type": "course",
+      "year": 2,
+      "term": "spring",
+      "semester": 4,
+      "category": "general_education",
+      "slot": {
+        "col": 1,
+        "band": "spring",
+        "row": 5
+      },
+      "credits": 3,
+      "needs_verification": "Bottom of image is cropped; title partly cut off.",
+      "theory_credits": 3,
+      "practical_credits": 0
+    },
+    {
+      "id": "CS-301",
+      "code": "CS-301",
+      "title": "Microprocessor Based System Design",
+      "type": "course",
+      "year": 3,
+      "term": "spring",
+      "semester": 6,
+      "category": "core_computing",
+      "slot": {
+        "col": 2,
+        "band": "spring",
+        "row": 0
+      },
+      "credits": 4,
+      "theory_credits": 3,
+      "practical_credits": 1
+    },
+    {
+      "id": "CS-329",
+      "code": "CS-329",
+      "title": "Operating Systems",
+      "type": "course",
+      "year": 3,
+      "term": "spring",
+      "semester": 6,
+      "category": "core_computing",
+      "slot": {
+        "col": 2,
+        "band": "spring",
+        "row": 1
+      },
+      "credits": 4,
+      "theory_credits": 3,
+      "practical_credits": 1
+    },
+    {
+      "id": "ELEC-1",
+      "code": "ELEC-1",
+      "title": "Elective 1",
+      "type": "elective_group",
+      "year": 3,
+      "term": "spring",
+      "semester": 6,
+      "category": "elective",
+      "slot": {
+        "col": 2,
+        "band": "spring",
+        "row": 2
+      },
+      "credits": 3,
+      "members": [
+        "CS-330",
+        "CS-325",
+        "CS-324"
+      ],
+      "theory_credits": 3,
+      "practical_credits": 0
+    },
+    {
+      "id": "CS-330",
+      "code": "CS-330",
+      "title": "Digital Communication Systems",
+      "type": "course",
+      "year": 3,
+      "term": "spring",
+      "semester": 6,
+      "category": "elective",
+      "elective_group": "ELEC-1",
+      "slot": {
+        "col": 2,
+        "band": "spring",
+        "row": 2,
+        "member_index": 0
+      },
+      "credits": 4,
+      "theory_credits": 3,
+      "practical_credits": 1
+    },
+    {
+      "id": "CS-325",
+      "code": "CS-325",
+      "title": "Software Development & Testing",
+      "type": "course",
+      "year": 3,
+      "term": "spring",
+      "semester": 6,
+      "category": "elective",
+      "elective_group": "ELEC-1",
+      "slot": {
+        "col": 2,
+        "band": "spring",
+        "row": 2,
+        "member_index": 1
+      },
+      "credits": 4,
+      "theory_credits": 3,
+      "practical_credits": 1
+    },
+    {
+      "id": "CS-324",
+      "code": "CS-324",
+      "title": "Machine Learning",
+      "type": "course",
+      "year": 3,
+      "term": "spring",
+      "semester": 6,
+      "category": "elective",
+      "elective_group": "ELEC-1",
+      "slot": {
+        "col": 2,
+        "band": "spring",
+        "row": 2,
+        "member_index": 2
+      },
+      "credits": 4,
+      "theory_credits": 3,
+      "practical_credits": 1
+    },
+    {
+      "id": "MT-442",
+      "code": "MT-442",
+      "title": "Numerical Methods",
+      "type": "course",
+      "year": 3,
+      "term": "spring",
+      "semester": 6,
+      "category": "mathematics",
+      "slot": {
+        "col": 2,
+        "band": "spring",
+        "row": 3
+      },
+      "credits": 3,
+      "theory_credits": 3,
+      "practical_credits": 0
+    },
+    {
+      "id": "EF-305",
+      "code": "EF-305",
+      "title": "Engineering Economics & Management",
+      "type": "course",
+      "year": 3,
+      "term": "spring",
+      "semester": 6,
+      "category": "general_education",
+      "slot": {
+        "col": 2,
+        "band": "spring",
+        "row": 4
+      },
+      "credits": 3,
+      "theory_credits": 3,
+      "practical_credits": 0
+    },
+    {
+      "id": "CS-406",
+      "code": "CS-406",
+      "title": "Computer Engineering Project",
+      "type": "course",
+      "year": 4,
+      "term": "spring",
+      "semester": 8,
+      "category": "fyp",
+      "slot": {
+        "col": 3,
+        "band": "spring",
+        "row": 0
+      },
+      "credits": 3,
+      "theory_credits": 0,
+      "practical_credits": 3
+    },
+    {
+      "id": "CS-438",
+      "code": "CS-438",
+      "title": "Computer System Modelling",
+      "type": "course",
+      "year": 4,
+      "term": "spring",
+      "semester": 8,
+      "category": "core_computing",
+      "slot": {
+        "col": 3,
+        "band": "spring",
+        "row": 1
+      },
+      "credits": 3,
+      "theory_credits": 3,
+      "practical_credits": 0
+    },
+    {
+      "id": "CS-432",
+      "code": "CS-432",
+      "title": "Distributed Computing",
+      "type": "course",
+      "year": 4,
+      "term": "spring",
+      "semester": 8,
+      "category": "core_computing",
+      "slot": {
+        "col": 3,
+        "band": "spring",
+        "row": 2
+      },
+      "credits": 3,
+      "theory_credits": 2,
+      "practical_credits": 1
+    },
+    {
+      "id": "ELEC-3",
+      "code": "ELEC-3",
+      "title": "Elective 3",
+      "type": "elective_group",
+      "year": 4,
+      "term": "spring",
+      "semester": 8,
+      "category": "elective",
+      "slot": {
+        "col": 3,
+        "band": "spring",
+        "row": 3
+      },
+      "credits": 3,
+      "members": [
+        "CS-426",
+        "CS-436",
+        "CS-437"
+      ],
+      "theory_credits": 3,
+      "practical_credits": 0
+    },
+    {
+      "id": "CS-426",
+      "code": "CS-426",
+      "title": "Computer System Security",
+      "type": "course",
+      "year": 4,
+      "term": "spring",
+      "semester": 8,
+      "category": "elective",
+      "elective_group": "ELEC-3",
+      "slot": {
+        "col": 3,
+        "band": "spring",
+        "row": 3,
+        "member_index": 0
+      },
+      "credits": 3,
+      "theory_credits": 2,
+      "practical_credits": 1
+    },
+    {
+      "id": "CS-436",
+      "code": "CS-436",
+      "title": "Computer Vision",
+      "type": "course",
+      "year": 4,
+      "term": "spring",
+      "semester": 8,
+      "category": "elective",
+      "elective_group": "ELEC-3",
+      "slot": {
+        "col": 3,
+        "band": "spring",
+        "row": 3,
+        "member_index": 1
+      },
+      "credits": 3,
+      "theory_credits": 2,
+      "practical_credits": 1
+    },
+    {
+      "id": "CS-437",
+      "code": "CS-437",
+      "title": "Parallel Programming",
+      "type": "course",
+      "year": 4,
+      "term": "spring",
+      "semester": 8,
+      "category": "elective",
+      "elective_group": "ELEC-3",
+      "slot": {
+        "col": 3,
+        "band": "spring",
+        "row": 3,
+        "member_index": 2
+      },
+      "credits": 3,
+      "theory_credits": 2,
+      "practical_credits": 1
+    },
+    {
+      "id": "MG-482",
+      "code": "MG-482",
+      "title": "Organizational Behaviour",
+      "type": "course",
+      "year": 4,
+      "term": "spring",
+      "semester": 8,
+      "category": "general_education",
+      "slot": {
+        "col": 3,
+        "band": "spring",
+        "row": 4
+      },
+      "credits": 3,
+      "theory_credits": 3,
+      "practical_credits": 0
+    }
+  ],
+  "candidate_edges": [
+    {
+      "from": "CS-115",
+      "to": "CS-218",
+      "confidence": "high",
+      "source": "image",
+      "note": "short arrow from Computer Programming up into Data Structures & Algorithms",
+      "status": "needs_verification_against_scheme_of_studies"
+    },
+    {
+      "from": "HSK-1",
+      "to": "HSK-II",
+      "confidence": "high",
+      "source": "image",
+      "note": "language slot I leads to language slot II (variants follow their own pair: HS-231 -> HS-232)",
+      "status": "needs_verification_against_scheme_of_studies"
+    },
+    {
+      "from": "CS-221",
+      "to": "CS-328",
+      "confidence": "medium",
+      "source": "image",
+      "note": "trunk line leaving Computer Organization & Design to the right, branching up",
+      "status": "needs_verification_against_scheme_of_studies"
+    },
+    {
+      "from": "CS-221",
+      "to": "CS-301",
+      "confidence": "medium",
+      "source": "image",
+      "note": "same trunk, horizontal branch into Microprocessor Based System Design",
+      "status": "needs_verification_against_scheme_of_studies"
+    },
+    {
+      "from": "CS-218",
+      "to": "CS-323",
+      "confidence": "medium",
+      "source": "image",
+      "note": "line leaves Data Structures & Algorithms to the right and rises into Artificial Intelligence",
+      "status": "needs_verification_against_scheme_of_studies"
+    },
+    {
+      "from": "CS-327",
+      "to": "ELEC-2",
+      "confidence": "low",
+      "source": "image",
+      "note": "possible arrow into the Elective 2 box from Networks; applies to which members is unknown",
+      "status": "needs_verification_against_scheme_of_studies"
+    }
+  ],
+  "arrowhead_inventory": [
+    {
+      "target": "CS-218",
+      "arrowheads": 1,
+      "source_resolved": true
+    },
+    {
+      "target": "HSK-II",
+      "arrowheads": 1,
+      "source_resolved": true
+    },
+    {
+      "target": "CS-323",
+      "arrowheads": 1,
+      "source_resolved": "partly"
+    },
+    {
+      "target": "CS-328",
+      "arrowheads": 1,
+      "source_resolved": "partly"
+    },
+    {
+      "target": "CS-301",
+      "arrowheads": 1,
+      "source_resolved": "partly"
+    },
+    {
+      "target": "CS-431",
+      "arrowheads": 1,
+      "source_resolved": false,
+      "note": "arrow enters from the left near the top of fourth year; long line, source unclear"
+    },
+    {
+      "target": "CS-419",
+      "arrowheads": 1,
+      "source_resolved": false,
+      "note": "arrow enters from the left; long line, source unclear"
+    },
+    {
+      "target": "ELEC-2",
+      "arrowheads": 2,
+      "source_resolved": "partly"
+    },
+    {
+      "target": "ELEC-1",
+      "arrowheads": 2,
+      "source_resolved": false,
+      "note": "one enters from the left, one points left into the right side of the box"
+    },
+    {
+      "target": "ELEC-3",
+      "arrowheads": 1,
+      "source_resolved": false,
+      "note": "arrow enters from the left; trunk near Operating Systems"
+    }
+  ],
+  "arrowhead_total_counted": 12,
+  "next_step": "Resolve all edges from the Scheme of Studies / course outline PDFs (official prerequisite column), then check against the full-resolution image. Report every mismatch for human review."
+}

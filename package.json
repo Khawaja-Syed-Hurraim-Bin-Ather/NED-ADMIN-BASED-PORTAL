@@ -1,0 +1,36 @@
+{
+  "name": "educompass",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter=./apps/* dev",
+    "dev:web": "pnpm --filter=@educompass/web dev",
+    "dev:api": "pnpm --filter=@educompass/api dev",
+    "build": "pnpm --filter=./packages/* build && pnpm --filter=./apps/* build",
+    "lint": "pnpm --recursive lint",
+    "typecheck": "pnpm --recursive typecheck",
+    "test": "pnpm --recursive test",
+    "test:unit": "pnpm --recursive --filter=./packages/* test",
+    "sync-env": "node scripts/sync-env.js"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "unrs-resolver",
+      "@next/swc-win32-x64-msvc",
+      "sharp"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/pg": "^8.23.1",
+    "eslint": "^9.0.0",
+    "pg": "^8.23.1",
+    "prettier": "^3.3.0",
+    "typescript": "^5.6.0"
+  }
+}

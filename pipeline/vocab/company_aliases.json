@@ -1,0 +1,24 @@
+{
+  "_comment": "Company name aliases for normalisation. Key = canonical normalised name; value = list of known variants. Merge variants only when confident — flag near-duplicates for Ram instead.",
+  "aliases": {
+    "systems-limited": ["Systems Ltd", "Systems Limited", "Systems Pvt Ltd", "Systems (Pvt) Ltd"],
+    "netsol-technologies": ["NetSol Technologies", "NetSol Tech", "NetSol Technologies Ltd"],
+    "arbisoft": ["Arbisoft", "Arbi Soft"],
+    "tkxel": ["TkXel", "Tkxel"],
+    "10pearls": ["10Pearls", "10 Pearls"],
+    "devsinc": ["Devsinc", "Devs Inc"],
+    "folio3": ["Folio3", "Folio3 Software"],
+    "i2c-inc": ["i2c Inc.", "i2c", "i2c Incorporated"],
+    "habib-metro-bank": ["HabibMetro Bank", "HabibMetro", "Habib Metropolitan Bank"],
+    "ufone": ["Ufone", "U Fone"],
+    "telenor-pakistan": ["Telenor Pakistan", "Telenor"],
+    "jazz": ["Jazz", "Jazz (Mobilink)"],
+    "zong": ["Zong", "ZONG"],
+    "psx": ["PSX", "Pakistan Stock Exchange"],
+    "hbl": ["HBL", "Habib Bank Limited", "Habib Bank"],
+    "meezan-bank": ["Meezan Bank", "Meezan Bank Ltd"],
+    "k-electric": ["K-Electric", "KE", "KESC"],
+    "nestle-pakistan": ["Nestlé Pakistan", "Nestle Pakistan"],
+    "unilever-pakistan": ["Unilever Pakistan", "Unilever"]
+  }
+}

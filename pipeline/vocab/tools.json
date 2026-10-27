@@ -1,0 +1,18 @@
+{
+  "_comment": "Tool names for FYP extraction. Only tag a record when the exact name appears in the title or text. Never infer tools.",
+  "tools": [
+    "Python", "TensorFlow", "PyTorch", "Keras", "scikit-learn", "OpenCV",
+    "YOLO", "YOLOv5", "YOLOv8", "Detectron2",
+    "Flutter", "React", "React Native", "Angular", "Vue.js", "Next.js", "Node.js",
+    "Django", "Flask", "FastAPI", "Laravel", "Spring Boot",
+    "Arduino", "Raspberry Pi", "ESP32", "ESP8266", "STM32",
+    "Unity", "Unreal Engine",
+    "TensorFlow Lite", "ONNX",
+    "Hadoop", "Apache Spark", "Kafka",
+    "Ethereum", "Solidity", "Hyperledger",
+    "MySQL", "PostgreSQL", "MongoDB", "Firebase", "SQLite",
+    "AWS", "Azure", "Google Cloud", "Docker", "Kubernetes",
+    "Matlab", "LabVIEW", "Simulink",
+    "Grafana", "Tableau", "Power BI"
+  ]
+}

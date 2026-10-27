@@ -1,0 +1,5 @@
+allowBuild:
+  - esbuild
+  - unrs-resolver
+  - "@next/swc-win32-x64-msvc"
+  - sharp

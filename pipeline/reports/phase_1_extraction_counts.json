@@ -1,0 +1,40 @@
+{
+  "total": {
+    "seen": 68,
+    "extracted": 68,
+    "dropped": 0,
+    "pii_rejected": 0
+  },
+  "per_file": {
+    "FYP 2022.pdf": {
+      "seen": 36,
+      "extracted": 36,
+      "dropped": 0,
+      "pii_rejected": 0
+    },
+    "SOP FYDP list-2022.pdf": {
+      "seen": 8,
+      "extracted": 8,
+      "dropped": 0,
+      "pii_rejected": 0
+    },
+    "SOP FYDP list-2023.pdf": {
+      "seen": 8,
+      "extracted": 8,
+      "dropped": 0,
+      "pii_rejected": 0
+    },
+    "SOP FYDP list-2024.pdf": {
+      "seen": 8,
+      "extracted": 8,
+      "dropped": 0,
+      "pii_rejected": 0
+    },
+    "SOP FYDP list-2025.pdf": {
+      "seen": 8,
+      "extracted": 8,
+      "dropped": 0,
+      "pii_rejected": 0
+    }
+  }
+}
