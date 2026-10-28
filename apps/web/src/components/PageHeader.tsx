@@ -14,18 +14,12 @@ interface PageHeaderProps {
   badge?: string;
   description?: string;
   actions?: React.ReactNode;
-  /** Page accent colour token, e.g. 'var(--cyan)' */
+  /** Page accent colour token, e.g. '#511030' */
   accent?: string;
 }
 
-/** Inline SVG icons — no external dependency */
+/** Inline SVG icons — 1.5px stroke, no external dependency */
 const Ic = {
-  compass: (
-    <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="9.5"/>
-      <path d="m15.5 8.5-2.7 4.3-4.3 2.7 2.7-4.3 4.3-2.7Z"/>
-    </svg>
-  ),
   dashboard: (
     <svg className="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
       <rect x="3.5" y="3.5" width="7" height="7" rx="1"/>
@@ -46,7 +40,7 @@ const Ic = {
     </svg>
   ),
   chevron: (
-    <svg className="icon-sm" style={{width:12,height:12,display:'inline-block',stroke:'currentColor',fill:'none',strokeWidth:2.2,strokeLinecap:'round',strokeLinejoin:'round'}} viewBox="0 0 24 24" aria-hidden="true">
+    <svg className="icon-sm" style={{width:12,height:12,display:'inline-block',stroke:'currentColor',fill:'none',strokeWidth:2,strokeLinecap:'round',strokeLinejoin:'round'}} viewBox="0 0 24 24" aria-hidden="true">
       <path d="m9 18 6-6-6-6"/>
     </svg>
   ),
@@ -58,9 +52,9 @@ export function PageHeader({
   badge,
   description,
   actions,
-  accent = 'var(--cyan)',
+  accent = '#511030',
 }: PageHeaderProps) {
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [theme, setTheme] = useState<'dark' | 'light'>('light');
 
   useEffect(() => {
     const stored = localStorage.getItem('educompass-theme') as 'dark' | 'light' | null;
@@ -75,51 +69,64 @@ export function PageHeader({
   }
 
   return (
-    <header className="page-header">
-      <div className="page-header-inner">
-        {/* ── Left: Brand + Crumbs + Title ── */}
-        <div className="page-header-left">
-          {/* Brand mark */}
-          <Link href="/" className="brand page-header-brand" aria-label="EduCompass home">
-            <span className="brand-mark">{Ic.compass}</span>
-            <span className="brand-word">Edu<em>Compass</em></span>
-          </Link>
+    <header className="page-header" style={{ borderBottom: '1px solid var(--border)', background: 'var(--surface)' }}>
+      <div className="page-header-inner" style={{ maxWidth: 1360, margin: '0 auto', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20 }}>
+        {/* ── Left: Official NED Brand + Crumbs + Title ── */}
+        <div className="page-header-left" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+            {/* Official Brand */}
+            <Link href="/" className="brand" aria-label="EduCompass home">
+              <img
+                src="/assets/brand/ned-logo.png"
+                alt="NED University of Engineering & Technology"
+                className="brand-logo-img"
+                style={{ height: 36, width: 'auto' }}
+              />
+              <div className="brand-text-block">
+                <span className="brand-title">EduCompass</span>
+                <span className="brand-dept">NED CISE</span>
+              </div>
+            </Link>
 
-          {/* Breadcrumb trail */}
-          <nav className="page-crumbs" aria-label="Breadcrumb">
-            <Link href="/dashboard" className="page-crumb-link">Dashboard</Link>
-            {breadcrumbs.map((crumb, idx) => (
-              <React.Fragment key={crumb.label}>
-                <span className="page-crumb-sep" aria-hidden="true">{Ic.chevron}</span>
-                {crumb.href ? (
-                  <Link href={crumb.href} className="page-crumb-link">{crumb.label}</Link>
-                ) : (
-                  <span className="page-crumb-active">{crumb.label}</span>
-                )}
-              </React.Fragment>
-            ))}
-          </nav>
+            <span style={{ color: 'var(--border)' }}>|</span>
+
+            {/* Breadcrumb trail */}
+            <nav className="page-crumbs" aria-label="Breadcrumb" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13 }}>
+              <Link href="/dashboard" style={{ color: 'var(--muted)', textDecoration: 'none' }}>Dashboard</Link>
+              {breadcrumbs.map((crumb) => (
+                <React.Fragment key={crumb.label}>
+                  <span style={{ color: 'var(--muted-2)' }} aria-hidden="true">{Ic.chevron}</span>
+                  {crumb.href ? (
+                    <Link href={crumb.href} style={{ color: 'var(--muted)', textDecoration: 'none' }}>{crumb.label}</Link>
+                  ) : (
+                    <span style={{ color: 'var(--text)', fontWeight: 500 }}>{crumb.label}</span>
+                  )}
+                </React.Fragment>
+              ))}
+            </nav>
+          </div>
 
           {/* Page title row */}
-          <div className="page-header-title-row">
-            <h1 className="page-title">{title}</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+            <h1 style={{ fontSize: 22, fontWeight: 600, margin: 0, color: 'var(--text)' }}>{title}</h1>
             {badge && (
-              <span className="pill pill-cyan page-badge">{badge}</span>
+              <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 6, background: 'var(--primary-tint)', color: 'var(--primary)', fontWeight: 500 }}>
+                {badge}
+              </span>
             )}
-            {/* Live status pill */}
-            <span className="page-status-pill">
-              <span className="live-dot" style={{ background: 'var(--sage)', boxShadow: '0 0 0 4px rgba(154,195,169,.15)' }} />
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--muted)', border: '1px solid var(--border)', borderRadius: 6, padding: '2px 8px' }}>
+              <span className="live-dot" style={{ width: 6, height: 6 }} />
               Guidance engine online
             </span>
           </div>
 
           {description && (
-            <p className="page-header-desc">{description}</p>
+            <p style={{ margin: 0, fontSize: 13, color: 'var(--muted)', maxWidth: 720 }}>{description}</p>
           )}
         </div>
 
         {/* ── Right: Actions + Theme toggle + Dashboard ── */}
-        <div className="page-header-right">
+        <div className="page-header-right" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           {actions}
 
           <button
@@ -131,15 +138,16 @@ export function PageHeader({
             {theme === 'dark' ? Ic.sun : Ic.moon}
           </button>
 
-          <Link href="/dashboard" className="button button-secondary page-dashboard-btn">
+          <Link href="/dashboard" className="button button-secondary" style={{ fontSize: 13, padding: '6px 14px' }}>
             {Ic.dashboard}
             <span>Dashboard</span>
           </Link>
         </div>
       </div>
 
-      {/* Accent underline */}
-      <div className="page-header-accent" style={{ background: accent }} aria-hidden="true" />
+      {/* Hairline subtle accent */}
+      <div style={{ height: 2, background: accent, opacity: 0.8 }} aria-hidden="true" />
     </header>
   );
 }
+

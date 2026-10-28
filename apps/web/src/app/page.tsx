@@ -1,304 +1,406 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { createClient } from '../lib/supabase/client';
 
-// ─── Inline SVG icon system (mirrors handoff iconPaths) ──────────────────────
+// ─── SVG Line Icons (1.5px stroke, no 3D or cartoon illustrations) ───────────
 
-const iconPaths: Record<string, string> = {
-  compass:    '<circle cx="12" cy="12" r="9.5"/><path d="m15.5 8.5-2.7 4.3-4.3 2.7 2.7-4.3 4.3-2.7Z"/>',
-  arrow:      '<path d="M5 12h13"/><path d="m13 6 6 6-6 6"/>',
-  arrowUpRight: '<path d="M5 19 19 5"/><path d="M9 5h10v10"/>',
-  dashboard:  '<rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/>',
-  book:       '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22V5.5Z"/><path d="M4 5.5v15A2.5 2.5 0 0 1 6.5 18H20"/>',
-  users:      '<path d="M16 20v-1.5A3.5 3.5 0 0 0 12.5 15h-5A3.5 3.5 0 0 0 4 18.5V20"/><circle cx="10" cy="8" r="3"/><path d="M17 11a3 3 0 0 0 0-6M19.5 20v-1.5A3.5 3.5 0 0 0 17 15.1"/>',
-  calendar:   '<rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M16 3v4M8 3v4M3.5 10h17"/>',
-  layers:     '<path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5M3 16l9 5 9-5"/>',
-  bot:        '<rect x="4" y="6" width="16" height="14" rx="3"/><path d="M12 3v3M8 13h.01M16 13h.01M8 17h8M2 11v4M22 11v4"/>',
-  calculator: '<rect x="5" y="2.5" width="14" height="19" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 19h8"/>',
-  rocket:     '<path d="M14.5 4.5C17 2 21 3 21 3s1 4-1.5 6.5c-2 2-5.5 2.5-7 2L9 15l-2-2 3.5-3.5c-.5-1.5 0-5 2-7Z"/><path d="M9 15 6 18M7 13l-3 1 2 2M15 17l-1 3 2-2M12 12l.01.01"/>',
-  github:     '<path d="M15 22v-3.5c.05-1-.3-1.8-1-2.5 3.2-.35 6.5-1.55 6.5-7A5.45 5.45 0 0 0 19 5.2 5.1 5.1 0 0 0 18.9 1S17.7.65 15 2.4a13.2 13.2 0 0 0-6 0C6.3.65 5.1 1 5.1 1A5.1 5.1 0 0 0 5 5.2a5.45 5.45 0 0 0-1.5 3.8c0 5.45 3.3 6.65 6.5 7-.7.7-1.05 1.55-1 2.5V22M9 18c-4.5 2-5-2-7-2"/>',
-  sun:        '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/>',
-  moon:       '<path d="M20.8 15.2A8.5 8.5 0 0 1 8.8 3.2 8.5 8.5 0 1 0 20.8 15.2Z"/>',
-  shield:     '<path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/>',
-  check:      '<path d="m5 12 4.5 4.5L19 7"/>',
-  help:       '<circle cx="12" cy="12" r="9"/><path d="M9.7 9a2.4 2.4 0 1 1 4.1 1.7c-1 .9-1.8 1.2-1.8 2.8M12 17h.01"/>',
+const Icons = {
+  bookOpen: (
+    <svg className="icon workspace-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+    </svg>
+  ),
+  users: (
+    <svg className="icon workspace-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  ),
+  calendar: (
+    <svg className="icon workspace-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+    </svg>
+  ),
+  layers: (
+    <svg className="icon workspace-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <polygon points="12 2 2 7 12 12 22 7 12 2" />
+      <polyline points="2 17 12 22 22 17" />
+      <polyline points="2 12 12 17 22 12" />
+    </svg>
+  ),
+  messageSquare: (
+    <svg className="icon workspace-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+  ),
+  calculator: (
+    <svg className="icon workspace-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="4" y="2" width="16" height="20" rx="2" />
+      <line x1="8" y1="6" x2="16" y2="6" />
+      <line x1="16" y1="14" x2="16" y2="18" />
+      <path d="M16 10h.01" />
+      <path d="M12 10h.01" />
+      <path d="M8 10h.01" />
+      <path d="M12 14h.01" />
+      <path d="M8 14h.01" />
+      <path d="M12 18h.01" />
+      <path d="M8 18h.01" />
+    </svg>
+  ),
+  briefcase: (
+    <svg className="icon workspace-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+    </svg>
+  ),
+  github: (
+    <svg className="icon workspace-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+    </svg>
+  ),
+  arrowRight: (
+    <svg className="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+      <line x1="5" y1="12" x2="19" y2="12" />
+      <polyline points="12 5 19 12 12 19" />
+    </svg>
+  ),
+  sun: (
+    <svg className="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42" />
+    </svg>
+  ),
+  moon: (
+    <svg className="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M20.8 15.2A8.5 8.5 0 0 1 8.8 3.2 8.5 8.5 0 1 0 20.8 15.2Z" />
+    </svg>
+  ),
 };
 
-function Icon({ name, className = '' }: { name: string; className?: string }) {
-  return (
-    <svg
-      className={`icon ${className}`}
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      dangerouslySetInnerHTML={{ __html: iconPaths[name] || iconPaths.help }}
-    />
-  );
-}
+// ─── Workspace Items (from design-spec.json) ──────────────────────────────────
 
-// ─── Feature data ─────────────────────────────────────────────────────────────
-
-const features = [
-  { key: 'fyp',             iconName: 'book',       href: '/fyp',             title: 'FYP Archive & Search',      description: 'Find reviewed projects, domains, tools, and supervisor context.',                     badge: 'M1', image: '/assets/fyp-archive.webp' },
-  { key: 'professors',      iconName: 'users',      href: '/professors',      title: 'Professor Directory',       description: 'Explore research areas and build a better-informed outreach plan.',                  badge: 'M2', image: '/assets/professor-directory.webp' },
-  { key: 'planner',         iconName: 'calendar',   href: '/planner',         title: 'Degree Planner',            description: 'Arrange eight semesters and catch prerequisite conflicts early.',                    badge: 'M3', image: '/assets/degree-planner.webp' },
-  { key: 'explorer',        iconName: 'layers',     href: '/explorer',        title: 'Prerequisite Explorer',     description: 'See the dependency chain from foundation courses to FYP.',                          badge: 'H2', image: '/assets/prerequisite-explorer.webp' },
-  { key: 'chat',            iconName: 'bot',        href: '/chat',            title: 'AI Academic Assistant',     description: 'Ask focused questions with visible source and layer context.',                       badge: 'H3', image: '/assets/ai-assistant.webp' },
-  { key: 'gpa',             iconName: 'calculator', href: '/gpa',             title: 'GPA & What-If',             description: 'Model grades and understand what your next semester changes.',                       badge: 'E4', image: '/assets/gpa-what-if.webp' },
-  { key: 'careers',         iconName: 'rocket',     href: '/careers',         title: 'Career Hub',                description: 'Translate course progress into practical technology tracks.',                         badge: 'E2', image: '/assets/career-hub.webp' },
-  { key: 'recommendations', iconName: 'github',     href: '/recommendations', title: 'GitHub Recommender',        description: 'Surface open-source ideas worth exploring for an FYP.',                             badge: 'E5', image: '/assets/github-recommender.webp' },
+const workspaceItems = [
+  {
+    title: 'FYP Archive',
+    text: 'Search past projects by domain, tools and supervisor.',
+    icon: Icons.bookOpen,
+    href: '/fyp',
+  },
+  {
+    title: 'Professor Directory',
+    text: 'Research areas and supervision interests.',
+    icon: Icons.users,
+    href: '/professors',
+  },
+  {
+    title: 'Degree Planner',
+    text: 'Plan eight semesters and catch prerequisite conflicts early.',
+    icon: Icons.calendar,
+    href: '/planner',
+  },
+  {
+    title: 'Prerequisite Explorer',
+    text: 'Trace the course chain leading to your FYP.',
+    icon: Icons.layers,
+    href: '/explorer',
+  },
+  {
+    title: 'AI Academic Assistant',
+    text: 'Ask questions about courses, rules and planning.',
+    icon: Icons.messageSquare,
+    href: '/chat',
+  },
+  {
+    title: 'GPA Calculator',
+    text: 'Model grades and see the effect on your CGPA.',
+    icon: Icons.calculator,
+    href: '/gpa',
+  },
+  {
+    title: 'Career Hub',
+    text: 'Link your coursework to technology career tracks.',
+    icon: Icons.briefcase,
+    href: '/careers',
+  },
+  {
+    title: 'GitHub Recommender',
+    text: 'Open-source projects relevant to your FYP interests.',
+    icon: Icons.github,
+    href: '/recommendations',
+  },
 ];
 
-// ─── Theme toggle (client-side, mirrors handoff) ──────────────────────────────
-
-function ThemeToggle() {
-  const [isDark, setIsDark] = React.useState(true);
+export default function LandingPage() {
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [firstName, setFirstName] = useState<string | null>(null);
+  const [userInitials, setUserInitials] = useState<string | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem('educompass-theme') || 'dark';
+    // Theme initialization (Light is default per spec)
+    const stored = (localStorage.getItem('educompass-theme') as 'light' | 'dark') || 'light';
+    setTheme(stored);
     document.documentElement.dataset.theme = stored;
-    setIsDark(stored === 'dark');
+
+    // Check user auth state
+    async function checkAuth() {
+      try {
+        const supabase = createClient();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (user) {
+          const rawName: string =
+            user.user_metadata?.full_name ||
+            user.user_metadata?.name ||
+            user.email?.split('@')[0] ||
+            '';
+          const first = rawName.split(' ')[0] || null;
+          setFirstName(first);
+          const initials = rawName
+            .split(' ')
+            .map((part) => part[0])
+            .join('')
+            .slice(0, 2)
+            .toUpperCase();
+          setUserInitials(initials || 'ST');
+        }
+      } catch {
+        // Fallback gracefully to signed-out view
+      } finally {
+        setIsLoaded(true);
+      }
+    }
+
+    checkAuth();
   }, []);
 
-  function toggle() {
-    const next = isDark ? 'light' : 'dark';
+  function toggleTheme() {
+    const next = theme === 'light' ? 'dark' : 'light';
+    setTheme(next);
     document.documentElement.dataset.theme = next;
     localStorage.setItem('educompass-theme', next);
-    setIsDark(!isDark);
   }
 
   return (
-    <button
-      className="button button-icon"
-      onClick={toggle}
-      aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-      title="Switch theme"
-    >
-      <Icon name={isDark ? 'sun' : 'moon'} />
-    </button>
-  );
-}
-
-// ─── Brand mark ───────────────────────────────────────────────────────────────
-
-function Brand() {
-  return (
-    <Link className="brand" href="/" aria-label="EduCompass home">
-      <span className="brand-mark"><Icon name="compass" /></span>
-      <span className="brand-word">Edu<em>Compass</em></span>
-    </Link>
-  );
-}
-
-// ─── Landing page ─────────────────────────────────────────────────────────────
-
-export default function LandingPage() {
-  return (
-    <div className="app-shell landing-shell">
-      {/* ── Navigation ── */}
-      <header className="landing-nav">
-        <Brand />
-        <nav className="landing-links" aria-label="Main navigation">
-          <a href="#features">Platform</a>
-          <a href="#workflow">How it works</a>
-          <Link href="/terms">Trust &amp; privacy</Link>
-        </nav>
-        <div className="nav-actions">
-          <Link href="/login" className="button button-ghost">Sign in / Register</Link>
-          <ThemeToggle />
-        </div>
-      </header>
-
-      <main className="landing-main">
-        {/* ── Hero ── */}
-        <section className="hero" aria-labelledby="hero-heading">
-          <div className="hero-copy">
-            <div className="hero-kicker">
-              <span className="eyebrow">FYP 2026 / SRS v1.0</span>
+    <div className="landing-shell">
+      {/* ── 1. Navbar ── */}
+      <div className="landing-nav-wrap">
+        <header className="landing-nav">
+          {/* Left: Logo + Wordmark + Small caption NED CISE */}
+          <Link href="/" className="brand" aria-label="EduCompass home">
+            <img
+              src="/assets/brand/ned-logo.png"
+              alt="NED University of Engineering & Technology, Karachi"
+              className="brand-logo-img"
+            />
+            <div className="brand-text-block">
+              <span className="brand-title">EduCompass</span>
+              <span className="brand-dept">NED CISE</span>
             </div>
-            <h1 id="hero-heading">
-              Your next step, <span className="gradient-text">with context.</span>
-            </h1>
-            <p className="hero-lede">
-              EduCompass brings NED CISE course planning, FYP discovery, professor research, and career direction
-              into one calm place to think clearly.
-            </p>
-            <div className="hero-actions">
-              <Link href="/dashboard" className="button button-primary">
-                Go to dashboard <Icon name="arrow" className="icon-sm" />
+          </Link>
+
+          {/* Center Links */}
+          <nav className="landing-links" aria-label="Primary navigation">
+            <Link href="/dashboard">Dashboard</Link>
+            <Link href="/planner">Planner</Link>
+            <Link href="/fyp">FYP</Link>
+            <Link href="/professors">Professors</Link>
+            <Link href="/chat">Assistant</Link>
+          </nav>
+
+          {/* Right: Theme toggle + Avatar / Sign in */}
+          <div className="nav-actions">
+            <button
+              className="button button-icon"
+              onClick={toggleTheme}
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+              title="Toggle theme"
+            >
+              {theme === 'dark' ? Icons.sun : Icons.moon}
+            </button>
+
+            {isLoaded && firstName ? (
+              <Link
+                href="/dashboard"
+                className="button"
+                style={{
+                  backgroundColor: '#511030',
+                  color: '#FFFFFF',
+                  padding: '6px 14px',
+                  fontSize: 13,
+                  fontWeight: 500,
+                  borderRadius: 8,
+                  gap: 8,
+                }}
+                title="Open dashboard"
+              >
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 22,
+                    height: 22,
+                    borderRadius: '50%',
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    fontSize: 11,
+                    fontWeight: 600,
+                  }}
+                >
+                  {userInitials}
+                </span>
+                <span>Dashboard</span>
               </Link>
-              <Link href="/fyp" className="button button-secondary">Browse FYP archive</Link>
-            </div>
-            <div className="hero-note">
-              <Icon name="shield" className="icon-sm" />
-              <span>Built for NED CISE · estimate labels always visible</span>
-            </div>
+            ) : (
+              <Link href="/login" className="button button-primary">
+                Sign in
+              </Link>
+            )}
+          </div>
+        </header>
+      </div>
+
+      <main>
+        {/* ── 2. Greeting Block ── */}
+        <section className="landing-greeting-block">
+          <span className="eyebrow">
+            Computer &amp; Information Systems Engineering, NED University
+          </span>
+          {isLoaded && firstName ? (
+            <>
+              <h1>Welcome back, {firstName}</h1>
+              <p>
+                Let&apos;s get back to your degree plan, FYP shortlist and upcoming deadlines.
+              </p>
+            </>
+          ) : (
+            <>
+              <h1>Welcome to EduCompass</h1>
+              <p>Sign in with your university account to continue.</p>
+              <div className="landing-greeting-action">
+                <Link href="/login" className="button button-primary">
+                  Sign in
+                </Link>
+              </div>
+            </>
+          )}
+        </section>
+
+        {/* ── 3. Building Hero (2400x1150, Never Cropped) ── */}
+        <section className="building-hero-container" aria-label="Department building">
+          <div className="building-hero-wrap">
+            <img
+              src="/assets/campus/cis-building.jpg"
+              alt="Front elevation of the Computer & Information Systems Engineering Department building at NED University"
+              width={2400}
+              height={1150}
+              loading="eager"
+            />
           </div>
 
-          {/* ── Preview window ── */}
-          <div className="hero-visual" aria-label="EduCompass dashboard preview">
-            <div className="preview-window">
-              <div className="preview-top">
-                <div className="window-dots"><i /><i /><i /></div>
-                <span className="window-label">student / overview</span>
-                <span className="pill pill-cyan">demo data</span>
-              </div>
-              <div className="preview-content">
-                <aside className="preview-side">
-                  <span className="brand-mark" style={{ margin: '0 auto 34px', display: 'grid' }}>
-                    <Icon name="compass" />
-                  </span>
-                  <div className="preview-side-nav">
-                    <Icon name="dashboard" className="active" />
-                    <Icon name="book" />
-                    <Icon name="calendar" />
-                    <Icon name="bot" />
-                  </div>
-                </aside>
-                <div className="preview-main">
-                  <div className="preview-greeting">
-                    <div>
-                      <span className="eyebrow">Monday, 12 May</span>
-                      <strong>Good morning, Ayesha</strong>
-                    </div>
-                    <span className="avatar">AK</span>
-                  </div>
-                  <div className="preview-stats">
-                    <div className="preview-stat">
-                      <small>Current CGPA</small>
-                      <strong>3.42</strong>
-                      <span className="pill pill-sage">+0.18</span>
-                    </div>
-                    <div className="preview-stat">
-                      <small>Credits complete</small>
-                      <strong>68 <small>/ 136</small></strong>
-                      <span className="pill pill-cyan">50%</span>
-                    </div>
-                    <div className="preview-stat">
-                      <small>FYP shortlist</small>
-                      <strong>06</strong>
-                      <span className="pill pill-amber">estimate</span>
-                    </div>
-                  </div>
-                  <div className="preview-chart">
-                    <div className="preview-chart-header">
-                      <strong>Academic momentum</strong>
-                      <span className="eyebrow">last 4 terms</span>
-                    </div>
-                    <div className="chart-area">
-                      <svg className="chart-line" viewBox="0 0 380 90" preserveAspectRatio="none">
-                        <polyline points="0,72 65,59 125,63 190,42 250,49 310,28 380,18" />
-                        <circle cx="0" cy="72" r="3" />
-                        <circle cx="125" cy="63" r="3" />
-                        <circle cx="190" cy="42" r="3" />
-                        <circle cx="310" cy="28" r="3" />
-                        <circle cx="380" cy="18" r="3" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          {/* ── 4. Caption Bar ── */}
+          <div className="building-caption-bar">
+            <span>CIS Department, NED University of Engineering &amp; Technology</span>
+            <span>Karachi</span>
           </div>
         </section>
 
-        {/* ── Trust bar ── */}
-        <div className="trust-bar">
-          <div className="trust-intro">
-            <span className="eyebrow">A clearer system</span><br />
-            for the decisions behind your degree.
+        {/* ── 5. Workspace Cards ── */}
+        <section className="workspace-section" aria-labelledby="workspace-title">
+          <div className="workspace-header">
+            <h2 id="workspace-title">Your academic workspace</h2>
+            <p>Planning, projects and guidance for your degree, in one place.</p>
           </div>
-          <div className="trust-item"><Icon name="check" className="icon-sm" />Demo-first</div>
-          <div className="trust-item"><Icon name="check" className="icon-sm" />Source-aware</div>
-          <div className="trust-item"><Icon name="shield" className="icon-sm" />Privacy-minded</div>
-          <div className="trust-item"><Icon name="layers" className="icon-sm" />NED CISE context</div>
-          <div className="trust-item"><Icon name="bot" className="icon-sm" />AI-ready</div>
-        </div>
 
-        {/* ── Feature grid ── */}
-        <section className="section" id="features">
-          <div className="section-heading">
-            <div>
-              <span className="eyebrow">One connected campus map</span>
-              <h2>Everything you need to move with intention.</h2>
-            </div>
-            <p>
-              Stop rebuilding context from PDFs, group chats, and half-remembered advice.
-              EduCompass makes the path visible while keeping estimates clearly marked.
-            </p>
-          </div>
-          <div className="feature-grid">
-            {features.map((f) => (
-              <Link href={f.href} key={f.key}>
-                <article className="feature-card">
-                  <div className="feature-image">
-                    <img src={f.image} alt={`${f.title} illustration`} />
-                  </div>
-                  <div className="feature-top">
-                    <div className="feature-icon"><Icon name={f.iconName} /></div>
-                    <span className="feature-badge">{f.badge}</span>
-                  </div>
-                  <h3>{f.title}</h3>
-                  <p>{f.description}</p>
-                  <span className="feature-link"><Icon name="arrowUpRight" className="icon-sm" /></span>
-                </article>
+          <div className="workspace-grid">
+            {workspaceItems.map((item) => (
+              <Link href={item.href} key={item.title} className="workspace-card">
+                <div>{item.icon}</div>
+                <span className="workspace-arrow">{Icons.arrowRight}</span>
+                <h3>{item.title}</h3>
+                <p>{item.text}</p>
               </Link>
             ))}
           </div>
         </section>
 
-        {/* ── Workflow band ── */}
-        <section className="section" id="workflow">
-          <div className="workflow-band">
+        {/* ── 6. Closing Section (Text left, Atrium photo right) ── */}
+        <section className="closing-section" aria-labelledby="closing-title">
+          <div className="closing-copy">
+            <span className="eyebrow">Your degree at a glance</span>
+            <h2 id="closing-title">Everything for your degree, in one place.</h2>
+            <p>
+              Track your credits, plan the semesters ahead and prepare for your final year project,
+              with guidance built around the NED CISE curriculum.
+            </p>
+            <ul className="closing-points">
+              <li className="closing-point">
+                <span className="closing-point-dot" />
+                <span>Your progress, updated from official records</span>
+              </li>
+              <li className="closing-point">
+                <span className="closing-point-dot" />
+                <span>Prerequisite checks before you register</span>
+              </li>
+              <li className="closing-point">
+                <span className="closing-point-dot" />
+                <span>Supervisor and project information for your FYP</span>
+              </li>
+            </ul>
             <div>
-              <span className="eyebrow">A practical loop</span>
-              <h2>See what is next, and why it matters.</h2>
-              <p>
-                From your current semester to your final-year project, each view is designed to reduce
-                uncertainty without pretending to make official university decisions.
-              </p>
-              <div style={{ marginTop: '22px' }}>
-                <Link href="/dashboard" className="button button-primary">
-                  Preview the dashboard <Icon name="arrow" className="icon-sm" />
-                </Link>
-              </div>
+              <Link href="/planner" className="closing-link">
+                <span>Open degree planner</span>
+                {Icons.arrowRight}
+              </Link>
             </div>
-            <div className="workflow-list">
-              <div className="workflow-step">
-                <span className="workflow-number">01</span>
-                <div>
-                  <strong>Orient</strong>
-                  <span>Start with your current credits, semester, and goals.</span>
-                </div>
-              </div>
-              <div className="workflow-step">
-                <span className="workflow-number">02</span>
-                <div>
-                  <strong>Explore</strong>
-                  <span>Compare FYPs, professors, prerequisite chains, and career tracks.</span>
-                </div>
-              </div>
-              <div className="workflow-step">
-                <span className="workflow-number">03</span>
-                <div>
-                  <strong>Decide</strong>
-                  <span>Save a shortlist and move forward with the source in view.</span>
-                </div>
-              </div>
-            </div>
+          </div>
+
+          {/* Native 4:5 ratio, Never crop */}
+          <div className="closing-atrium-wrap">
+            <img
+              src="/assets/campus/cis-atrium.png"
+              alt="Interior glass atrium of the CIS Department at NED University"
+              width={816}
+              height={1020}
+              loading="lazy"
+            />
           </div>
         </section>
-
-        {/* ── Footer ── */}
-        <footer className="landing-footer">
-          <span>© 2026 EduCompass · NED CISE student guidance platform</span>
-          <div className="footer-links">
-            <Link href="/terms">Terms</Link>
-            <Link href="/privacy">Privacy</Link>
-            <Link href="/help">Help &amp; FAQs</Link>
-          </div>
-        </footer>
       </main>
+
+      {/* ── 7. Institutional Footer (Logo, University name, Terms link, Disclaimer) ── */}
+      <footer className="site-footer">
+        <div className="site-footer-inner">
+          <div className="site-footer-top">
+            <div className="site-footer-brand">
+              <img
+                src="/assets/brand/ned-logo.png"
+                alt="NED University of Engineering & Technology, Karachi"
+                className="site-footer-logo"
+              />
+              <span>NED University of Engineering &amp; Technology, Karachi</span>
+            </div>
+            <div className="site-footer-links">
+              <Link href="/terms">Terms of Service &amp; Policies</Link>
+              <Link href="/privacy">Privacy</Link>
+              <Link href="/help">Help &amp; FAQs</Link>
+            </div>
+          </div>
+          <div className="site-footer-disclaimer">
+            Match scores, prerequisite mappings and recommendations are guidance only, not official university decisions.
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

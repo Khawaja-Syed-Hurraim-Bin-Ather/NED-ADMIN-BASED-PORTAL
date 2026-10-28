@@ -202,7 +202,7 @@ Public read: only `review_status = 'Published'` and `name_status in ('confirmed'
 **Tags:** embedded, nlp, computer-vision, ai-ml | **Name status:** confirmed
 **Supervised projects:** 4 listed in the JSON
 
-### Name needed
+### Mr Affan
 *Assistant Professor*  
 **Qualification:** PhD (Computer Systems), M.Engg 2015 (CGPA 3.91), B.E. 2007 (85.18%, 9th rank), all NED.  
 **Research interests:** Neuromorphic design; Digital system design; Analog circuit design; Computer architecture  

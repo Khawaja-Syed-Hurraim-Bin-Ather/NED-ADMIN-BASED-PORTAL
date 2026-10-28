@@ -129,7 +129,7 @@ export default function ChatPage() {
     <div className="inner-page">
       <PageHeader
         title="AI Academic Assistant"
-        badge="H3"
+        badge="4-Layer Verified"
         breadcrumbs={[{ label: 'AI Assistant' }]}
         description="Ask about degree requirements, course prerequisites, grading rules, and FYP regulations."
         accent="var(--lavender)"

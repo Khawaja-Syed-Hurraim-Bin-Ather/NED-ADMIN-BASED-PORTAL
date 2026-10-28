@@ -1,7 +1,33 @@
 # EduCompass State
-Last updated: 2026-10-27
+Last updated: 2026-10-28
 
 ## Latest Updates
+- **FAQ Preload & Grounded LLM Chatbot Enhancement (H3.1)**:
+  - Executed full 5-phase implementation specified in `EDUCOMPASS_FAQ_PRELOAD.md`:
+    - **Phase 0 (Answerability Inventory)**: Audited all 100 questions in `faq_seed.json` against published database and codebase; produced [`docs/data/faq/reports/answerability.md`](file:///c:/Users/syedh/.gemini/antigravity/scratch/educompass/docs/data/faq/reports/answerability.md) (90 Answerable, 7 Partial, 3 Blocked).
+    - **Phase 1 (Verified Answers)**: Authored all 100 institutional answers across 5 answer modes (`static_kb`, `data_query`, `engine_call`, `tool_flow`, `guardrail`) adhering strictly to plain language, <80 words, source labels (`database`, `roadmap`), estimate disclaimers, and Rule 3 (zero student PII), saved in `docs/data/faq/faq_answers.json`.
+    - **Phase 2 (Paraphrase Expansion)**: Generated 1,100 active variants (typos, Roman Urdu, keyword forms, slot variations) in `docs/data/faq/faq_variants.json`, and an isolated held-out test set of 500 cases in `docs/data/faq/faq_held_out_test_set.json`.
+    - **Phase 3 (Matcher Engine & Offline Execution)**: Built `FAQMatcher` in `apps/api/src/lib/faq-matcher.ts` with text normalization (Roman Urdu & acronyms), slot extraction (`course`, `track`, `program`, `semester`, `target`), token recall + trigram similarity scoring, and near-miss protection (D01 vs D02 vs E02; E03 vs E04; G01 vs G02; F05 vs F11).
+    - **Phase 4 & 5 (Validation & Storage)**: Added automated test suite `apps/api/src/lib/faq-matcher.test.ts` (16/16 tests passing, >85% accuracy on held-out set, zero PII privacy scan passing). Integrated with Express `/api/v1/chat` Layer 1. Generated complete database migration `supabase/migrations/20261028000001_faq_preload_system.sql`.
+  - Monorepo validation: **116/116 Vitest tests passing**, 0 TypeScript errors across all 6 workspace packages.
+
+- **Professional Institutional UI Redesign for NED University (CISE) (FE3)**:
+  - Transferred official institutional brand assets (`/assets/brand/ned-logo.png`, `/assets/brand/ned-logo.jpg`) and campus photography (`/assets/campus/cis-building.jpg`, `/assets/campus/cis-atrium.png`).
+  - Sampled exact RGB/Hex values from the NED crest: **Maroon `#511030`** (spec `#5A1A3C`) and **Sun Gold `#FFAE07`** (spec `#F2A31B`).
+  - Replaced entire design token system with calm, institutional palette: Light theme default (`#F6F7F9` page, `#FFFFFF` surface, `#E3E6EB` border, `#1B2330` text, `#5C667A` muted), dark theme with lifted maroon (`#B5557F`) meeting WCAG AA contrast.
+  - Typography: switched to Inter with IBM Plex Sans fallback, constrained to weights 400, 500, and 600 (no extra-bold or black weights).
+  - Landing page:
+    - Navbar with official NED crest logo, "EduCompass", "NED CISE", clean links, and theme toggle.
+    - Greeting block with student first name greeting when authenticated, or clean institutional sign-in fallback.
+    - Building hero showing the complete uncropped CIS Department elevation at 2400/1150 aspect ratio (`object-fit: contain`) with caption bar ("CIS Department, NED University of Engineering & Technology | Karachi").
+    - 8 Academic Workspace cards with 1.5px line icons, titles, and descriptions, hovering with a subtle maroon border and arrow.
+    - Closing section replacing "A practical loop" with degree progress overview and uncropped interior atrium photograph at native 4:5 ratio.
+    - Institutional footer with official logo, university department text, policies link, and Rule 13 disclaimer notice.
+  - Login page: two-column layout with left surface form and right solid maroon panel (`#511030`) with motto "Your degree, planned with clarity."
+  - Dashboard: institutional student hub with left collapsible sidebar, dynamic greeting (`Good {morning|afternoon|evening}, {firstName}`), 4 metric cards (CGPA with estimate tooltip, Credits completed with gold meter fill, FYP shortlist, Current semester), academic progress line chart with maroon stroke and gold current term dot, 1-to-8 semester progression bar, and assistant strip.
+  - Complete elimination of forbidden elements: zero demo pills or wording, zero module codes (M1, M2, M3, H2, H3, E4, etc.), zero marketing copy ("unlock", "supercharge", "AI-ready"), zero cartoon/3D illustrations, zero glow/glassmorphism.
+  - Verification: 100/100 Vitest tests passing, 0 TypeScript errors, Next.js 15 production build passes for all 22 routes. Screenshots captured at 1440x900 and 390x844.
+
 - **Inner Pages Design System Alignment & Shared Navigation Shell (FE2)**:
   - Standardized `PageHeader` component with brand mark, breadcrumb navigation, live status pill (`Guidance engine online`), theme toggle (dark/light), and direct dashboard navigation button across all inner routes.
   - Aligned `/chat` with design system: tokenized user and assistant bubbles (`chat-bubble-user`, `chat-bubble-assistant`), animated typing indicator dots, suggestion chip pills, and 4-layer verified badge pills.
@@ -68,6 +94,7 @@ Last updated: 2026-10-27
 | E2 | done | main | Career Hub — /careers page with 12 tracks, search/filter/modal + /api/v1/careers route (2 tests) |
 | H2 | done | main | Prerequisite Explorer (/explorer with @xyflow/react, semester columns, What-If failure simulation, critical path) |
 | H3 | done | main | AI Chatbot (4-layer: preloaded → retrieval → LLM gateway → fallback) + 300 char/500 token hard caps + /chat UI (13 tests) |
+| H3.1 | done | main | FAQ Preload & Grounded LLM Chatbot Enhancement (100 verified intents, 1,100 variants, 500 test cases, 16 new tests, offline matcher) |
 | M2 | done | main | Professor Directory — 16 profiles in professors.json, migration applied, Express /api/v1/professors (list+slug), /professors page with search/tag filter/match scoring/profile modal/mailto draft (13 tests total) |
 | M3 | done | main | Student Planner — @educompass/engine validator, 20261026000002 migration applied, Express /api/v1/planner routes, /planner interactive 8-semester grid with workload balancer and export (15 tests total) |
 | M1 | done | main | FYP Advanced: semantic similarity (pgvector cosine + fallback), team formation board, mailto contact (Rule 12), tests |
@@ -76,6 +103,7 @@ Last updated: 2026-10-27
 | F7 | done | main | Integration + demo: polished landing page, smoke-test.mjs (22 routes), DEMO.md guide, STATE.md final update |
 | FE1 | done | main | Frontend Overhaul: persistent sidebar rail + drawer, topbar, 4 academic metrics, 8-capability toolkit, schedule, announcements, activity, handoff styles |
 | FE2 | done | main | Inner Pages Design System Alignment & Shared Navigation Shell (PageHeader, Chat, FYP, GPA, Professors, Planner, Explorer, Careers, Recommendations, Admin) |
+| FE3 | done | main | Professional Institutional UI Redesign for NED University CISE (design-spec.json v2.0, brand crest, building hero, uncropped photos, calm institutional tone) |
 
 ## Session 2026-10-25 (Antigravity)
 Did:

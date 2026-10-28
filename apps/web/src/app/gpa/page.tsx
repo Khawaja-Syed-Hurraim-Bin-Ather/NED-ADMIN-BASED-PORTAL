@@ -118,7 +118,7 @@ export default function GPACalculatorPage() {
     <div className="inner-page">
       <PageHeader
         title="GPA Calculator &amp; What-If Planner"
-        badge="E4"
+        badge="Official 4.0 Scale"
         breadcrumbs={[{ label: 'GPA Calculator' }]}
         description="Semester GPA · Cumulative CGPA · Retake policies · Graduation target modeller. NED official 4.0 scale."
         accent="var(--sage)"

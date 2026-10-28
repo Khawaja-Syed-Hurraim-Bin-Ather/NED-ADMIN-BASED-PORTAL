@@ -1,0 +1,383 @@
+[
+  {
+    "title": "IoT Based Air Pollution Monitoring & Alert System",
+    "year": 2022,
+    "supervisor": "Dr. Syed Zaffar Qasim",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [
+      "ai-ml",
+      "iot"
+    ],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Telepresence Robot",
+    "year": 2022,
+    "supervisor": "Dr. Urooj Ainuddin",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [
+      "robotics"
+    ],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Behavioral Monitoring Using Vocal Sentiment Analysis",
+    "year": 2022,
+    "supervisor": "Dr. Urooj Ainuddin",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [
+      "nlp"
+    ],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Automation and Tracking of Inventory",
+    "year": 2022,
+    "supervisor": "Mr. Kashif Asrar",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Smart Libarary Assistant Robot",
+    "year": 2022,
+    "supervisor": "Mr. Shahab Tehzeeb",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [
+      "ar-vr",
+      "robotics"
+    ],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Point Pay (Track & Pay on the go!)",
+    "year": 2022,
+    "supervisor": "Dr. Asad Arfeen",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Software -defined Camera for Outdoor Surveillance Applications",
+    "year": 2022,
+    "supervisor": "Ms. Fakhra Aftab",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [
+      "ar-vr",
+      "blockchain"
+    ],
+    "outcome": "accepted"
+  },
+  {
+    "title": "IOT Based Smart Medicine Dispenser",
+    "year": 2022,
+    "supervisor": "Syeda Ramish Fatima",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [
+      "ar-vr",
+      "iot"
+    ],
+    "outcome": "accepted"
+  },
+  {
+    "title": "SIGNAL (Smart Integrated and Guarded with Navigation, Autonomous Luggage)",
+    "year": 2022,
+    "supervisor": "Ms. Ibshar Ishrat",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [
+      "ar-vr",
+      "robotics"
+    ],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Eyes and Ears",
+    "year": 2022,
+    "supervisor": "Ms. Ibshar Ishrat",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [
+      "ar-vr"
+    ],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Textile Trade Intelligence",
+    "year": 2022,
+    "supervisor": "Dr. Syed Abbas Ali",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [],
+    "outcome": "accepted"
+  },
+  {
+    "title": "AI Based Event Coverage",
+    "year": 2022,
+    "supervisor": "Dr. Syed Abbas Ali",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [
+      "ai-ml"
+    ],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Digital OPD",
+    "year": 2022,
+    "supervisor": "Dr. Syed Abbas Ali",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Visualri - Image and Video Fores Toolkit",
+    "year": 2022,
+    "supervisor": "Dr. Syed Abbas Ali",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [
+      "computer-vision"
+    ],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Virtual Reality Application for STEAM based Space Expedition",
+    "year": 2022,
+    "supervisor": "Dr. Majida Kazmi",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [
+      "ar-vr"
+    ],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Automation and Recommendation of Logistics for Optimal Utilization of Resources",
+    "year": 2022,
+    "supervisor": "Mr. Kashif Asrar",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Optimization and Real-Time Analysis of Big Transactional Data",
+    "year": 2022,
+    "supervisor": "Mr. Kashif Asrar",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [
+      "embedded"
+    ],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Production Process Optimization Using ML",
+    "year": 2022,
+    "supervisor": "Mr. Kashif Asrar",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Data-driven Analysis and Forecasting on Big Distributed Data File Systems",
+    "year": 2022,
+    "supervisor": "Mr. Kashif Asrar",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Al Enabled Urdu OCR for Mobile Devices",
+    "year": 2022,
+    "supervisor": "Ms. Fauzia Yasir",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Dynamic Chatbot",
+    "year": 2022,
+    "supervisor": "Dr. Maria Waqas",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [
+      "nlp"
+    ],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Sketch2Code",
+    "year": 2022,
+    "supervisor": "Dr. Maria Waqas",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Intelligent Attendance Marking System",
+    "year": 2022,
+    "supervisor": "Dr. Maria Waqas",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [
+      "ar-vr"
+    ],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Autocompleting Sentences in Urdu Using Natural Language Processing",
+    "year": 2022,
+    "supervisor": "Dr. Maria Waqas",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [
+      "nlp"
+    ],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Recognition of Waste Material and Predictive Analysis of Rate of Disposals",
+    "year": 2022,
+    "supervisor": "Dr. Maria Waqas",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Automated Quality Assurance System Through E- TAMU for Hair Care Products",
+    "year": 2022,
+    "supervisor": "Dr. Majida Kazmi",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [
+      "ai-ml",
+      "ar-vr"
+    ],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Automated Malware Hunting Using End Point Detection and Response",
+    "year": 2022,
+    "supervisor": "Dr. Asad Arfeen",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [
+      "ar-vr",
+      "cybersecurity"
+    ],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Anomaly based Hybrid Cyber Threat Detection System using Machine Learning",
+    "year": 2022,
+    "supervisor": "Mr. Umar Iftikhar",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [
+      "ai-ml",
+      "ar-vr"
+    ],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Air Writing with finger Detection",
+    "year": 2022,
+    "supervisor": "Mr. Umar Iftikhar",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [
+      "ai-ml"
+    ],
+    "outcome": "accepted"
+  },
+  {
+    "title": "AI Enabled DR Diagnosis FYP 2021",
+    "year": 2022,
+    "supervisor": "Dr. Majida Kazmi",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [
+      "ai-ml",
+      "healthcare-tech"
+    ],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Automated Speech Recognition System for Urdu Language",
+    "year": 2022,
+    "supervisor": "Dr. Majida Kazmi",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [
+      "nlp"
+    ],
+    "outcome": "accepted"
+  },
+  {
+    "title": "ENDURANCE- A Multi-Functional Unmanned Exploratory Rover",
+    "year": 2022,
+    "supervisor": "Dr. Muhammad Ali Ismail",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Metaverse Virtual Conference Room",
+    "year": 2022,
+    "supervisor": "Ms. Ibshar Ishrat",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [
+      "ar-vr"
+    ],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Qualitative Analysis Of Hostility Over Social Media Using A.I",
+    "year": 2022,
+    "supervisor": "Dr. Syed Abbas Ali",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Cloud Based Inventory Management System",
+    "year": 2022,
+    "supervisor": "Dr. Muhammad Ali Ismail",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [],
+    "outcome": "accepted"
+  },
+  {
+    "title": "Care For All- An IOT enabled System for Hospital",
+    "year": 2022,
+    "supervisor": "Mr. Kashif Asrar",
+    "department": "Computer & Information Systems Engineering",
+    "university": "NED University of Engineering & Technology",
+    "domain_tags": [
+      "ar-vr",
+      "healthcare-tech",
+      "iot"
+    ],
+    "outcome": "accepted"
+  }
+]

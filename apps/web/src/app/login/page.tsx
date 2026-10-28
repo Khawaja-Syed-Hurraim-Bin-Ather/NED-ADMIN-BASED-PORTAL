@@ -4,17 +4,6 @@ import React, { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '../../lib/supabase/client';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-  Input,
-  Button,
-  Alert,
-} from '@educompass/ui';
 
 function LoginForm() {
   const router = useRouter();
@@ -55,110 +44,176 @@ function LoginForm() {
         router.refresh();
       }
     } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : 'Unexpected login error.');
+      setErrorMsg(err instanceof Error ? err.message : 'Unexpected sign in error.');
     } finally {
       setIsLoading(false);
     }
   }
 
   return (
-    <main className="flex items-center justify-center min-h-[85vh] px-4 py-12 bg-slate-950 text-slate-100">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-6">
-          <Link href="/" className="inline-flex items-center gap-2 text-xl font-bold tracking-tight text-white">
-            <span className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-black text-sm shadow-md shadow-blue-500/30">
-              EC
-            </span>
-            EduCompass
-          </Link>
-          <p className="text-xs text-slate-400 mt-2">
-            Academic &amp; Career Guidance Platform for Computing Fields
-          </p>
-        </div>
+    <div className="login-split-page">
+      {/* ── Left: Form on a plain surface ── */}
+      <div className="login-form-side">
+        <div className="login-form-container">
+          {/* Logo centered above the form (height 72px) */}
+          <div className="login-logo-wrap">
+            <Link href="/" aria-label="EduCompass home">
+              <img
+                src="/assets/brand/ned-logo.png"
+                alt="NED University of Engineering & Technology, Karachi"
+                className="login-logo-img"
+              />
+            </Link>
+          </div>
 
-        <Card variant="glass" className="border-slate-800 bg-slate-900/80">
-          <CardHeader>
-            <CardTitle>Sign in to your account</CardTitle>
-            <CardDescription>
-              Enter your credentials to access your academic planner and FYP portals.
-            </CardDescription>
-          </CardHeader>
+          <div className="login-header">
+            <h1>Sign in to EduCompass</h1>
+            <p>NED University of Engineering &amp; Technology, CISE Department</p>
+          </div>
 
-          <form onSubmit={handleLogin}>
-            <CardContent className="space-y-4">
-              {errorMsg && (
-                <Alert
-                  variant="danger"
-                  title="Sign in failed"
-                  onClose={() => setErrorMsg(null)}
-                >
-                  {errorMsg}
-                </Alert>
-              )}
+          {errorMsg && (
+            <div
+              role="alert"
+              style={{
+                padding: '10px 14px',
+                borderRadius: 8,
+                backgroundColor: 'rgba(192, 57, 43, 0.08)',
+                border: '1px solid #C0392B',
+                color: '#C0392B',
+                fontSize: 13,
+                marginBottom: 20,
+              }}
+            >
+              {errorMsg}
+            </div>
+          )}
 
-              <Input
-                label="Email address"
+          <form onSubmit={handleLogin} style={{ display: 'grid', gap: 16 }}>
+            <div>
+              <label
+                htmlFor="email-input"
+                style={{
+                  display: 'block',
+                  fontSize: 13,
+                  fontWeight: 500,
+                  marginBottom: 6,
+                  color: 'var(--text)',
+                }}
+              >
+                University email or roll number
+              </label>
+              <input
+                id="email-input"
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="student@university.edu.pk"
+                placeholder="student@cloud.neduet.edu.pk"
                 autoComplete="email"
                 autoFocus
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  borderRadius: 8,
+                  border: '1px solid var(--border)',
+                  backgroundColor: 'var(--surface)',
+                  color: 'var(--text)',
+                  fontSize: 14,
+                }}
               />
+            </div>
 
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <label
-                    htmlFor="password-input"
-                    className="block text-xs font-medium text-slate-300"
-                  >
-                    Password
-                  </label>
-                  <Link
-                    href="/forgot-password"
-                    className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
-                <Input
-                  id="password-input"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  autoComplete="current-password"
-                />
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                <label
+                  htmlFor="password-input"
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 500,
+                    color: 'var(--text)',
+                  }}
+                >
+                  Password
+                </label>
+                <Link
+                  href="/forgot-password"
+                  style={{
+                    fontSize: 12,
+                    color: 'var(--primary)',
+                    textDecoration: 'none',
+                  }}
+                >
+                  Forgot password
+                </Link>
               </div>
-            </CardContent>
+              <input
+                id="password-input"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                autoComplete="current-password"
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  borderRadius: 8,
+                  border: '1px solid var(--border)',
+                  backgroundColor: 'var(--surface)',
+                  color: 'var(--text)',
+                  fontSize: 14,
+                }}
+              />
+            </div>
 
-            <CardFooter className="flex-col gap-3">
-              <Button
-                type="submit"
-                variant="primary"
-                size="md"
-                isLoading={isLoading}
-                className="w-full"
-              >
-                Sign In
-              </Button>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="button button-primary"
+              style={{
+                width: '100%',
+                marginTop: 8,
+                padding: '10px 16px',
+                fontSize: 14,
+              }}
+            >
+              {isLoading ? 'Signing in...' : 'Sign in'}
+            </button>
 
-              <p className="text-xs text-center text-slate-400">
+            <div style={{ textAlign: 'center', marginTop: 12 }}>
+              <p style={{ fontSize: 13, color: 'var(--muted)', margin: 0 }}>
                 Don&apos;t have an account?{' '}
                 <Link
                   href="/signup"
-                  className="text-blue-400 hover:text-blue-300 font-medium transition-colors"
+                  style={{
+                    color: 'var(--primary)',
+                    textDecoration: 'none',
+                    fontWeight: 500,
+                  }}
                 >
                   Create one now
                 </Link>
               </p>
-            </CardFooter>
+            </div>
           </form>
-        </Card>
+        </div>
       </div>
-    </main>
+
+      {/* ── Right: Solid maroon panel with logo and motto ── */}
+      <div className="login-panel-side">
+        <div className="login-panel-content">
+          <img
+            src="/assets/brand/ned-logo.png"
+            alt="NED University of Engineering & Technology"
+            className="login-panel-logo"
+          />
+          <h2 className="login-panel-text">Your degree, planned with clarity.</h2>
+          <p className="login-panel-sub">
+            Department of Computer &amp; Information Systems Engineering
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -166,7 +221,7 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-slate-950 flex items-center justify-center p-6 text-slate-400 text-sm">
+        <main style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', background: 'var(--page)', color: 'var(--muted)', fontSize: 14 }}>
           Loading sign in...
         </main>
       }

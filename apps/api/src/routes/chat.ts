@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { apiError } from '@educompass/shared';
 import { supabaseAdmin } from '../lib/supabase';
 import { generateChatResponse, LLM_CONFIG } from '../lib/llm-gateway';
+import { faqMatcher } from '../lib/faq-matcher';
 
 export const chatRouter = Router();
 
@@ -280,7 +281,7 @@ chatRouter.post('/', async (req: Request, res: Response) => {
   const userId = req.user?.id || null;
   const disclaimer = 'Guidance estimates, not official university decisions.';
 
-  // ─── LAYER 1: Preloaded Answers (Instant, 0 latency, 0 tokens) ──────────────
+  // ─── LAYER 1: Preloaded Verified Answers (Instant, 0 latency, 0 tokens) ─────
   const preloaded = await matchLayer1Preloaded(message);
   if (preloaded) {
     res.json({
@@ -288,8 +289,43 @@ chatRouter.post('/', async (req: Request, res: Response) => {
         answer: preloaded,
         layer: 1,
         source: 'preloaded_official',
+        source_type: 'database',
         sources: [],
         disclaimer,
+      },
+    });
+    return;
+  }
+
+  const userRole = (req.user?.role as 'public' | 'enrolled' | 'admin') || 'public';
+  const faqResult = faqMatcher.match(message, userRole);
+
+  if (faqResult.status === 'direct_match' && faqResult.renderedAnswer) {
+    res.json({
+      data: {
+        answer: faqResult.renderedAnswer,
+        layer: 1,
+        source: 'preloaded_official',
+        source_type: faqResult.sourceLabel || 'database',
+        sources: [],
+        disclaimer,
+        related: faqResult.relatedChips || [],
+        publicBehaviour: faqResult.publicBehaviour || 'answer',
+      },
+    });
+    return;
+  }
+
+  if (faqResult.status === 'clarification' && faqResult.renderedAnswer && !preferOffline) {
+    res.json({
+      data: {
+        answer: faqResult.renderedAnswer,
+        layer: 1,
+        source: 'clarification',
+        sources: [],
+        disclaimer,
+        suggestions: faqResult.suggestions || [],
+        related: faqResult.relatedChips || [],
       },
     });
     return;

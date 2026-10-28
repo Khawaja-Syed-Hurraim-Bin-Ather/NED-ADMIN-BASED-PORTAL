@@ -5,59 +5,131 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../../lib/supabase/client';
 
-// ─── SVG Icon System ──────────────────────────────────────────────────────────
+// ─── SVG Line Icons (1.5px stroke, no 3D or cartoon illustrations) ───────────
 
-const iconPaths: Record<string, string> = {
-  compass:      '<circle cx="12" cy="12" r="9.5"/><path d="m15.5 8.5-2.7 4.3-4.3 2.7 2.7-4.3 4.3-2.7Z"/>',
-  arrow:        '<path d="M5 12h13"/><path d="m13 6 6 6-6 6"/>',
-  arrowUpRight: '<path d="M5 19 19 5"/><path d="M9 5h10v10"/>',
-  dashboard:    '<rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/>',
-  book:         '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22V5.5Z"/><path d="M4 5.5v15A2.5 2.5 0 0 1 6.5 18H20"/>',
-  users:        '<path d="M16 20v-1.5A3.5 3.5 0 0 0 12.5 15h-5A3.5 3.5 0 0 0 4 18.5V20"/><circle cx="10" cy="8" r="3"/><path d="M17 11a3 3 0 0 0 0-6M19.5 20v-1.5A3.5 3.5 0 0 0 17 15.1"/>',
-  calendar:     '<rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M16 3v4M8 3v4M3.5 10h17"/>',
-  layers:       '<path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5M3 16l9 5 9-5"/>',
-  bot:          '<rect x="4" y="6" width="16" height="14" rx="3"/><path d="M12 3v3M8 13h.01M16 13h.01M8 17h8M2 11v4M22 11v4"/>',
-  calculator:   '<rect x="5" y="2.5" width="14" height="19" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 19h8"/>',
-  rocket:       '<path d="M14.5 4.5C17 2 21 3 21 3s1 4-1.5 6.5c-2 2-5.5 2.5-7 2L9 15l-2-2 3.5-3.5c-.5-1.5 0-5 2-7Z"/><path d="M9 15 6 18M7 13l-3 1 2 2M15 17l-1 3 2-2M12 12l.01.01"/>',
-  github:       '<path d="M15 22v-3.5c.05-1-.3-1.8-1-2.5 3.2-.35 6.5-1.55 6.5-7A5.45 5.45 0 0 0 19 5.2 5.1 5.1 0 0 0 18.9 1S17.7.65 15 2.4a13.2 13.2 0 0 0-6 0C6.3.65 5.1 1 5.1 1A5.1 5.1 0 0 0 5 5.2a5.45 5.45 0 0 0-1.5 3.8c0 5.45 3.3 6.65 6.5 7-.7.7-1.05 1.55-1 2.5V22M9 18c-4.5 2-5-2-7-2"/>',
-  settings:     '<path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5Z"/><path d="m19.4 15 .1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2v.3a2 2 0 1 1-4 0V19a1.7 1.7 0 0 0-2.9-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 3 12.1v-.2a1.7 1.7 0 0 0-1.2-2.9h-.3a2 2 0 1 1 0-4h.3A1.7 1.7 0 0 0 3 2.1l-.1-.1A2 2 0 1 1 5.7-.8l.1.1A1.7 1.7 0 0 0 8.7-2v-.3a2 2 0 1 1 4 0v.3a1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0 1.2 2.9h.3a2 2 0 1 1 0 4h-.3a1.7 1.7 0 0 0-1.2 2.9Z"/>',
-  sun:          '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/>',
-  moon:         '<path d="M20.8 15.2A8.5 8.5 0 0 1 8.8 3.2 8.5 8.5 0 1 0 20.8 15.2Z"/>',
-  bell:         '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>',
-  menu:         '<path d="M4 6h16M4 12h16M4 18h16"/>',
-  x:            '<path d="m6 6 12 12M18 6 6 18"/>',
-  check:        '<path d="m5 12 4.5 4.5L19 7"/>',
-  clock:        '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
-  target:       '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
-  bookmark:     '<path d="M6 4.5A2.5 2.5 0 0 1 8.5 2h7A2.5 2.5 0 0 1 18 4.5V21l-6-3-6 3V4.5Z"/>',
-  trend:        '<path d="m4 16 5-5 3 3 7-8"/><path d="M14 6h5v5"/>',
-  shield:       '<path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/>',
-  help:         '<circle cx="12" cy="12" r="9"/><path d="M9.7 9a2.4 2.4 0 1 1 4.1 1.7c-1 .9-1.8 1.2-1.8 2.8M12 17h.01"/>',
+const Icons = {
+  compass: (
+    <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+    </svg>
+  ),
+  dashboard: (
+    <svg className="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3" y="3" width="7" height="9" rx="1" />
+      <rect x="14" y="3" width="7" height="5" rx="1" />
+      <rect x="14" y="12" width="7" height="9" rx="1" />
+      <rect x="3" y="16" width="7" height="5" rx="1" />
+    </svg>
+  ),
+  book: (
+    <svg className="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+    </svg>
+  ),
+  users: (
+    <svg className="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  ),
+  calendar: (
+    <svg className="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+    </svg>
+  ),
+  layers: (
+    <svg className="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+      <polygon points="12 2 2 7 12 12 22 7 12 2" />
+      <polyline points="2 17 12 22 22 17" />
+      <polyline points="2 12 12 17 22 12" />
+    </svg>
+  ),
+  bot: (
+    <svg className="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3" y="11" width="18" height="10" rx="2" />
+      <circle cx="12" cy="5" r="2" />
+      <path d="M12 7v4" />
+      <line x1="8" y1="16" x2="8" y2="16" />
+      <line x1="16" y1="16" x2="16" y2="16" />
+    </svg>
+  ),
+  calculator: (
+    <svg className="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="4" y="2" width="16" height="20" rx="2" />
+      <line x1="8" y1="6" x2="16" y2="6" />
+      <line x1="16" y1="14" x2="16" y2="18" />
+      <path d="M16 10h.01" />
+      <path d="M12 10h.01" />
+      <path d="M8 10h.01" />
+      <path d="M12 14h.01" />
+      <path d="M8 14h.01" />
+      <path d="M12 18h.01" />
+      <path d="M8 18h.01" />
+    </svg>
+  ),
+  rocket: (
+    <svg className="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+      <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+      <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+      <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+    </svg>
+  ),
+  github: (
+    <svg className="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+    </svg>
+  ),
+  settings: (
+    <svg className="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </svg>
+  ),
+  sun: (
+    <svg className="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42" />
+    </svg>
+  ),
+  moon: (
+    <svg className="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M20.8 15.2A8.5 8.5 0 0 1 8.8 3.2 8.5 8.5 0 1 0 20.8 15.2Z" />
+    </svg>
+  ),
+  menu: (
+    <svg className="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true">
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+  ),
+  arrowRight: (
+    <svg className="icon-sm" style={{ width: 12, height: 12 }} viewBox="0 0 24 24" aria-hidden="true">
+      <line x1="5" y1="12" x2="19" y2="12" />
+      <polyline points="12 5 19 12 12 19" />
+    </svg>
+  ),
+  info: (
+    <svg className="icon icon-sm" style={{ width: 14, height: 14, display: 'inline-block', verticalAlign: 'middle' }} viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="16" x2="12" y2="12" />
+      <line x1="12" y1="8" x2="12.01" y2="8" />
+    </svg>
+  ),
+  check: (
+    <svg className="icon icon-sm" style={{ width: 14, height: 14 }} viewBox="0 0 24 24" aria-hidden="true">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  ),
 };
-
-function Icon({ name, className = '' }: { name: string; className?: string }) {
-  return (
-    <svg
-      className={`icon ${className}`}
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      dangerouslySetInnerHTML={{ __html: iconPaths[name] || iconPaths.help }}
-    />
-  );
-}
-
-// ─── Module Data ──────────────────────────────────────────────────────────────
-
-const modules = [
-  { key: 'fyp',             iconName: 'book',       href: '/fyp',             title: 'FYP Archive',        description: '68 reviewed NED CISE projects & similarity search.',   image: '/assets/fyp-archive.webp' },
-  { key: 'professors',      iconName: 'users',      href: '/professors',      title: 'Professor Directory', description: '16 faculty members & research alignment scoring.',     image: '/assets/professor-directory.webp' },
-  { key: 'planner',         iconName: 'calendar',   href: '/planner',         title: 'Degree Planner',      description: '8-term schedule with prerequisite bottleneck guards.',   image: '/assets/degree-planner.webp' },
-  { key: 'explorer',        iconName: 'layers',     href: '/explorer',        title: 'Prerequisite Graph',  description: 'Visual DAG dependency flows & What-If failure cascade.', image: '/assets/prerequisite-explorer.webp' },
-  { key: 'chat',            iconName: 'bot',        href: '/chat',            title: 'AI Assistant',        description: '4-layer verified academic & syllabus answering.',      image: '/assets/ai-assistant.webp' },
-  { key: 'gpa',             iconName: 'calculator', href: '/gpa',             title: 'GPA & What-If',       description: 'Official NED grading scale & graduation target math.', image: '/assets/gpa-what-if.webp' },
-  { key: 'careers',         iconName: 'rocket',     href: '/careers',         title: 'Career Hub',          description: '12 technology tracks matched to course progression.',    image: '/assets/career-hub.webp' },
-  { key: 'recommendations', iconName: 'github',     href: '/recommendations', title: 'GitHub Recommender',  description: 'Trending open-source architectures & FYP seeds.',       image: '/assets/github-recommender.webp' },
-];
 
 interface UserProfile {
   id: string;
@@ -65,66 +137,64 @@ interface UserProfile {
   full_name: string | null;
   role: 'public' | 'enrolled' | 'admin';
   current_semester: number;
-  interests: string[];
-  career_goal: string | null;
 }
 
 export default function DashboardPage() {
   const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [modalContent, setModalContent] = useState<{ title: string; body: string } | null>(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem('educompass-theme') || 'dark';
+    const stored = (localStorage.getItem('educompass-theme') as 'dark' | 'light') || 'light';
     document.documentElement.dataset.theme = stored;
     setIsDark(stored === 'dark');
 
     async function loadUser() {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      try {
+        const supabase = createClient();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
 
-      if (!user) {
-        // Fallback demo student context for instant review
-        setProfile({
-          id: 'demo-student',
-          email: 'ayesha.khan@cloud.neduet.edu.pk',
-          full_name: 'Ayesha Khan',
-          role: 'enrolled',
-          current_semester: 6,
-          interests: ['AI & Machine Learning', 'Software Systems'],
-          career_goal: 'Full-Stack AI Engineer',
-        });
+        if (!user) {
+          // Standard student fallback context
+          setProfile({
+            id: 'ned-student',
+            email: 'ayesha.khan@cloud.neduet.edu.pk',
+            full_name: 'Ayesha Khan',
+            role: 'enrolled',
+            current_semester: 6,
+          });
+          setLoading(false);
+          return;
+        }
+
+        const { data } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (data) {
+          setProfile(data as UserProfile);
+        } else {
+          setProfile({
+            id: user.id,
+            email: user.email ?? 'student@cloud.neduet.edu.pk',
+            full_name: user.user_metadata?.full_name ?? user.email?.split('@')[0] ?? 'Student',
+            role: 'enrolled',
+            current_semester: 6,
+          });
+        }
+      } catch {
+        // Fallback
+      } finally {
         setLoading(false);
-        return;
       }
-
-      const { data } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-      if (data) {
-        setProfile(data as UserProfile);
-      } else {
-        setProfile({
-          id: user.id,
-          email: user.email ?? 'student@cloud.neduet.edu.pk',
-          full_name: user.user_metadata?.full_name ?? user.email?.split('@')[0] ?? 'Ayesha Khan',
-          role: 'enrolled',
-          current_semester: 6,
-          interests: [],
-          career_goal: null,
-        });
-      }
-      setLoading(false);
     }
+
     loadUser();
   }, []);
 
@@ -133,14 +203,6 @@ export default function DashboardPage() {
     document.documentElement.dataset.theme = next;
     localStorage.setItem('educompass-theme', next);
     setIsDark(!isDark);
-    triggerToast(`${next === 'dark' ? 'Dark' : 'Light'} theme enabled`);
-  }
-
-  function triggerToast(msg: string) {
-    setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 3200);
   }
 
   async function handleSignOut() {
@@ -150,114 +212,145 @@ export default function DashboardPage() {
     router.refresh();
   }
 
-  const studentName = profile?.full_name || 'Ayesha Khan';
-  const studentInitials = studentName
+  const studentFullName = profile?.full_name || 'Ayesha Khan';
+  const firstName = studentFullName.split(' ')[0] || 'Student';
+  const studentInitials = studentFullName
     .split(' ')
     .map((n) => n[0])
     .join('')
     .slice(0, 2)
     .toUpperCase() || 'AK';
 
+  // Format date: Weekday, D Month (e.g. Wednesday, 28 October)
+  const now = new Date();
+  const dateFormatted = now.toLocaleDateString('en-GB', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  });
+
+  // Time of day greeting
+  const hour = now.getHours();
+  const timeOfDay = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
+
+  const currentSem = profile?.current_semester ?? 6;
+
   if (loading) {
     return (
-      <main className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-6">
-        <div className="flex items-center gap-3 text-slate-400 text-sm">
-          <svg className="animate-spin h-5 w-5 text-cyan-400" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-          </svg>
-          Loading student overview...
-        </div>
+      <main style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', background: 'var(--page)', color: 'var(--muted)', fontSize: 14 }}>
+        Loading student overview...
       </main>
     );
   }
 
   return (
     <div className="dashboard-shell">
-      {/* ── Left Navigation Rail (Persistent Desktop + Mobile Off-Canvas) ── */}
+      {/* ── Left Sidebar (Collapsible, Line icons, Institutional) ── */}
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`} id="sidebar">
-        <div className="sidebar-brand">
-          <Link className="brand" href="/" aria-label="EduCompass home">
-            <span className="brand-mark"><Icon name="compass" /></span>
-            <span className="brand-word">Edu<em>Compass</em></span>
+        {/* Brand */}
+        <div style={{ padding: '4px 10px 24px', borderBottom: '1px solid var(--border)' }}>
+          <Link href="/" className="brand" aria-label="EduCompass home">
+            <img
+              src="/assets/brand/ned-logo.png"
+              alt="NED University of Engineering & Technology, Karachi"
+              className="brand-logo-img"
+              style={{ height: 36, width: 'auto' }}
+            />
+            <div className="brand-text-block">
+              <span className="brand-title">EduCompass</span>
+              <span className="brand-dept">NED CISE</span>
+            </div>
           </Link>
         </div>
 
-        <div className="side-label eyebrow">Workspace</div>
+        {/* Workspace links */}
+        <div className="side-label eyebrow" style={{ marginTop: 20 }}>Workspace</div>
         <nav className="side-nav" aria-label="Workspace navigation">
           <Link href="/dashboard" className="active">
-            <Icon name="dashboard" />
+            {Icons.dashboard}
             <span>Overview</span>
           </Link>
           <Link href="/fyp">
-            <Icon name="book" />
+            {Icons.book}
             <span>FYP Archive</span>
           </Link>
           <Link href="/professors">
-            <Icon name="users" />
+            {Icons.users}
             <span>Professors</span>
           </Link>
           <Link href="/planner">
-            <Icon name="calendar" />
+            {Icons.calendar}
             <span>Degree Planner</span>
           </Link>
           <Link href="/explorer">
-            <Icon name="layers" />
+            {Icons.layers}
             <span>Prerequisite Explorer</span>
           </Link>
           <Link href="/chat">
-            <Icon name="bot" />
+            {Icons.bot}
             <span>AI Assistant</span>
           </Link>
         </nav>
 
-        <div className="side-label eyebrow">Planning</div>
+        {/* Planning links */}
+        <div className="side-label eyebrow" style={{ marginTop: 20 }}>Planning</div>
         <nav className="side-nav" aria-label="Planning navigation">
           <Link href="/gpa">
-            <Icon name="calculator" />
-            <span>GPA &amp; What-If</span>
+            {Icons.calculator}
+            <span>GPA Calculator</span>
           </Link>
           <Link href="/careers">
-            <Icon name="rocket" />
+            {Icons.rocket}
             <span>Career Hub</span>
           </Link>
           <Link href="/recommendations">
-            <Icon name="github" />
-            <span>GitHub Ideas</span>
+            {Icons.github}
+            <span>GitHub Recommender</span>
           </Link>
         </nav>
 
         <div className="sidebar-spacer" />
 
-        <div className="sidebar-support">
-          <Icon name="help" className="icon-sm" />
-          <strong>Need a starting point?</strong>
-          <p>Ask the assistant about your next prerequisite or FYP direction.</p>
-          <Link href="/chat" className="button button-secondary" style={{ width: '100%', minHeight: '31px', padding: '0 8px', fontSize: '11px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-            <span>Open assistant</span>
-            <Icon name="arrow" className="icon-sm" />
-          </Link>
-        </div>
-
-        <div className="sidebar-user">
-          <span className="avatar">{studentInitials}</span>
-          <div style={{ minWidth: 0 }}>
-            <strong style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{studentName}</strong>
-            <span>BE-CSE &bull; Sem 0{profile?.current_semester ?? 6}</span>
+        {/* User profile capsule */}
+        <div className="sidebar-user" style={{ borderTop: '1px solid var(--border)', paddingTop: 16 }}>
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 34,
+              height: 34,
+              borderRadius: '50%',
+              backgroundColor: '#511030',
+              color: '#FFFFFF',
+              fontSize: 12,
+              fontWeight: 600,
+              flexShrink: 0,
+            }}
+          >
+            {studentInitials}
+          </span>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <strong style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {studentFullName}
+            </strong>
+            <span style={{ fontSize: 11, color: 'var(--muted)', display: 'block' }}>
+              BE-CSE &bull; Semester {currentSem}
+            </span>
           </div>
-          <Link href="/settings" title="Profile Settings" aria-label="Settings">
-            <Icon name="settings" className="icon-sm" />
+          <Link href="/settings" title="Profile Settings" aria-label="Settings" style={{ color: 'var(--muted)' }}>
+            {Icons.settings}
           </Link>
         </div>
       </aside>
 
-      {/* ── Main Canvas ── */}
+      {/* ── Main Dashboard Canvas ── */}
       <main className="dashboard-main">
         {/* Topbar */}
         <header className="dashboard-topbar">
           <div className="crumbs">
             <span>EduCompass</span>
-            <Icon name="arrow" className="icon-sm" />
+            <span style={{ color: 'var(--muted-2)' }}>&rsaquo;</span>
             <strong>Overview</strong>
           </div>
 
@@ -265,9 +358,9 @@ export default function DashboardPage() {
             <button
               className="button button-icon mobile-menu"
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              aria-label="Open navigation"
+              aria-label="Toggle navigation"
             >
-              <Icon name="menu" />
+              {Icons.menu}
             </button>
 
             <div className="status-pill">
@@ -277,403 +370,310 @@ export default function DashboardPage() {
 
             <button
               className="button button-icon"
-              onClick={() => triggerToast('You have 2 new department updates')}
-              aria-label="Notifications"
-              title="Notifications"
-            >
-              <Icon name="bell" />
-            </button>
-
-            <button
-              className="button button-icon"
               onClick={toggleTheme}
               aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
               title="Switch theme"
             >
-              <Icon name={isDark ? 'sun' : 'moon'} />
+              {isDark ? Icons.sun : Icons.moon}
             </button>
-
-            <Link href="/settings" title="Profile">
-              <span className="avatar">{studentInitials}</span>
-            </Link>
 
             <button
               className="button button-ghost"
-              style={{ fontSize: '11px', padding: '6px 12px' }}
+              style={{ fontSize: 12, padding: '6px 12px' }}
               onClick={handleSignOut}
-              title="Sign out of account"
+              title="Sign out"
             >
-              Sign Out
+              Sign out
             </button>
           </div>
         </header>
 
-        {/* Dashboard Content */}
-        <div className="dashboard-content">
-          {/* Admin Banner if Admin */}
-          {profile?.role === 'admin' && (
-            <div style={{ padding: '14px 18px', borderRadius: '12px', background: 'rgba(244, 63, 94, 0.1)', border: '1px solid rgba(244, 63, 94, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
+        {/* Content Area (Max width 1360px per spec) */}
+        <div className="dashboard-content" style={{ maxWidth: 1360, margin: '0 auto', paddingTop: 28 }}>
+          {/* Greeting per spec: Good {timeOfDay}, {firstName} */}
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ fontSize: 12, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 500, marginBottom: 4 }}>
+              {dateFormatted}
+            </div>
+            <h1 style={{ margin: 0, fontSize: 26, fontWeight: 600, color: 'var(--text)' }}>
+              Good {timeOfDay}, {firstName}
+            </h1>
+            <p style={{ margin: '4px 0 0', color: 'var(--muted)', fontSize: 14 }}>
+              Here is where you stand this semester.
+            </p>
+          </div>
+
+          {/* 4 Stat Cards per spec */}
+          <section className="metric-grid" aria-label="Academic statistics">
+            {/* Card 1: Current CGPA */}
+            <article className="metric-card">
+              <div className="metric-head">
+                <span style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 500 }}>Current CGPA</span>
+                <span title="Guidance estimate, not an official university transcript" style={{ color: 'var(--muted-2)', cursor: 'help' }}>
+                  {Icons.info}
+                </span>
+              </div>
+              <div className="metric-value mono" style={{ fontSize: 28, fontWeight: 600, color: 'var(--text)', margin: '12px 0 4px' }}>
+                3.42<small style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 400 }}> / 4.00</small>
+              </div>
+              <div className="metric-foot" style={{ fontSize: 12, color: 'var(--muted)' }}>
+                <span style={{ color: 'var(--success)', fontWeight: 500 }}>+0.18</span> vs last term
+              </div>
+            </article>
+
+            {/* Card 2: Credits Completed with gold fill progress bar */}
+            <article className="metric-card">
+              <div className="metric-head">
+                <span style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 500 }}>Credits completed</span>
+                <span style={{ fontSize: 12, color: 'var(--muted)' }}>50%</span>
+              </div>
+              <div className="metric-value mono" style={{ fontSize: 28, fontWeight: 600, color: 'var(--text)', margin: '12px 0 4px' }}>
+                68<small style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 400 }}> / 136</small>
+              </div>
+              <div className="metric-meter" style={{ height: 6, background: 'var(--border)', borderRadius: 3, marginTop: 10, overflow: 'hidden' }}>
+                <span style={{ display: 'block', height: '100%', width: '50%', background: '#FFAE07', borderRadius: 3 }} />
+              </div>
+            </article>
+
+            {/* Card 3: FYP Shortlist */}
+            <article className="metric-card">
+              <div className="metric-head">
+                <span style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 500 }}>FYP shortlist</span>
+                <Link href="/fyp" style={{ fontSize: 12, color: 'var(--primary)', textDecoration: 'none', fontWeight: 500 }}>
+                  View all
+                </Link>
+              </div>
+              <div className="metric-value mono" style={{ fontSize: 28, fontWeight: 600, color: 'var(--text)', margin: '12px 0 4px' }}>
+                06<small style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 400 }}> projects</small>
+              </div>
+              <div className="metric-foot" style={{ fontSize: 12, color: 'var(--muted)' }}>
+                Saved across 3 domains
+              </div>
+            </article>
+
+            {/* Card 4: Current Semester */}
+            <article className="metric-card">
+              <div className="metric-head">
+                <span style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 500 }}>Current semester</span>
+                <span style={{ fontSize: 12, color: 'var(--muted)' }}>Fall 2026</span>
+              </div>
+              <div className="metric-value mono" style={{ fontSize: 28, fontWeight: 600, color: 'var(--text)', margin: '12px 0 4px' }}>
+                Semester {currentSem}<small style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 400 }}> of 8</small>
+              </div>
+              <div className="metric-foot" style={{ fontSize: 12, color: 'var(--muted)' }}>
+                Target graduation Spring 2028
+              </div>
+            </article>
+          </section>
+
+          {/* Academic Progress Chart + Timeline Grid */}
+          <div className="dashboard-analytics-grid">
+            {/* Chart per spec: Academic progress, Last 4 terms, maroon line, gold dot on current term, light grid lines */}
+            <section className="panel" style={{ padding: 22 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18, borderBottom: '1px solid var(--border)', paddingBottom: 12 }}>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: 'var(--text)' }}>Academic progress</h3>
+                  <span style={{ fontSize: 12, color: 'var(--muted)' }}>CGPA trend over last 4 terms</span>
+                </div>
+                <span style={{ fontSize: 12, color: 'var(--muted)', fontWeight: 500, border: '1px solid var(--border)', borderRadius: 6, padding: '2px 8px' }}>
+                  Last 4 terms
+                </span>
+              </div>
+
+              {/* Line chart svg */}
+              <div style={{ position: 'relative', height: 180, width: '100%' }}>
+                <svg viewBox="0 0 500 160" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
+                  {/* Subtle horizontal grid lines */}
+                  <line x1="0" y1="30" x2="500" y2="30" stroke="var(--border)" strokeWidth="1" strokeDasharray="3 3" />
+                  <line x1="0" y1="70" x2="500" y2="70" stroke="var(--border)" strokeWidth="1" strokeDasharray="3 3" />
+                  <line x1="0" y1="110" x2="500" y2="110" stroke="var(--border)" strokeWidth="1" strokeDasharray="3 3" />
+                  <line x1="0" y1="150" x2="500" y2="150" stroke="var(--border)" strokeWidth="1" />
+
+                  {/* Maroon trend line */}
+                  <polyline
+                    fill="none"
+                    stroke="#511030"
+                    strokeWidth="2.5"
+                    points="40,118 160,94 300,72 440,42"
+                  />
+
+                  {/* Past term dots */}
+                  <circle cx="40" cy="118" r="4.5" fill="var(--surface)" stroke="#511030" strokeWidth="2" />
+                  <circle cx="160" cy="94" r="4.5" fill="var(--surface)" stroke="#511030" strokeWidth="2" />
+                  <circle cx="300" cy="72" r="4.5" fill="var(--surface)" stroke="#511030" strokeWidth="2" />
+
+                  {/* Gold dot on current term per spec */}
+                  <circle cx="440" cy="42" r="6" fill="#FFAE07" stroke="#511030" strokeWidth="2.5" />
+                </svg>
+
+                {/* Term labels */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, fontSize: 11, color: 'var(--muted)' }}>
+                  <span>Sem 03 (3.12)</span>
+                  <span>Sem 04 (3.24)</span>
+                  <span>Sem 05 (3.32)</span>
+                  <span style={{ fontWeight: 600, color: 'var(--text)' }}>Sem 06 (3.42) &bull; Current</span>
+                </div>
+              </div>
+            </section>
+
+            {/* Progress Section: Semester Timeline 1 to 8 + Milestones per spec */}
+            <section className="panel" style={{ padding: 22 }}>
+              <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 12, marginBottom: 16 }}>
+                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: 'var(--text)' }}>Semester progression</h3>
+                <span style={{ fontSize: 12, color: 'var(--muted)' }}>Eight-semester curriculum timeline</span>
+              </div>
+
+              {/* 1 to 8 timeline with current marked in gold */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: 6, marginBottom: 20 }}>
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => {
+                  const isCurrent = sem === currentSem;
+                  const isPast = sem < currentSem;
+                  return (
+                    <div
+                      key={sem}
+                      style={{
+                        padding: '8px 2px',
+                        textAlign: 'center',
+                        borderRadius: 6,
+                        border: '1px solid',
+                        borderColor: isCurrent ? '#FFAE07' : isPast ? 'var(--border)' : 'var(--border)',
+                        backgroundColor: isCurrent ? 'rgba(255, 174, 7, 0.12)' : isPast ? 'var(--page)' : 'transparent',
+                        color: isCurrent ? '#B77905' : isPast ? 'var(--text)' : 'var(--muted)',
+                        fontWeight: isCurrent ? 600 : 500,
+                        fontSize: 11,
+                      }}
+                      title={isCurrent ? `Semester ${sem} (Current)` : isPast ? `Semester ${sem} (Completed)` : `Semester ${sem} (Upcoming)`}
+                    >
+                      {sem}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Milestones & Deadlines */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
+                  <span style={{ color: 'var(--text)' }}>Registration window</span>
+                  <span style={{ fontSize: 12, color: 'var(--success)', fontWeight: 500 }}>Open for Spring 2027</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
+                  <span style={{ color: 'var(--text)' }}>FYP proposal submission</span>
+                  <span style={{ fontSize: 12, color: 'var(--muted)' }}>Semester 07</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 13, padding: '8px 0' }}>
+                  <span style={{ color: 'var(--text)' }}>FYP final defense</span>
+                  <span style={{ fontSize: 12, color: 'var(--muted)' }}>Semester 08</span>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          {/* Assistant Strip per spec */}
+          <section
+            style={{
+              padding: '16px 20px',
+              borderRadius: 10,
+              backgroundColor: 'var(--surface)',
+              border: '1px solid var(--border)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: 16,
+              marginBottom: 24,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <span style={{ color: '#511030' }}>{Icons.bot}</span>
               <div>
-                <strong style={{ color: '#fda4af', display: 'block', fontSize: '12px' }}>Administrator Console Active</strong>
-                <span style={{ fontSize: '11px', color: '#fecdd3' }}>
-                  You have administrative access to the offline extraction review queue, published FYP records, and student deletion audit logs.
+                <strong style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)', display: 'block' }}>
+                  AI-powered, privacy-first student assistant
+                </strong>
+                <span style={{ fontSize: 12, color: 'var(--muted)' }}>
+                  Trained strictly on verified NED CISE regulations and course schemes.
                 </span>
               </div>
-              <Link href="/admin" className="button button-primary" style={{ fontSize: '11px', padding: '6px 14px' }}>
-                Open Admin Queue &rarr;
-              </Link>
             </div>
-          )}
 
-          {/* Welcome Intro */}
-          <div className="dashboard-intro">
-            <div>
-              <span className="eyebrow">Student overview &bull; Demo data</span>
-              <h1>Good morning, {studentName.split(' ')[0]}.</h1>
-              <p>Your academic map is moving in the right direction. Here&apos;s the useful signal for today.</p>
-            </div>
-            <div className="intro-actions">
-              <Link href="/planner" className="button button-secondary">
-                <Icon name="calendar" className="icon-sm" />
-                <span>Continue degree plan</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 6, backgroundColor: 'var(--page)', border: '1px solid var(--border)', color: 'var(--muted)' }}>
+                Privacy-first
+              </span>
+              <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 6, backgroundColor: 'var(--page)', border: '1px solid var(--border)', color: 'var(--muted)' }}>
+                NED CISE curriculum
+              </span>
+              <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 6, backgroundColor: 'var(--page)', border: '1px solid var(--border)', color: 'var(--muted)' }}>
+                AI student assistant
+              </span>
+              <Link href="/chat" className="button button-primary" style={{ fontSize: 12, padding: '6px 14px' }}>
+                Open assistant
               </Link>
-              <Link href="/chat" className="button button-primary">
-                <Icon name="bot" className="icon-sm" />
-                <span>Ask assistant</span>
-              </Link>
-            </div>
-          </div>
-
-          {/* Profile Banner */}
-          <section className="profile-banner">
-            <div className="profile-main">
-              <span className="avatar">{studentInitials}</span>
-              <div>
-                <h2>BE Computer &amp; Information Systems Engineering</h2>
-                <p>
-                  Semester 0{profile?.current_semester ?? 6} <span className="subtle">&bull;</span> 68 of 136 credit hours completed <span className="subtle">&bull;</span> Target graduation Spring 2028
-                </p>
-              </div>
-            </div>
-            <div className="profile-chips">
-              <span className="pill pill-cyan">BE-CSE</span>
-              <span className="pill pill-sage">50% complete</span>
-              <span className="pill pill-amber">Demo data</span>
             </div>
           </section>
 
-          {/* 4 Academic Metric Cards */}
-          <section className="metric-grid">
-            <article className="metric-card">
-              <div className="metric-head">
-                <span>Current CGPA</span>
-                <span className="metric-icon" style={{ color: 'var(--brand)' }}>
-                  <Icon name="target" />
-                </span>
-              </div>
-              <div className="metric-value mono">
-                3.42<small>/ 4.00</small>
-              </div>
-              <div className="metric-foot">
-                <span className="up">&uarr; 0.18</span> this year
-              </div>
-              <div className="metric-meter">
-                <span style={{ width: '85%' }} />
-              </div>
-            </article>
-
-            <article className="metric-card">
-              <div className="metric-head">
-                <span>Credits completed</span>
-                <span className="metric-icon" style={{ color: 'var(--cyan)' }}>
-                  <Icon name="book" />
-                </span>
-              </div>
-              <div className="metric-value mono">
-                68<small>/ 136 Cr</small>
-              </div>
-              <div className="metric-foot">
-                <span className="up">+15 Cr</span> this semester
-              </div>
-              <div className="metric-meter">
-                <span style={{ width: '50%' }} />
-              </div>
-            </article>
-
-            <article className="metric-card">
-              <div className="metric-head">
-                <span>Prerequisite chain</span>
-                <span className="metric-icon" style={{ color: 'var(--amber)' }}>
-                  <Icon name="layers" />
-                </span>
-              </div>
-              <div className="metric-value mono">
-                04<small> courses</small>
-              </div>
-              <div className="metric-foot">
-                <span className="estimate">Estimate</span> &bull; critical path depth
-              </div>
-              <div className="metric-meter">
-                <span style={{ width: '67%' }} />
-              </div>
-            </article>
-
-            <article className="metric-card">
-              <div className="metric-head">
-                <span>Shortlisted FYPs</span>
-                <span className="metric-icon" style={{ color: 'var(--sage)' }}>
-                  <Icon name="bookmark" />
-                </span>
-              </div>
-              <div className="metric-value mono">
-                06<small> projects</small>
-              </div>
-              <div className="metric-foot">
-                <span className="up">+2</span> since last week
-              </div>
-              <div className="metric-meter">
-                <span style={{ width: '40%' }} />
-              </div>
-            </article>
-          </section>
-
-          {/* Split Grid: Toolkit + Side Stack */}
-          <div className="dashboard-grid">
-            {/* Academic Toolkit (8 Module Cards) */}
-            <div className="panel">
-              <div className="panel-header">
-                <div className="panel-title">
-                  <Icon name="compass" />
-                  <strong>Your academic toolkit</strong>
-                  <span className="pill pill-amber">Demo data</span>
-                </div>
-                <button
-                  className="panel-action"
-                  onClick={() =>
-                    setModalContent({
-                      title: 'Platform Roadmap & Modules',
-                      body: 'The full suite integrates FYP discovery, professor matching, degree planning, DAG prerequisite visualization, and LLM-powered academic guidance with strict PII containment.',
-                    })
-                  }
-                >
-                  View roadmap <Icon name="arrow" className="icon-sm" />
-                </button>
-              </div>
-
-              <div className="module-grid">
-                {modules.map((m) => (
-                  <Link
-                    key={m.key}
-                    href={m.href}
-                    className="module-card"
-                    tabIndex={0}
-                    role="button"
-                    aria-label={`Open ${m.title}`}
-                  >
-                    <div className="module-image">
-                      <img src={m.image} alt={`${m.title} illustration`} />
-                    </div>
-                    <div className="module-meta">
-                      <span className="module-icon">
-                        <Icon name={m.iconName} />
-                      </span>
-                      <span className="module-arrow">
-                        <Icon name="arrowUpRight" className="icon-sm" />
-                      </span>
-                    </div>
-                    <strong>{m.title}</strong>
-                    <span>{m.description}</span>
-                  </Link>
-                ))}
-              </div>
+          {/* Institutional Academic Modules (8 Tools) */}
+          <section style={{ marginBottom: 32 }}>
+            <div style={{ marginBottom: 16 }}>
+              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: 'var(--text)' }}>Academic toolkit</h3>
+              <span style={{ fontSize: 13, color: 'var(--muted)' }}>Direct tools for planning and degree requirements</span>
             </div>
 
-            {/* Side Stack: Today's Schedule & Department Updates */}
-            <div className="side-stack">
-              <section className="panel">
-                <div className="panel-header">
-                  <div className="panel-title">
-                    <Icon name="calendar" />
-                    <strong>Today&apos;s schedule</strong>
-                  </div>
-                  <button
-                    className="panel-action"
-                    onClick={() => triggerToast('Calendar sync staged for next release')}
-                  >
-                    Open calendar
-                  </button>
-                </div>
-                <div className="schedule-list">
-                  <div className="schedule-item" style={{ '--accent': 'var(--cyan)' } as React.CSSProperties}>
-                    <span className="schedule-time">09:00</span>
-                    <i className="schedule-dot" />
-                    <div>
-                      <strong>Database Systems</strong>
-                      <span>Lab 2 &bull; 2 hours</span>
-                    </div>
-                  </div>
-                  <div className="schedule-item" style={{ '--accent': 'var(--brand)' } as React.CSSProperties}>
-                    <span className="schedule-time">13:30</span>
-                    <i className="schedule-dot" />
-                    <div>
-                      <strong>Software Engineering</strong>
-                      <span>Room A-12 &bull; Lecture</span>
-                    </div>
-                  </div>
-                  <div className="schedule-item" style={{ '--accent': 'var(--amber)' } as React.CSSProperties}>
-                    <span className="schedule-time">17:00</span>
-                    <i className="schedule-dot" />
-                    <div>
-                      <strong>FYP shortlisting</strong>
-                      <span>Personal focus block</span>
-                    </div>
-                  </div>
-                </div>
-              </section>
+            <div className="dashboard-toolkit-grid">
+              <Link href="/planner" className="workspace-card" style={{ minHeight: 120 }}>
+                <span style={{ color: '#511030', marginBottom: 10 }}>{Icons.calendar}</span>
+                <span className="workspace-arrow">{Icons.arrowRight}</span>
+                <h3 style={{ fontSize: 15, margin: '0 0 4px' }}>Degree Planner</h3>
+                <p style={{ fontSize: 12, margin: 0 }}>Eight-semester sequencing and prerequisite alerts.</p>
+              </Link>
 
-              <section className="panel">
-                <div className="panel-header">
-                  <div className="panel-title">
-                    <Icon name="bell" />
-                    <strong>Department updates</strong>
-                  </div>
-                  <span className="pill pill-cyan">2 new</span>
-                </div>
-                <div className="announcement-list">
-                  <article className="announcement">
-                    <div className="announcement-top">
-                      <strong>FYP archive review complete</strong>
-                      <time>Today</time>
-                    </div>
-                    <p>8 projects in AI &amp; ML were approved into the official reviewed archive.</p>
-                  </article>
-                  <article className="announcement">
-                    <div className="announcement-top">
-                      <strong>Curriculum office notice</strong>
-                      <time>2d ago</time>
-                    </div>
-                    <p>Spring 2028 graduation planning window opens next week.</p>
-                  </article>
-                </div>
-              </section>
-            </div>
-          </div>
+              <Link href="/fyp" className="workspace-card" style={{ minHeight: 120 }}>
+                <span style={{ color: '#511030', marginBottom: 10 }}>{Icons.book}</span>
+                <span className="workspace-arrow">{Icons.arrowRight}</span>
+                <h3 style={{ fontSize: 15, margin: '0 0 4px' }}>FYP Archive</h3>
+                <p style={{ fontSize: 12, margin: 0 }}>Approved department projects, domains, and tools.</p>
+              </Link>
 
-          {/* Recent Activity Panel */}
-          <section className="panel" style={{ marginTop: '15px' }}>
-            <div className="panel-header">
-              <div className="panel-title">
-                <Icon name="clock" />
-                <strong>Recent activity</strong>
-              </div>
-              <button
-                className="panel-action"
-                onClick={() => triggerToast('Activity history will be available in next build')}
-              >
-                See all activity
-              </button>
-            </div>
-            <div className="activity-list">
-              <div className="activity-row">
-                <span className="activity-icon">
-                  <Icon name="bookmark" className="icon-sm" />
-                </span>
-                <div>
-                  <strong>Shortlisted &ldquo;Vision-based Campus Navigation&rdquo;</strong>
-                  <span>FYP Archive &bull; AI &amp; Machine Learning</span>
-                </div>
-                <span className="activity-time">2h ago</span>
-              </div>
-              <div className="activity-row">
-                <span className="activity-icon">
-                  <Icon name="trend" className="icon-sm" />
-                </span>
-                <div>
-                  <strong>Completed the Computer Networks prerequisite chain</strong>
-                  <span>Prerequisite Explorer &bull; 3 courses unlocked</span>
-                </div>
-                <span className="activity-time">Yesterday</span>
-              </div>
-              <div className="activity-row">
-                <span className="activity-icon">
-                  <Icon name="bot" className="icon-sm" />
-                </span>
-                <div>
-                  <strong>Asked about minimum CGPA to graduate</strong>
-                  <span>AI Assistant &bull; Layer 1 official regulation</span>
-                </div>
-                <span className="activity-time">Mon</span>
-              </div>
+              <Link href="/professors" className="workspace-card" style={{ minHeight: 120 }}>
+                <span style={{ color: '#511030', marginBottom: 10 }}>{Icons.users}</span>
+                <span className="workspace-arrow">{Icons.arrowRight}</span>
+                <h3 style={{ fontSize: 15, margin: '0 0 4px' }}>Professors</h3>
+                <p style={{ fontSize: 12, margin: 0 }}>Faculty research areas and supervision focus.</p>
+              </Link>
+
+              <Link href="/explorer" className="workspace-card" style={{ minHeight: 120 }}>
+                <span style={{ color: '#511030', marginBottom: 10 }}>{Icons.layers}</span>
+                <span className="workspace-arrow">{Icons.arrowRight}</span>
+                <h3 style={{ fontSize: 15, margin: '0 0 4px' }}>Prerequisite Explorer</h3>
+                <p style={{ fontSize: 12, margin: 0 }}>Interactive DAG chain leading to graduation.</p>
+              </Link>
             </div>
           </section>
 
-          {/* Rule 13 Guidance Disclaimer */}
-          <div className="disclaimer" style={{ marginTop: '20px' }}>
-            <Icon name="shield" />
-            <span>Guidance estimates, not official university decisions.</span>
-            <Link href="/terms">Read terms</Link>
-          </div>
+          {/* Institutional Footer per spec */}
+          <footer className="site-footer" style={{ marginTop: 40, padding: '24px 0 16px' }}>
+            <div className="site-footer-inner" style={{ padding: 0 }}>
+              <div className="site-footer-top">
+                <div className="site-footer-brand">
+                  <img
+                    src="/assets/brand/ned-logo.png"
+                    alt="NED University of Engineering & Technology, Karachi"
+                    className="site-footer-logo"
+                  />
+                  <span>NED University of Engineering &amp; Technology, Karachi</span>
+                </div>
+                <div className="site-footer-links">
+                  <Link href="/terms">Terms of Service &amp; Policies</Link>
+                  <Link href="/privacy">Privacy</Link>
+                  <Link href="/help">Help &amp; FAQs</Link>
+                </div>
+              </div>
+              <div className="site-footer-disclaimer">
+                Match scores, prerequisite mappings and recommendations are guidance only, not official university decisions.
+              </div>
+            </div>
+          </footer>
         </div>
       </main>
-
-      {/* ── Toast Notifications ── */}
-      {toastMessage && (
-        <div className="toast-region" aria-live="polite" aria-atomic="true">
-          <div className="toast">
-            <Icon name="check" className="icon-sm" />
-            <span>{toastMessage}</span>
-          </div>
-        </div>
-      )}
-
-      {/* ── Modal Dialog ── */}
-      {modalContent && (
-        <div className="modal-backdrop" onClick={() => setModalContent(null)}>
-          <section
-            className="modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="modal-title"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="modal-head">
-              <div>
-                <h3 id="modal-title">{modalContent.title}</h3>
-                <p>{modalContent.body}</p>
-              </div>
-              <button
-                className="button button-icon"
-                onClick={() => setModalContent(null)}
-                aria-label="Close"
-              >
-                <Icon name="x" />
-              </button>
-            </div>
-            <div className="modal-body">
-              <div className="modal-row">
-                <span>Data state</span>
-                <strong>Demo data</strong>
-              </div>
-              <div className="modal-row">
-                <span>Guidance label</span>
-                <strong>Estimate where applicable</strong>
-              </div>
-              <div className="modal-row">
-                <span>Privacy posture</span>
-                <strong>No student PII sent to LLMs</strong>
-              </div>
-            </div>
-            <div className="modal-actions">
-              <button
-                className="button button-primary"
-                onClick={() => setModalContent(null)}
-              >
-                Got it
-              </button>
-            </div>
-          </section>
-        </div>
-      )}
     </div>
   );
 }

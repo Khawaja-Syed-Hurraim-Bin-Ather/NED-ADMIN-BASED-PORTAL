@@ -403,7 +403,7 @@ export default function FYPPortalPage() {
       <PageHeader
         title="FYP Archive &amp; Team Board"
         breadcrumbs={[{ label: 'FYP Portal' }]}
-        badge="M1"
+        badge="Verified Archive"
         description="68 reviewed NED CISE final year projects. Semantic similarity search, domain filters, and student team formation board."
         accent="var(--cyan)"
         actions={
