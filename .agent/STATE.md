@@ -2,6 +2,16 @@
 Last updated: 2026-10-28
 
 ## Latest Updates
+- **Institutional Admin Panel — Deletion Lifecycle & Schedule (Card A10)**:
+  - Built router `apps/api/src/routes/deletions.ts` mounted under `/api/v1/admin/deletions`:
+    - Resource cooling-off duration resolver (`getCoolingOffDays`): Career/Chatbot (7 days), FYP/Professors (14 days), Curriculum (30 days), Schemes (90 days).
+    - Soft deletion staging `POST /`: Sets `deleted_at = NOW()` immediately on the target table (hiding item from students) and inserts into `deletion_schedule`.
+    - Scheduled deletions queue `GET /`: Lists items with real-time countdown timer (`hoursRemaining`) and department scoping.
+    - Restoration before purge `POST /:id/restore`: Clears `deleted_at = null`, marks `state = 'restored'`, and records audit trail.
+    - Final purge `POST /:id/purge` (Golden Rule 3): Enforces VC-only role, step-up token challenge, cooling-off elapsed date, daily rate cap (maximum 5 purges per 24 hours), permanent row deletion, and immutable tombstone logged in `audit_log`.
+  - Tests-first test suite in `apps/api/src/routes/deletions.test.ts` (8/8 tests passing).
+  - Monorepo validation: **168/168 Vitest tests green**, 0 TypeScript errors across all 6 workspace packages.
+
 - **Institutional Admin Panel — Publish Cascade Execution & VC Rollback (Card A9)**:
   - Built background cascade execution engine `apps/api/src/lib/publish-cascade.ts`:
     - Handles sequential steps 3 to 10 (`rebuild_graph`, `recompute_scores`, `refresh_caches`, `reembed_chatbot`, `faq_staleness`, `career_links`, `student_notice`, `health_report`).
@@ -130,6 +140,7 @@ Last updated: 2026-10-28
 | A7 | done | main | Content modules (FYP, professors, career, chatbot, imports queue) & draft transformers |
 | A8 | done | main | Curriculum admin module (scheme cloning, validation DAG engine, impact preview, equivalences) |
 | A9 | done | main | Publish cascade background runner (steps 3-10), status monitoring panel, and VC rollback |
+| A10 | done | main | Deletion lifecycle (cooling-off timer, soft-delete hiding, restore before purge, VC-only 5/day purge cap) |
 | F1 | done | main | Scaffolded monorepo, secrets, localhost web (3000) & api (4000) |
 | F2 | done | main | Base schema + FYP v2 + roadmap progress migrations applied to Supabase |
 | F3 | done | main | Supabase Auth + Next.js middleware + requireRole('enrolled'|'admin') + deletion requests (Rule 9) |
