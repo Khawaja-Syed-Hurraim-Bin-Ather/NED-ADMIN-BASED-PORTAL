@@ -85,6 +85,7 @@ Last updated: 2026-10-28
 | A3 | done | main | Version-aware curriculum endpoints, batch resolver, and hybrid batch picker UI |
 | A4 | done | main | Admin auth (2-step OTP, 8h sessions, lockout, step-up, invitations, security panel) |
 | A5 | done | main | Dynamic permission matrix checks (admin_permissions.json) & 16 unit tests |
+| A6 | done | main | Change sets, deterministic diff message generator, approvals queue & atomic apply_change_set |
 | F1 | done | main | Scaffolded monorepo, secrets, localhost web (3000) & api (4000) |
 | F2 | done | main | Base schema + FYP v2 + roadmap progress migrations applied to Supabase |
 | F3 | done | main | Supabase Auth + Next.js middleware + requireRole('enrolled'|'admin') + deletion requests (Rule 9) |
