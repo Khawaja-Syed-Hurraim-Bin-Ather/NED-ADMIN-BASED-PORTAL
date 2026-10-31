@@ -1,0 +1,497 @@
+{
+  "schema_version": 1,
+  "roles": [
+    "vc",
+    "chairman",
+    "operator"
+  ],
+  "resources": [
+    "curriculum",
+    "fyp",
+    "professors",
+    "career",
+    "chatbot_content",
+    "data_imports",
+    "chatbot_settings",
+    "admin_accounts",
+    "student_deletion_requests",
+    "departments",
+    "releases",
+    "audit_log",
+    "analytics"
+  ],
+  "actions": [
+    "view",
+    "draft",
+    "submit",
+    "approve",
+    "publish",
+    "request_delete",
+    "approve_delete",
+    "purge",
+    "view_history"
+  ],
+  "legend": {
+    "allow": "allowed everywhere",
+    "allow_own_department": "allowed in the user's department only",
+    "allow_assigned_modules": "allowed in own department and only the modules assigned to this operator",
+    "allow_own_department_operators": "chairman manages operators of own department only",
+    "minor_only_major_needs_vc": "chairman may publish minor changes; major changes need VC approval",
+    "needs_approval": "creates an approval request; nothing changes until approved",
+    "needs_vc_approval": "creates an approval request routed to the Vice Chancellor",
+    "allow_after_cooling_off": "allowed only after the cooling-off period and with step-up verification",
+    "own_submissions_only": "only records this user submitted",
+    "deny": "never allowed (hide the control and explain why)"
+  },
+  "notes": [
+    "Live tables are never written directly by any admin session; only the server-side publish function applies approved change sets.",
+    "No role can read individual student academic records.",
+    "Even for allowed actions, destructive actions require step-up verification (fresh email code)."
+  ],
+  "matrix": {
+    "vc": {
+      "curriculum": {
+        "view": "allow",
+        "draft": "allow",
+        "submit": "allow",
+        "approve": "allow",
+        "publish": "allow",
+        "request_delete": "allow",
+        "approve_delete": "allow",
+        "purge": "allow_after_cooling_off",
+        "view_history": "allow"
+      },
+      "fyp": {
+        "view": "allow",
+        "draft": "allow",
+        "submit": "allow",
+        "approve": "allow",
+        "publish": "allow",
+        "request_delete": "allow",
+        "approve_delete": "allow",
+        "purge": "allow_after_cooling_off",
+        "view_history": "allow"
+      },
+      "professors": {
+        "view": "allow",
+        "draft": "allow",
+        "submit": "allow",
+        "approve": "allow",
+        "publish": "allow",
+        "request_delete": "allow",
+        "approve_delete": "allow",
+        "purge": "allow_after_cooling_off",
+        "view_history": "allow"
+      },
+      "career": {
+        "view": "allow",
+        "draft": "allow",
+        "submit": "allow",
+        "approve": "allow",
+        "publish": "allow",
+        "request_delete": "allow",
+        "approve_delete": "allow",
+        "purge": "allow_after_cooling_off",
+        "view_history": "allow"
+      },
+      "chatbot_content": {
+        "view": "allow",
+        "draft": "allow",
+        "submit": "allow",
+        "approve": "allow",
+        "publish": "allow",
+        "request_delete": "allow",
+        "approve_delete": "allow",
+        "purge": "allow_after_cooling_off",
+        "view_history": "allow"
+      },
+      "data_imports": {
+        "view": "allow",
+        "draft": "allow",
+        "submit": "allow",
+        "approve": "allow",
+        "publish": "allow",
+        "request_delete": "allow",
+        "approve_delete": "allow",
+        "purge": "allow_after_cooling_off",
+        "view_history": "allow"
+      },
+      "chatbot_settings": {
+        "view": "allow",
+        "draft": "allow",
+        "submit": "deny",
+        "approve": "deny",
+        "publish": "allow",
+        "request_delete": "deny",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "allow"
+      },
+      "admin_accounts": {
+        "view": "allow",
+        "draft": "allow",
+        "submit": "deny",
+        "approve": "deny",
+        "publish": "allow",
+        "request_delete": "deny",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "allow"
+      },
+      "student_deletion_requests": {
+        "view": "allow",
+        "draft": "deny",
+        "submit": "deny",
+        "approve": "allow",
+        "publish": "allow",
+        "request_delete": "deny",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "allow"
+      },
+      "departments": {
+        "view": "allow",
+        "draft": "allow",
+        "submit": "deny",
+        "approve": "deny",
+        "publish": "allow",
+        "request_delete": "deny",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "allow"
+      },
+      "releases": {
+        "view": "allow",
+        "draft": "deny",
+        "submit": "deny",
+        "approve": "allow",
+        "publish": "allow",
+        "request_delete": "deny",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "allow"
+      },
+      "audit_log": {
+        "view": "allow",
+        "draft": "deny",
+        "submit": "deny",
+        "approve": "deny",
+        "publish": "deny",
+        "request_delete": "deny",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "allow"
+      },
+      "analytics": {
+        "view": "allow",
+        "draft": "deny",
+        "submit": "deny",
+        "approve": "deny",
+        "publish": "deny",
+        "request_delete": "deny",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "deny"
+      }
+    },
+    "chairman": {
+      "curriculum": {
+        "view": "allow_own_department",
+        "draft": "allow_own_department",
+        "submit": "allow_own_department",
+        "approve": "deny",
+        "publish": "minor_only_major_needs_vc",
+        "request_delete": "needs_vc_approval",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "allow_own_department"
+      },
+      "fyp": {
+        "view": "allow_own_department",
+        "draft": "allow_own_department",
+        "submit": "allow_own_department",
+        "approve": "allow_own_department",
+        "publish": "allow_own_department",
+        "request_delete": "allow_own_department",
+        "approve_delete": "allow_own_department",
+        "purge": "deny",
+        "view_history": "allow_own_department"
+      },
+      "professors": {
+        "view": "allow_own_department",
+        "draft": "allow_own_department",
+        "submit": "allow_own_department",
+        "approve": "allow_own_department",
+        "publish": "allow_own_department",
+        "request_delete": "allow_own_department",
+        "approve_delete": "allow_own_department",
+        "purge": "deny",
+        "view_history": "allow_own_department"
+      },
+      "career": {
+        "view": "allow_own_department",
+        "draft": "allow_own_department",
+        "submit": "allow_own_department",
+        "approve": "allow_own_department",
+        "publish": "allow_own_department",
+        "request_delete": "allow_own_department",
+        "approve_delete": "allow_own_department",
+        "purge": "deny",
+        "view_history": "allow_own_department"
+      },
+      "chatbot_content": {
+        "view": "allow_own_department",
+        "draft": "allow_own_department",
+        "submit": "allow_own_department",
+        "approve": "allow_own_department",
+        "publish": "allow_own_department",
+        "request_delete": "allow_own_department",
+        "approve_delete": "allow_own_department",
+        "purge": "deny",
+        "view_history": "allow_own_department"
+      },
+      "data_imports": {
+        "view": "allow_own_department",
+        "draft": "allow_own_department",
+        "submit": "allow_own_department",
+        "approve": "allow_own_department",
+        "publish": "allow_own_department",
+        "request_delete": "allow_own_department",
+        "approve_delete": "allow_own_department",
+        "purge": "deny",
+        "view_history": "allow_own_department"
+      },
+      "chatbot_settings": {
+        "view": "deny",
+        "draft": "deny",
+        "submit": "deny",
+        "approve": "deny",
+        "publish": "deny",
+        "request_delete": "deny",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "deny"
+      },
+      "admin_accounts": {
+        "view": "allow_own_department_operators",
+        "draft": "allow_own_department_operators",
+        "submit": "deny",
+        "approve": "deny",
+        "publish": "allow_own_department_operators",
+        "request_delete": "deny",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "allow_own_department"
+      },
+      "student_deletion_requests": {
+        "view": "allow_own_department",
+        "draft": "deny",
+        "submit": "deny",
+        "approve": "allow_own_department",
+        "publish": "allow_own_department",
+        "request_delete": "deny",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "deny"
+      },
+      "departments": {
+        "view": "deny",
+        "draft": "deny",
+        "submit": "deny",
+        "approve": "deny",
+        "publish": "deny",
+        "request_delete": "deny",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "deny"
+      },
+      "releases": {
+        "view": "allow_own_department",
+        "draft": "deny",
+        "submit": "deny",
+        "approve": "deny",
+        "publish": "deny",
+        "request_delete": "needs_vc_approval",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "allow_own_department"
+      },
+      "audit_log": {
+        "view": "allow_own_department",
+        "draft": "deny",
+        "submit": "deny",
+        "approve": "deny",
+        "publish": "deny",
+        "request_delete": "deny",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "allow_own_department"
+      },
+      "analytics": {
+        "view": "allow_own_department",
+        "draft": "deny",
+        "submit": "deny",
+        "approve": "deny",
+        "publish": "deny",
+        "request_delete": "deny",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "deny"
+      }
+    },
+    "operator": {
+      "curriculum": {
+        "view": "deny",
+        "draft": "deny",
+        "submit": "deny",
+        "approve": "deny",
+        "publish": "deny",
+        "request_delete": "deny",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "deny"
+      },
+      "fyp": {
+        "view": "allow_assigned_modules",
+        "draft": "allow_assigned_modules",
+        "submit": "allow_assigned_modules",
+        "approve": "deny",
+        "publish": "deny",
+        "request_delete": "needs_approval",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "own_submissions_only"
+      },
+      "professors": {
+        "view": "allow_assigned_modules",
+        "draft": "allow_assigned_modules",
+        "submit": "allow_assigned_modules",
+        "approve": "deny",
+        "publish": "deny",
+        "request_delete": "needs_approval",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "own_submissions_only"
+      },
+      "career": {
+        "view": "allow_assigned_modules",
+        "draft": "allow_assigned_modules",
+        "submit": "allow_assigned_modules",
+        "approve": "deny",
+        "publish": "deny",
+        "request_delete": "needs_approval",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "own_submissions_only"
+      },
+      "chatbot_content": {
+        "view": "allow_assigned_modules",
+        "draft": "allow_assigned_modules",
+        "submit": "allow_assigned_modules",
+        "approve": "deny",
+        "publish": "deny",
+        "request_delete": "needs_approval",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "own_submissions_only"
+      },
+      "data_imports": {
+        "view": "allow_assigned_modules",
+        "draft": "allow_assigned_modules",
+        "submit": "allow_assigned_modules",
+        "approve": "deny",
+        "publish": "deny",
+        "request_delete": "needs_approval",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "own_submissions_only"
+      },
+      "chatbot_settings": {
+        "view": "deny",
+        "draft": "deny",
+        "submit": "deny",
+        "approve": "deny",
+        "publish": "deny",
+        "request_delete": "deny",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "deny"
+      },
+      "admin_accounts": {
+        "view": "deny",
+        "draft": "deny",
+        "submit": "deny",
+        "approve": "deny",
+        "publish": "deny",
+        "request_delete": "deny",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "deny"
+      },
+      "student_deletion_requests": {
+        "view": "deny",
+        "draft": "deny",
+        "submit": "deny",
+        "approve": "deny",
+        "publish": "deny",
+        "request_delete": "deny",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "deny"
+      },
+      "departments": {
+        "view": "deny",
+        "draft": "deny",
+        "submit": "deny",
+        "approve": "deny",
+        "publish": "deny",
+        "request_delete": "deny",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "deny"
+      },
+      "releases": {
+        "view": "deny",
+        "draft": "deny",
+        "submit": "deny",
+        "approve": "deny",
+        "publish": "deny",
+        "request_delete": "deny",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "deny"
+      },
+      "audit_log": {
+        "view": "own_submissions_only",
+        "draft": "deny",
+        "submit": "deny",
+        "approve": "deny",
+        "publish": "deny",
+        "request_delete": "deny",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "deny"
+      },
+      "analytics": {
+        "view": "deny",
+        "draft": "deny",
+        "submit": "deny",
+        "approve": "deny",
+        "publish": "deny",
+        "request_delete": "deny",
+        "approve_delete": "deny",
+        "purge": "deny",
+        "view_history": "deny"
+      }
+    }
+  },
+  "cooling_off_days_default": {
+    "curriculum_item": 30,
+    "curriculum_version": 90,
+    "fyp": 14,
+    "professors": 14,
+    "career": 7,
+    "chatbot_content": 7,
+    "data_imports": 7
+  }
+}
