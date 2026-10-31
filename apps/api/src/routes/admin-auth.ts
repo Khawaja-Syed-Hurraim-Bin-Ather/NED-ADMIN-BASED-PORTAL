@@ -332,6 +332,90 @@ adminAuthRouter.post('/verify-code', async (req: Request, res: Response) => {
 });
 
 /**
+ * POST /api/v1/admin/auth/demo-session
+ * Fast persona switcher for demonstration / dev environment.
+ * Generates an authentic JWT for the requested role (operator, chairman, vc).
+ */
+adminAuthRouter.post('/demo-session', async (req: Request, res: Response) => {
+  const role = req.body?.role as string;
+  if (!['operator', 'chairman', 'vc'].includes(role)) {
+    res.status(400).json(apiError('INVALID_ROLE', 'Role must be operator, chairman, or vc'));
+    return;
+  }
+
+  // Get CIS department ID
+  const { data: dept } = await supabaseAdmin.from('departments').select('id').eq('code', 'CIS').maybeSingle();
+  const deptId = dept?.id || null;
+
+  // Find or create admin user for this role
+  let { data: user } = await supabaseAdmin
+    .from('admin_users')
+    .select('id, email, full_name, role, department_id, allowed_modules, status')
+    .eq('role', role)
+    .maybeSingle();
+
+  if (!user) {
+    const email = `${role}.demo@nedut.edu.pk`;
+    const fullName = role === 'vc' ? 'Vice Chancellor' : role === 'chairman' ? 'Department Chairman (CISE)' : 'Data Entry Operator';
+    const allowedModules = role === 'operator' ? ['courses', 'professors', 'fyp', 'careers', 'chatbot'] : [];
+
+    const { data: created } = await supabaseAdmin
+      .from('admin_users')
+      .insert({
+        email,
+        full_name: fullName,
+        role,
+        department_id: role === 'vc' ? null : deptId,
+        status: 'active',
+        allowed_modules: allowedModules,
+      })
+      .select('id, email, full_name, role, department_id, allowed_modules, status')
+      .single();
+    user = created;
+  }
+
+  if (!user) {
+    res.status(500).json(apiError('INTERNAL_ERROR', 'Failed to resolve demo user'));
+    return;
+  }
+
+  const token = jwt.sign(
+    {
+      adminId: user.id,
+      email: user.email,
+      role: user.role,
+      departmentId: user.department_id,
+      allowedModules: user.allowed_modules || [],
+      sessionStartedAt: Date.now(),
+    },
+    ADMIN_JWT_SECRET,
+    { expiresIn: '8h' }
+  );
+
+  res.cookie('educompass_admin_token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 8 * 60 * 60 * 1000,
+  });
+
+  res.json({
+    success: true,
+    data: {
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        fullName: user.full_name,
+        role: user.role,
+        departmentId: user.department_id,
+        allowedModules: user.allowed_modules || [],
+      },
+    },
+  });
+});
+
+/**
  * POST /api/v1/admin/auth/step-up
  * Step-up challenge for destructive actions (valid 5 minutes).
  */

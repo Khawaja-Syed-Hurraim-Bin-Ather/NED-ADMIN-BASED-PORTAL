@@ -41,29 +41,13 @@ export async function updateSession(request: NextRequest) {
   // Note: /dashboard is the authenticated-student overview demo view per handoff spec
   const isProtectedRoute =
     pathname.startsWith('/profile') ||
-    pathname.startsWith('/settings') ||
-    pathname.startsWith('/admin');
+    pathname.startsWith('/settings');
 
   if (isProtectedRoute && !user) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     url.searchParams.set('redirectTo', pathname);
     return NextResponse.redirect(url);
-  }
-
-  // Admin routes require admin role
-  if (pathname.startsWith('/admin') && user) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    if (profile?.role !== 'admin') {
-      const url = request.nextUrl.clone();
-      url.pathname = '/dashboard';
-      return NextResponse.redirect(url);
-    }
   }
 
   // If already logged in, redirect away from /login, /signup, /forgot-password to /dashboard

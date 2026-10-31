@@ -87,7 +87,18 @@ export default function InstitutionalAdminConsole() {
 
   // Active role state (allows toggling role view for demonstration/governance audit)
   const [activeRole, setActiveRole] = useState<AdminRole>('chairman');
+  const [authToken, setAuthToken] = useState<string>('');
+  const [currentUser, setCurrentUser] = useState<{ id: string; email: string; fullName: string; role: string } | null>(null);
   const [selectedBatchPreview, setSelectedBatchPreview] = useState('2022');
+
+  // Login Modal State (Full 2-step credentials flow)
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [loginEmail, setLoginEmail] = useState('cursor.pro.test124@gmail.com');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginStep, setLoginStep] = useState<'credentials' | 'otp'>('credentials');
+  const [otpCode, setOtpCode] = useState('');
+  const [otpHint, setOtpHint] = useState<string | null>(null);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   // Navigation tab per role
   const [operatorTab, setOperatorTab] = useState<'drafts' | 'requests' | 'entry' | 'help'>('drafts');
@@ -115,40 +126,66 @@ export default function InstitutionalAdminConsole() {
   // Tooltip helper state for "Why can't I do this?"
   const [lockedReason, setLockedReason] = useState<string | null>(null);
 
-  // ── Data Fetching ───────────────────────────────────────────────────────────
+  // ── Session & Data Fetching ─────────────────────────────────────────────────
 
-  const loadData = useCallback(async () => {
+  const syncRoleSession = useCallback(async (role: AdminRole): Promise<string | null> => {
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/admin/auth/demo-session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        const token = json.data?.token;
+        if (token) {
+          setAuthToken(token);
+          setCurrentUser(json.data.user);
+          return token;
+        }
+      }
+    } catch (_) {}
+    return null;
+  }, []);
+
+  const loadData = useCallback(async (tokenOverride?: string) => {
+    const token = tokenOverride || authToken;
+    const reqHeaders: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+
     try {
       // 1. Fetch health report
-      const healthRes = await fetch(`${API_BASE}/api/v1/admin/health/report`);
+      const healthRes = await fetch(`${API_BASE}/api/v1/admin/health/report`, { headers: reqHeaders });
       if (healthRes.ok) {
         const json = await healthRes.json();
         setHealthData(json);
       }
 
       // 2. Fetch change sets
-      const csRes = await fetch(`${API_BASE}/api/v1/admin/change-sets`);
+      const csRes = await fetch(`${API_BASE}/api/v1/admin/change-sets`, { headers: reqHeaders });
       if (csRes.ok) {
         const json = await csRes.json();
         setChangeSets(json.data || []);
       }
 
       // 3. Fetch approvals queue
-      const appRes = await fetch(`${API_BASE}/api/v1/admin/approvals`);
+      const appRes = await fetch(`${API_BASE}/api/v1/admin/approvals`, { headers: reqHeaders });
       if (appRes.ok) {
         const json = await appRes.json();
         setApprovals(json.data || []);
       }
 
       // 4. Fetch deletions schedule
-      const delRes = await fetch(`${API_BASE}/api/v1/admin/deletions`);
+      const delRes = await fetch(`${API_BASE}/api/v1/admin/deletions`, { headers: reqHeaders });
       if (delRes.ok) {
         const json = await delRes.json();
         setDeletions(json.data || []);
       }
 
       // 5. Fetch releases
-      const relRes = await fetch(`${API_BASE}/api/v1/admin/releases`);
+      const relRes = await fetch(`${API_BASE}/api/v1/admin/releases`, { headers: reqHeaders });
       if (relRes.ok) {
         const json = await relRes.json();
         setReleases(json.data || []);
@@ -210,11 +247,74 @@ Code expires in 72 hours. Institutional governance Rule 1 enforced.`,
         { id: 'rel-1', tag: 'cis-scheme2022-r1', notes: 'Initial backfill of Scheme 2022', created_at: new Date().toISOString() },
       ]);
     }
-  }, []);
+  }, [authToken]);
 
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    syncRoleSession(activeRole).then((token) => {
+      loadData(token || undefined);
+    });
+  }, [activeRole, syncRoleSession, loadData]);
+
+  // ── Authentication Modal Handlers ───────────────────────────────────────────
+
+  const handleCredentialsSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError(null);
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/admin/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: loginEmail, password: loginPassword }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error?.message || 'Login failed');
+      }
+      if (data.data?.testCodeHint) {
+        setOtpHint(data.data.testCodeHint);
+        setOtpCode(data.data.testCodeHint);
+      }
+      setLoginStep('otp');
+    } catch (err: any) {
+      setAuthError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError(null);
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/admin/auth/verify-code`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: loginEmail, code: otpCode }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error?.message || 'Verification failed');
+      }
+      const token = data.data?.token;
+      const user = data.data?.user;
+      if (token) {
+        setAuthToken(token);
+        setCurrentUser(user);
+        if (user?.role === 'vc' || user?.role === 'chairman' || user?.role === 'operator') {
+          setActiveRole(user.role as AdminRole);
+        }
+        setLoginModalOpen(false);
+        setToastMessage(`Signed in successfully as ${user?.fullName || user?.email} (${user?.role})`);
+        loadData(token);
+      }
+    } catch (err: any) {
+      setAuthError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // ── Actions ─────────────────────────────────────────────────────────────────
 
@@ -232,6 +332,7 @@ Code expires in 72 hours. Institutional governance Rule 1 enforced.`,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
           'x-admin-approval-code': stepUpCode,
           'x-admin-step-up-token': 'valid-step-up-token',
         },
@@ -257,7 +358,10 @@ Code expires in 72 hours. Institutional governance Rule 1 enforced.`,
     try {
       const res = await fetch(`${API_BASE}/api/v1/admin/curriculum/versions/v-2022/clone`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+        },
         body: JSON.stringify({ name: cloneSchemeName }),
       });
       if (!res.ok) throw new Error('Cloning failed');
@@ -297,7 +401,7 @@ Code expires in 72 hours. Institutional governance Rule 1 enforced.`,
 
         {/* Role & Governance Control Bar */}
         <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 mb-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <span className="text-xs font-semibold text-[var(--color-muted)] uppercase tracking-wider">Active Role:</span>
             <div className="inline-flex rounded-lg border border-[var(--color-border)] p-1 bg-[var(--color-bg)]">
               {(['operator', 'chairman', 'vc'] as AdminRole[]).map((role) => (
@@ -314,6 +418,25 @@ Code expires in 72 hours. Institutional governance Rule 1 enforced.`,
                 </button>
               ))}
             </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setLoginStep('credentials');
+                setAuthError(null);
+                setLoginModalOpen(true);
+              }}
+              className="text-xs py-1 h-auto"
+            >
+              🔐 Sign In with Credentials
+            </Button>
+
+            {currentUser && (
+              <span className="text-xs text-[var(--color-muted)] hidden xl:inline">
+                Active Session: <strong className="text-[var(--color-text)]">{currentUser.fullName}</strong>
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-4">
@@ -1021,6 +1144,134 @@ Code expires in 72 hours. Institutional governance Rule 1 enforced.`,
                 {loading ? 'Cloning...' : 'Create Draft Revision'}
               </Button>
             </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Admin 2-Step Login Modal */}
+      {loginModalOpen && (
+        <Modal
+          isOpen={true}
+          title="Institutional Admin Sign In (2-Step Verification)"
+          onClose={() => setLoginModalOpen(false)}
+        >
+          <div className="space-y-4 text-xs">
+            {/* Quick Fill Credentials Buttons for Demo / Testing */}
+            <div className="p-3 bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg space-y-2">
+              <span className="font-semibold text-[var(--color-muted)] uppercase tracking-wider block">Quick-Fill Testing Accounts:</span>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setLoginEmail('cursor.pro.test124@gmail.com');
+                  }}
+                  className="text-xs"
+                >
+                  Vice Chancellor Email
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setLoginEmail('chairman.cis@nedut.edu.pk');
+                  }}
+                  className="text-xs"
+                >
+                  Chairman CISE Email
+                </Button>
+              </div>
+            </div>
+
+            {authError && (
+              <Alert variant="danger" title="Authentication Error">
+                {authError}
+              </Alert>
+            )}
+
+            {loginStep === 'credentials' ? (
+              <form onSubmit={handleCredentialsSubmit} className="space-y-3">
+                <div>
+                  <label className="block font-medium mb-1">Institutional Email:</label>
+                  <Input
+                    type="email"
+                    value={loginEmail}
+                    onChange={(e) => setLoginEmail(e.target.value)}
+                    required
+                    placeholder="e.g. cursor.pro.test124@gmail.com"
+                  />
+                </div>
+                <div>
+                  <label className="block font-medium mb-1">Password:</label>
+                  <Input
+                    type="password"
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
+                    required
+                    placeholder="Enter admin password"
+                  />
+                </div>
+                <div className="flex justify-between items-center pt-2">
+                  <span className="text-[10px] text-[var(--color-muted)]">Step 1 of 2: Password check</span>
+                  <div className="flex gap-2">
+                    <Button type="button" variant="outline" onClick={() => setLoginModalOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button type="submit" disabled={loading}>
+                      {loading ? 'Validating...' : 'Send Verification Code →'}
+                    </Button>
+                  </div>
+                </div>
+              </form>
+            ) : (
+              <form onSubmit={handleVerifyOtpSubmit} className="space-y-3">
+                <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded text-blue-200">
+                  <p className="font-medium">Verification code dispatched</p>
+                  <p className="text-[11px] text-blue-300">
+                    A 6-digit one-time code was sent to <strong>{loginEmail}</strong> (expires in 10 minutes).
+                  </p>
+                  {otpHint && (
+                    <div className="mt-2 text-[11px] font-mono bg-blue-900/50 p-1.5 rounded text-amber-300">
+                      Development Mode OTP Hint: <strong>{otpHint}</strong>
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block font-medium mb-1">6-Digit One-Time Code:</label>
+                  <Input
+                    type="text"
+                    maxLength={6}
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value)}
+                    required
+                    placeholder="e.g. 123456"
+                    className="font-mono text-center tracking-widest text-base"
+                  />
+                </div>
+
+                <div className="flex justify-between items-center pt-2">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => {
+                      setLoginStep('credentials');
+                      setAuthError(null);
+                    }}
+                  >
+                    ← Back
+                  </Button>
+                  <div className="flex gap-2">
+                    <Button type="button" variant="outline" onClick={() => setLoginModalOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button type="submit" disabled={loading || otpCode.length !== 6}>
+                      {loading ? 'Verifying...' : 'Verify & Enter Admin Console'}
+                    </Button>
+                  </div>
+                </div>
+              </form>
+            )}
           </div>
         </Modal>
       )}
