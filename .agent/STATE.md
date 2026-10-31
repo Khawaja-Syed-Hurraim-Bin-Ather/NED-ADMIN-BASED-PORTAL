@@ -2,6 +2,12 @@
 Last updated: 2026-10-28
 
 ## Latest Updates
+- **Institutional Admin Panel — Hardening, Section 14 Test Suite & Handbook (Card A12)**:
+  - Authored comprehensive governance test suite `apps/api/src/tests/institutional-governance.test.ts` covering all Section 14 verification categories (matrix rules, DAG cycle detection, backward prerequisite rejection, credit limit overflow, cooling-off timelines, and zero student PII leaks).
+  - Executed automated client bundle secret audit asserting zero server secrets or credentials (`SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_JWT_SECRET`, `NEXTAUTH_SECRET`, hard-coded passwords) exist in any web client component (Rule 11).
+  - Authored the comprehensive Institutional Admin Handbook in [`docs/admin/ADMIN_HANDBOOK.md`](file:///c:/Users/syedh/.gemini/antigravity/scratch/educompass/docs/admin/ADMIN_HANDBOOK.md) documenting core golden rules, role hierarchy, operator/chairman/VC SOPs, publish cascade flow, and disaster recovery emergency rollback procedures.
+  - Monorepo validation: **180/180 Vitest tests green**, 0 TypeScript errors across all 6 workspace packages, Next.js 15 production build succeeds cleanly for all 22/22 routes.
+
 - **Institutional Admin Panel — Dashboards & Help System (Card A11)**:
   - Built endpoint `GET /api/v1/admin/health/report` in `apps/api/src/routes/health-report.ts` computing data health diagnostics across catalog courses, unreviewed FYPs, cooling-off items, and prerequisite DAG acyclic integrity.
   - Upgraded frontend console in `apps/web/src/app/admin/page.tsx` into a multi-role institutional experience (Section 11):
@@ -153,6 +159,7 @@ Last updated: 2026-10-28
 | A9 | done | main | Publish cascade background runner (steps 3-10), status monitoring panel, and VC rollback |
 | A10 | done | main | Deletion lifecycle (cooling-off timer, soft-delete hiding, restore before purge, VC-only 5/day purge cap) |
 | A11 | done | main | Multi-role admin consoles (Operator, Chairman, VC), Data Health report, and Data Map visualizer |
+| A12 | done | main | Institutional hardening, full Section 14 test suite (180 tests green), and Admin Handbook |
 | F1 | done | main | Scaffolded monorepo, secrets, localhost web (3000) & api (4000) |
 | F2 | done | main | Base schema + FYP v2 + roadmap progress migrations applied to Supabase |
 | F3 | done | main | Supabase Auth + Next.js middleware + requireRole('enrolled'|'admin') + deletion requests (Rule 9) |

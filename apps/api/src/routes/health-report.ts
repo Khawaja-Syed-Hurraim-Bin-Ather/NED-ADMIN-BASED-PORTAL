@@ -115,3 +115,4 @@ healthReportRouter.get('/report', async (req: Request, res: Response) => {
     res.status(500).json(apiError('INTERNAL_ERROR', err.message || 'Error generating health report'));
   }
 });
+
