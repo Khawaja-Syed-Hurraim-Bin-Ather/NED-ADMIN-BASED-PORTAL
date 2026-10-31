@@ -317,3 +317,4 @@ Target (A5):
 
 *End of schema_map.md — Phase 0 complete. No code changes made.*  
 *Waiting for Ram's answers to Q1–Q8 and "go" before A2 (migrations) begins.*
+
