@@ -147,3 +147,4 @@ EduCompass is a unified academic governance and degree planning ecosystem built 
 
 **Q4: Can an admin accidentally wipe out university records?**  
 > **Answer:** *"No. Deletions pass through a 7 to 90-day cooling-off period and can be restored at any point. Purging requires Vice Chancellor step-up authorization, is capped at 5 records per day, and core curriculum items referenced by enrolled students can only be archived, never purged."*
+
