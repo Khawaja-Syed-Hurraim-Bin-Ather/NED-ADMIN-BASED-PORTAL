@@ -519,3 +519,283 @@ adminContentRouter.post('/:module/draft', async (req: Request, res: Response) =>
     res.status(500).json(apiError('INTERNAL_ERROR', err.message || 'Unexpected error staging draft change'));
   }
 });
+
+// ── Edit Mode Working Set Endpoints (v3 Section 5.2, Step E1) ─────────────────
+
+const SaveDraftItemSchema = z.object({
+  resource: z.string().min(1),
+  tableName: z.string().min(1),
+  recordId: z.string().optional(),
+  op: z.enum(['insert', 'update', 'delete', 'archive']).default('update'),
+  patch: z.record(z.any()).default({}),
+  title: z.string().optional(),
+});
+
+/**
+ * POST /api/v1/admin/content/working-set/item
+ * saveDraftItem implementation: stages edits into the person's open working change set.
+ * NEVER writes to live tables (Golden Rule 1).
+ */
+adminContentRouter.post('/working-set/item', async (req: Request, res: Response) => {
+  const admin = req.adminUser!;
+  const parsed = SaveDraftItemSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid saveDraftItem payload', parsed.error.errors));
+    return;
+  }
+
+  const { resource, tableName, recordId, op, patch, title } = parsed.data;
+
+  // Enforce operator allowed_modules
+  if (admin.role === 'operator') {
+    if (resource === 'curriculum') {
+      res.status(403).json(apiError('FORBIDDEN', 'Operators may not edit curriculum directly. Use proposal workflow.'));
+      return;
+    }
+    const moduleMap: Record<string, ContentModuleKey> = {
+      fyp: 'fyp',
+      professors: 'professors',
+      career: 'career',
+      chatbot_content: 'chatbot',
+    };
+    const mod = moduleMap[resource];
+    if (mod && !admin.allowedModules?.includes(mod)) {
+      res.status(403).json(apiError('FORBIDDEN', `Operator account is not entitled to edit module '${resource}'`));
+      return;
+    }
+  }
+
+  try {
+    // 1. Find or create caller's active working change set
+    let { data: workingCs } = await supabaseAdmin
+      .from('change_sets')
+      .select('id, title, impact')
+      .eq('created_by', admin.adminId)
+      .eq('status', 'draft')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (!workingCs) {
+      const { data: createdCs, error: csError } = await supabaseAdmin
+        .from('change_sets')
+        .insert({
+          resource,
+          title: title || `Edit Mode Draft by ${admin.email} (${new Date().toLocaleDateString()})`,
+          status: 'draft',
+          impact: 'minor',
+          created_by: admin.adminId,
+          department_id: admin.departmentId,
+        })
+        .select('id, title, impact')
+        .single();
+
+      if (csError || !createdCs) {
+        res.status(500).json(apiError('INTERNAL_ERROR', 'Failed to initialize working set'));
+        return;
+      }
+      workingCs = createdCs;
+    }
+
+    // 2. Fetch beforeState if updating/deleting
+    let beforeState: Record<string, any> | null = null;
+    if ((op === 'update' || op === 'delete' || op === 'archive') && recordId) {
+      const { data: liveRecord } = await supabaseAdmin
+        .from(tableName)
+        .select('*')
+        .eq('id', recordId)
+        .maybeSingle();
+      if (liveRecord) beforeState = liveRecord;
+    }
+
+    // 3. Check if this record already has an existing change item in this working set
+    let existingItemQuery = supabaseAdmin
+      .from('change_items')
+      .select('id, after')
+      .eq('change_set_id', workingCs.id)
+      .eq('table_name', tableName);
+
+    if (recordId) {
+      existingItemQuery = existingItemQuery.eq('record_id', recordId);
+    }
+
+    const { data: existingItems } = await existingItemQuery;
+    const existingItem = existingItems && existingItems.length > 0 ? existingItems[0] : null;
+
+    let savedItem: any = null;
+
+    if (existingItem) {
+      // Merge patch into existing draft
+      const mergedAfter = {
+        ...(existingItem.after || {}),
+        ...patch,
+      };
+      const { data: updatedItem, error: updateError } = await supabaseAdmin
+        .from('change_items')
+        .update({ after: mergedAfter })
+        .eq('id', existingItem.id)
+        .select('id, change_set_id, table_name, record_id, op, before, after, created_at')
+        .single();
+
+      if (updateError) {
+        res.status(500).json(apiError('INTERNAL_ERROR', 'Failed to update draft item'));
+        return;
+      }
+      savedItem = updatedItem;
+    } else {
+      // Insert new change item
+      const afterState = op === 'delete' ? null : { ...(beforeState || {}), ...patch };
+      const { data: newItem, error: insertError } = await supabaseAdmin
+        .from('change_items')
+        .insert({
+          change_set_id: workingCs.id,
+          table_name: tableName,
+          record_id: recordId || null,
+          op,
+          before: beforeState,
+          after: afterState,
+        })
+        .select('id, change_set_id, table_name, record_id, op, before, after, created_at')
+        .single();
+
+      if (insertError) {
+        res.status(500).json(apiError('INTERNAL_ERROR', 'Failed to insert draft item'));
+        return;
+      }
+      savedItem = newItem;
+    }
+
+    // Count pending items in this working set
+    const { count } = await supabaseAdmin
+      .from('change_items')
+      .select('id', { count: 'exact', head: true })
+      .eq('change_set_id', workingCs.id);
+
+    res.status(201).json({
+      success: true,
+      changeSetId: workingCs.id,
+      item: savedItem,
+      pendingCount: count || 1,
+    });
+  } catch (err: any) {
+    res.status(500).json(apiError('INTERNAL_ERROR', err.message || 'Error saving draft item'));
+  }
+});
+
+/**
+ * GET /api/v1/admin/content/working-set
+ * Returns caller's open draft change set and items for <PendingDrawer>.
+ */
+adminContentRouter.get('/working-set', async (req: Request, res: Response) => {
+  const admin = req.adminUser!;
+  try {
+    const { data: cs } = await supabaseAdmin
+      .from('change_sets')
+      .select('id, resource, title, status, impact, created_at')
+      .eq('created_by', admin.adminId)
+      .eq('status', 'draft')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (!cs) {
+      res.json({
+        changeSet: null,
+        items: [],
+        pendingCount: 0,
+      });
+      return;
+    }
+
+    const { data: items } = await supabaseAdmin
+      .from('change_items')
+      .select('id, change_set_id, table_name, record_id, op, before, after, created_at')
+      .eq('change_set_id', cs.id)
+      .order('created_at', { ascending: true });
+
+    res.json({
+      changeSet: cs,
+      items: items || [],
+      pendingCount: items?.length || 0,
+    });
+  } catch (err: any) {
+    res.status(500).json(apiError('INTERNAL_ERROR', err.message || 'Error fetching working set'));
+  }
+});
+
+/**
+ * DELETE /api/v1/admin/content/working-set/items/:itemId
+ * Discards a single pending change item.
+ */
+adminContentRouter.delete('/working-set/items/:itemId', async (req: Request, res: Response) => {
+  const admin = req.adminUser!;
+  const itemId = req.params.itemId;
+
+  try {
+    // Verify item belongs to a draft change set created by this admin
+    const { data: item } = await supabaseAdmin
+      .from('change_items')
+      .select('id, change_set_id')
+      .eq('id', itemId)
+      .single();
+
+    if (!item) {
+      res.status(404).json(apiError('NOT_FOUND', 'Item not found'));
+      return;
+    }
+
+    const { data: cs } = await supabaseAdmin
+      .from('change_sets')
+      .select('id, created_by, status')
+      .eq('id', item.change_set_id)
+      .single();
+
+    if (!cs || cs.created_by !== admin.adminId || cs.status !== 'draft') {
+      res.status(403).json(apiError('FORBIDDEN', 'Cannot delete item from this change set'));
+      return;
+    }
+
+    await supabaseAdmin.from('change_items').delete().eq('id', itemId);
+
+    const { count } = await supabaseAdmin
+      .from('change_items')
+      .select('id', { count: 'exact', head: true })
+      .eq('change_set_id', cs.id);
+
+    res.json({
+      success: true,
+      pendingCount: count || 0,
+    });
+  } catch (err: any) {
+    res.status(500).json(apiError('INTERNAL_ERROR', err.message || 'Error deleting item'));
+  }
+});
+
+/**
+ * DELETE /api/v1/admin/content/working-set
+ * Discards all pending changes in the caller's active draft.
+ */
+adminContentRouter.delete('/working-set', async (req: Request, res: Response) => {
+  const admin = req.adminUser!;
+
+  try {
+    const { data: cs } = await supabaseAdmin
+      .from('change_sets')
+      .select('id')
+      .eq('created_by', admin.adminId)
+      .eq('status', 'draft')
+      .maybeSingle();
+
+    if (!cs) {
+      res.json({ success: true, pendingCount: 0 });
+      return;
+    }
+
+    await supabaseAdmin.from('change_items').delete().eq('change_set_id', cs.id);
+    await supabaseAdmin.from('change_sets').delete().eq('id', cs.id);
+
+    res.json({ success: true, pendingCount: 0 });
+  } catch (err: any) {
+    res.status(500).json(apiError('INTERNAL_ERROR', err.message || 'Error discarding working set'));
+  }
+});

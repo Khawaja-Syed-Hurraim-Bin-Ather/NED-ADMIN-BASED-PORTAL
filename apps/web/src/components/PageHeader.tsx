@@ -3,6 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { BatchPicker, BatchNoticeBanner } from './BatchPicker';
+import { useEditMode } from '../context/EditModeContext';
+import { EditModeBanner } from './edit-mode/EditModeBanner';
+import { PendingDrawer } from './edit-mode/PendingDrawer';
+import { AdminMenuDropdown } from './edit-mode/AdminMenuDropdown';
 
 interface BreadcrumbItem {
   label: string;
@@ -56,6 +60,15 @@ export function PageHeader({
   accent = '#511030',
 }: PageHeaderProps) {
   const [theme, setTheme] = useState<'dark' | 'light'>('light');
+
+  const {
+    isEditMode,
+    toggleEditMode,
+    pendingCount,
+    setIsPendingDrawerOpen,
+    activeRole,
+    currentUser,
+  } = useEditMode();
 
   useEffect(() => {
     const stored = localStorage.getItem('educompass-theme') as 'dark' | 'light' | null;
@@ -126,11 +139,48 @@ export function PageHeader({
           )}
         </div>
 
-        {/* ── Right: Actions + Theme toggle + Dashboard ── */}
-        <div className="page-header-right" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        {/* ── Right: Actions + Edit Mode Switch + Theme toggle + Dashboard ── */}
+        <div className="page-header-right" style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
           <React.Suspense fallback={null}>
             <BatchPicker />
           </React.Suspense>
+
+          {/* Edit Mode Switch & Admin Controls (v3 Section 2.1) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {(activeRole || currentUser) && (
+              <>
+                <button
+                  type="button"
+                  onClick={toggleEditMode}
+                  className={`px-2.5 py-1 rounded-md text-xs font-semibold border transition-all flex items-center gap-1.5 cursor-pointer ${
+                    isEditMode
+                      ? 'bg-amber-500 text-black border-amber-600 shadow-sm'
+                      : 'bg-[var(--color-surface)] text-[var(--color-text)] border-[var(--color-border)] hover:bg-[var(--color-bg)]'
+                  }`}
+                  title="Toggle institutional edit mode"
+                >
+                  <span>Edit mode</span>
+                  <span className={`w-2 h-2 rounded-full ${isEditMode ? 'bg-black animate-pulse' : 'bg-slate-400'}`} />
+                </button>
+
+                {pendingCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setIsPendingDrawerOpen(true)}
+                    className="px-2 py-1 rounded-md text-xs font-medium border border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 cursor-pointer flex items-center gap-1"
+                  >
+                    <span>Pending</span>
+                    <span className="bg-amber-500 text-black px-1.5 rounded-full text-[10px] font-bold">
+                      {pendingCount}
+                    </span>
+                  </button>
+                )}
+              </>
+            )}
+
+            <AdminMenuDropdown />
+          </div>
+
           {actions}
 
           <button
@@ -154,6 +204,10 @@ export function PageHeader({
       <React.Suspense fallback={null}>
         <BatchNoticeBanner />
       </React.Suspense>
+
+      {/* Edit Mode Draft Status Banner & Drawer (v3 Section 2.1 & 2.2) */}
+      <EditModeBanner />
+      <PendingDrawer />
     </header>
   );
 }
