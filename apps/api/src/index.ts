@@ -18,6 +18,7 @@ for (const envPath of [
   }
 }
 
+import cookieParser from 'cookie-parser';
 import {
   authRateLimiter,
   chatRateLimiter,
@@ -54,6 +55,7 @@ app.use(
 
 // 3. Request body size limit — 10kb prevents large payload DoS
 app.use(express.json({ limit: '10kb' }));
+app.use(cookieParser());
 
 // 4. Request sanitizer — strip null bytes and control chars (Rule #14)
 app.use(requestSanitizer);
@@ -82,6 +84,7 @@ import { professorsRouter } from './routes/professors';
 import { plannerRouter } from './routes/planner';
 import { batchesRouter } from './routes/batches';
 import { curriculumRouter } from './routes/curriculum';
+import { adminAuthRouter, bootstrapAdminAccounts } from './routes/admin-auth';
 
 // ── API v1 health (read limiter) ─────────────────────────────────────────
 app.get('/api/v1/health', readLimiter, (_req, res) => {
@@ -95,6 +98,7 @@ app.use('/api/v1/account', authRateLimiter, accountRouter);
 app.use('/api/v1/chat', chatRateLimiter, chatRouter);
 
 // Admin — write limiter (protected by requireRole('admin') inside router)
+app.use('/api/v1/admin/auth', authRateLimiter, adminAuthRouter);
 app.use('/api/v1/admin', writeLimiter, adminRouter);
 
 // Read-heavy routes — generous limiter
@@ -117,12 +121,19 @@ app.use((_req, res) => {
 app.use(errorSanitizer);
 
 // ── Start ────────────────────────────────────────────────────────────────
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`✅  EduCompass API v1.0 running on http://localhost:${PORT}`);
   console.log(`   Health: http://localhost:${PORT}/health`);
   console.log(
     `   Security: helmet ✓ | CORS allow-list ✓ | rate-limits ✓ | sanitizer ✓`
   );
+
+  // Bootstrap initial admin accounts (VC + Chairman)
+  try {
+    await bootstrapAdminAccounts();
+  } catch (err) {
+    console.error('Failed to bootstrap admin accounts:', err);
+  }
 });
 
 export default app;

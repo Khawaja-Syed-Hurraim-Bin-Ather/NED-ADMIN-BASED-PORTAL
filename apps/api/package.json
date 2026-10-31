@@ -11,19 +11,25 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@educompass/shared": "workspace:*",
     "@educompass/engine": "workspace:*",
+    "@educompass/shared": "workspace:*",
     "@supabase/supabase-js": "^2.46.0",
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.0",
     "express": "^4.21.0",
     "express-rate-limit": "^7.4.0",
     "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.3",
     "zod": "^3.23.0"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^3.0.0",
+    "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.0.0",
     "@typescript-eslint/eslint-plugin": "^8.72.0",
     "@typescript-eslint/parser": "^8.72.0",
