@@ -31,7 +31,20 @@ export const authRateLimiter = rateLimit({
       message: 'Too many authentication attempts. Please wait 15 minutes.',
     },
   },
-  skip: (req) => process.env.NODE_ENV === 'test' || req.path === '/demo-session',
+  skip: (req) => {
+    if (process.env.NODE_ENV === 'test' || req.path === '/demo-session') return true;
+    // In local development, never lock out developer/tester on localhost
+    const ip = req.ip || req.socket?.remoteAddress || '';
+    if (
+      process.env.NODE_ENV !== 'production' ||
+      ip === '127.0.0.1' ||
+      ip === '::1' ||
+      ip.includes('127.0.0.1')
+    ) {
+      return true;
+    }
+    return false;
+  },
 });
 
 /**

@@ -60,6 +60,7 @@ export function PageHeader({
   accent = '#511030',
 }: PageHeaderProps) {
   const [theme, setTheme] = useState<'dark' | 'light'>('light');
+  const [mounted, setMounted] = useState(false);
 
   const {
     isEditMode,
@@ -71,6 +72,7 @@ export function PageHeader({
   } = useEditMode();
 
   useEffect(() => {
+    setMounted(true);
     const stored = localStorage.getItem('educompass-theme') as 'dark' | 'light' | null;
     if (stored) setTheme(stored);
   }, []);
@@ -147,7 +149,7 @@ export function PageHeader({
 
           {/* Edit Mode Switch & Admin Controls (v3 Section 2.1) */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            {(activeRole || currentUser) && (
+            {mounted && (activeRole || currentUser) && (
               <>
                 <button
                   type="button"
@@ -178,7 +180,7 @@ export function PageHeader({
               </>
             )}
 
-            <AdminMenuDropdown />
+            {mounted && <AdminMenuDropdown />}
           </div>
 
           {actions}

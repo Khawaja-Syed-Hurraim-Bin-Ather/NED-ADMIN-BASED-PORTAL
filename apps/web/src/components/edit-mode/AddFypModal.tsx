@@ -256,3 +256,4 @@ export function AddFypModal({ isOpen, onClose, onProjectAdded }: AddFypModalProp
     </div>
   );
 }
+

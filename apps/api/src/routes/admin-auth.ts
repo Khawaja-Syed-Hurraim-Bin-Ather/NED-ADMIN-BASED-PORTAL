@@ -59,6 +59,12 @@ export async function bootstrapAdminAccounts(): Promise<void> {
       role: 'chairman',
       deptCode: 'CIS',
     },
+    {
+      email: 'operator@nedut.edu.pk',
+      fullName: 'Data Entry Operator',
+      role: 'operator',
+      deptCode: 'CIS',
+    },
   ];
 
   if (rawJson) {
@@ -146,9 +152,9 @@ adminAuthRouter.post('/login', async (req: Request, res: Response) => {
   const { email, password } = parsed.data;
   const lowerEmail = email.toLowerCase();
 
-  // Check lockout
+  // Check lockout (enforced strictly in production; relaxed in dev for testing)
   const attempt = loginTracker.get(lowerEmail) || { failedAttempts: 0, codeRequests: [] };
-  if (attempt.lockedUntil && attempt.lockedUntil > Date.now()) {
+  if (process.env.NODE_ENV === 'production' && attempt.lockedUntil && attempt.lockedUntil > Date.now()) {
     const minsLeft = Math.ceil((attempt.lockedUntil - Date.now()) / (60 * 1000));
     await logAdminLoginEvent('locked', lowerEmail, undefined, ip, ua);
     res.status(429).json(

@@ -4,6 +4,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useEditMode, AdminRole } from '../../context/EditModeContext';
 import { Badge } from '@educompass/ui';
+import { ApprovalsModal } from './ApprovalsModal';
+import { HistoryReleasesModal } from './HistoryReleasesModal';
 
 export function AdminMenuDropdown() {
   const {
@@ -15,6 +17,8 @@ export function AdminMenuDropdown() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [demoMenuOpen, setDemoMenuOpen] = useState(false);
+  const [approvalsModalOpen, setApprovalsModalOpen] = useState(false);
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on outside click
@@ -55,18 +59,21 @@ export function AdminMenuDropdown() {
             </div>
           )}
 
-          {/* Core Admin Pages per v3 Section 4 */}
-          <Link
-            href="/admin"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-2.5 px-3 py-2 hover:bg-[var(--color-bg)] text-[var(--color-text)] transition-colors"
+          {/* Core Admin Modals & Controls per v3 Section 4 */}
+          <button
+            type="button"
+            onClick={() => {
+              setIsOpen(false);
+              setApprovalsModalOpen(true);
+            }}
+            className="w-full text-left flex items-center gap-2.5 px-3 py-2 hover:bg-[var(--color-bg)] text-[var(--color-text)] transition-colors cursor-pointer"
           >
             <span>📋</span>
             <div>
               <span className="font-medium block">Approvals Queue</span>
               <span className="text-[10px] text-[var(--color-muted)] block">Review & sign off pending drafts</span>
             </div>
-          </Link>
+          </button>
 
           <Link
             href="/admin"
@@ -80,17 +87,20 @@ export function AdminMenuDropdown() {
             </div>
           </Link>
 
-          <Link
-            href="/admin"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-2.5 px-3 py-2 hover:bg-[var(--color-bg)] text-[var(--color-text)] transition-colors"
+          <button
+            type="button"
+            onClick={() => {
+              setIsOpen(false);
+              setHistoryModalOpen(true);
+            }}
+            className="w-full text-left flex items-center gap-2.5 px-3 py-2 hover:bg-[var(--color-bg)] text-[var(--color-text)] transition-colors cursor-pointer"
           >
             <span>📜</span>
             <div>
               <span className="font-medium block">History & Releases</span>
               <span className="text-[10px] text-[var(--color-muted)] block">Version snapshots & rollbacks</span>
             </div>
-          </Link>
+          </button>
 
           {(activeRole === 'chairman' || activeRole === 'vc') && (
             <Link
@@ -168,6 +178,16 @@ export function AdminMenuDropdown() {
           </button>
         </div>
       )}
+
+      {/* Auxiliary Modals (v3 Section 4) */}
+      <ApprovalsModal
+        isOpen={approvalsModalOpen}
+        onClose={() => setApprovalsModalOpen(false)}
+      />
+      <HistoryReleasesModal
+        isOpen={historyModalOpen}
+        onClose={() => setHistoryModalOpen(false)}
+      />
     </div>
   );
 }

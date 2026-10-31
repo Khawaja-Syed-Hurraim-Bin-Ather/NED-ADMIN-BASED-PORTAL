@@ -19,8 +19,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <EditModeProvider>
           {children}
         </EditModeProvider>
-        <div id="toast-region" className="toast-region" aria-live="polite" aria-atomic="true" />
-        <div id="modal-root" />
+        <div id="toast-region" className="toast-region" aria-live="polite" aria-atomic="true" suppressHydrationWarning />
+        <div id="modal-root" suppressHydrationWarning />
       </body>
     </html>
   );

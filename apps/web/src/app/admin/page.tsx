@@ -1163,22 +1163,35 @@ Code expires in 72 hours. Institutional governance Rule 1 enforced.`,
                 <Button
                   size="sm"
                   variant="outline"
+                  type="button"
                   onClick={() => {
                     setLoginEmail('cursor.pro.test124@gmail.com');
                   }}
                   className="text-xs"
                 >
-                  Vice Chancellor Email
+                  Vice Chancellor (VC)
                 </Button>
                 <Button
                   size="sm"
                   variant="outline"
+                  type="button"
                   onClick={() => {
                     setLoginEmail('chairman.cis@nedut.edu.pk');
                   }}
                   className="text-xs"
                 >
-                  Chairman CISE Email
+                  Chairman CISE
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  type="button"
+                  onClick={() => {
+                    setLoginEmail('operator@nedut.edu.pk');
+                  }}
+                  className="text-xs"
+                >
+                  Data Operator
                 </Button>
               </div>
             </div>

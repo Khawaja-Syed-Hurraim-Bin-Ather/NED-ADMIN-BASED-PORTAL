@@ -5,6 +5,7 @@ import { useEditMode } from '../../context/EditModeContext';
 import { Button, Badge } from '@educompass/ui';
 
 export function EditModeBanner() {
+  const [mounted, setMounted] = React.useState(false);
   const {
     isEditMode,
     viewAsStudent,
@@ -15,7 +16,11 @@ export function EditModeBanner() {
     activeRole,
   } = useEditMode();
 
-  if (!isEditMode) return null;
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted || !isEditMode) return null;
 
   return (
     <aside
