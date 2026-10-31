@@ -4,6 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Alert } from '@educompass/ui';
 import { PageHeader } from '../../components/PageHeader';
+import { useEditMode } from '../../context/EditModeContext';
+import { UnansweredQuestionsDrawer } from '../../components/edit-mode/UnansweredQuestionsDrawer';
 
 interface RetrievalSource {
   title: string;
@@ -38,6 +40,9 @@ const LAYER_META: Record<number, { label: string; emoji: string; cls: string }> 
 };
 
 export default function ChatPage() {
+  const { isEditMode, viewAsStudent, can, saveDraftItem } = useEditMode();
+  const canEdit = isEditMode && !viewAsStudent && can('chat', 'edit');
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'welcome',
@@ -53,6 +58,9 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(false);
   const [offlineMode, setOfflineMode] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isUnansweredOpen, setIsUnansweredOpen] = useState(false);
+  const [editingMessage, setEditingMessage] = useState<{ id: string; text: string } | null>(null);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -134,18 +142,28 @@ export default function ChatPage() {
         description="Ask about degree requirements, course prerequisites, grading rules, and FYP regulations."
         accent="var(--lavender)"
         actions={
-          <label
-            className={`offline-toggle${offlineMode ? ' active' : ''}`}
-            aria-label="Toggle offline mode"
-          >
-            <input
-              type="checkbox"
-              checked={offlineMode}
-              onChange={(e) => setOfflineMode(e.target.checked)}
-              style={{ width: 12, height: 12 }}
-            />
-            {offlineMode ? '⚡ Offline ON' : 'Offline Mode'}
-          </label>
+          <div className="flex items-center gap-2.5">
+            {canEdit && (
+              <button
+                onClick={() => setIsUnansweredOpen(true)}
+                className="px-3 py-1.5 rounded bg-amber-950/80 hover:bg-amber-900 text-amber-200 border border-amber-600/40 font-medium text-xs shadow-sm transition-colors flex items-center gap-1.5"
+              >
+                <span>Unanswered Inquiries (4)</span>
+              </button>
+            )}
+            <label
+              className={`offline-toggle${offlineMode ? ' active' : ''}`}
+              aria-label="Toggle offline mode"
+            >
+              <input
+                type="checkbox"
+                checked={offlineMode}
+                onChange={(e) => setOfflineMode(e.target.checked)}
+                style={{ width: 12, height: 12 }}
+              />
+              {offlineMode ? '⚡ Offline ON' : 'Offline Mode'}
+            </label>
+          </div>
         }
       />
 
@@ -212,6 +230,18 @@ export default function ChatPage() {
                           </div>
                         </div>
                       ))}
+                    </div>
+                  )}
+
+                  {/* Edit Verified Answer action (Edit Mode Only) */}
+                  {msg.sender === 'assistant' && (msg.layer === 1 || msg.layer === 2) && canEdit && (
+                    <div className="mt-2 pt-2 border-t border-[rgba(213,228,236,0.1)] flex justify-end">
+                      <button
+                        onClick={() => setEditingMessage({ id: msg.id, text: msg.text })}
+                        className="text-[10px] px-2 py-0.5 rounded bg-blue-900/40 text-blue-300 hover:bg-blue-900/60 transition-colors flex items-center gap-1"
+                      >
+                        <span>✎ Edit Verified Answer</span>
+                      </button>
                     </div>
                   )}
 
@@ -316,6 +346,56 @@ export default function ChatPage() {
           </Link>
         </div>
       </div>
+
+      {/* Verified Answer Editing Modal */}
+      {editingMessage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+          <div className="w-full max-w-lg bg-[#0f1823] border border-amber-500/40 rounded-xl p-5 shadow-2xl space-y-3.5 text-xs">
+            <h3 className="text-sm font-semibold text-amber-300">Edit Verified Academic Answer</h3>
+            <textarea
+              rows={5}
+              value={editingMessage.text}
+              onChange={(e) => setEditingMessage({ ...editingMessage, text: e.target.value })}
+              className="w-full bg-[#162231] border border-slate-700 rounded px-2.5 py-1.5 text-slate-100 resize-none focus:border-amber-400"
+            />
+            <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+              <button
+                onClick={() => setEditingMessage(null)}
+                className="px-3.5 py-1.5 rounded text-slate-400 hover:text-slate-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  saveDraftItem(
+                    'faq',
+                    'faq_answers',
+                    editingMessage.id,
+                    { answer: editingMessage.text },
+                    'update',
+                    `Edit verified answer for intent (${editingMessage.id})`
+                  );
+                  setMessages((prev) =>
+                    prev.map((m) =>
+                      m.id === editingMessage.id ? { ...m, text: editingMessage.text } : m
+                    )
+                  );
+                  setEditingMessage(null);
+                }}
+                className="px-4 py-1.5 rounded bg-[#511030] hover:bg-[#6e1642] text-white font-semibold shadow-sm transition-colors"
+              >
+                Save Draft
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Unanswered Questions Drawer */}
+      <UnansweredQuestionsDrawer
+        isOpen={isUnansweredOpen}
+        onClose={() => setIsUnansweredOpen(false)}
+      />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Card,
@@ -15,6 +15,8 @@ import {
   Modal,
 } from '@educompass/ui';
 import { PageHeader } from '../../components/PageHeader';
+import { useEditMode } from '../../context/EditModeContext';
+import { Editable } from '../../components/edit-mode/Editable';
 
 // ─── Static career track data (mirrors docs/data/career_tracks.json) ─────────
 // Served as static data — no live scraping at runtime (Rule #1)
@@ -210,12 +212,113 @@ const COLOR_MAP: Record<string, { badge: string; icon: string; border: string; g
 };
 
 export default function CareerHubPage() {
+  const { isEditMode, viewAsStudent, can, pendingItems, saveDraftItem } = useEditMode();
+  const canEdit = isEditMode && !viewAsStudent && can('careers', 'edit');
+
+  const [tracks, setTracks] = useState<CareerTrack[]>(CAREER_TRACKS);
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
   const [selectedTrack, setSelectedTrack] = useState<CareerTrack | null>(null);
+  const [newStepText, setNewStepText] = useState('');
+
+  // Fetch live career tracks from API
+  useEffect(() => {
+    async function loadCareers() {
+      try {
+        const res = await fetch('/api/v1/careers');
+        if (res.ok) {
+          const json = await res.json();
+          if (json.data && Array.isArray(json.data) && json.data.length > 0) {
+            setTracks(
+              json.data.map((t: any) => ({
+                ...t,
+                category: t.category || 'Engineering',
+                icon: t.icon || '💼',
+                color: t.color || 'blue',
+                skills: t.skills || ['Core Computing', 'System Architecture'],
+                roles: t.roles || ['Software Engineer'],
+                stages: t.stages || ['Foundation', 'Intermediate', 'Advanced', 'Capstone'],
+              }))
+            );
+          }
+        }
+      } catch {
+        // Fallback remains CAREER_TRACKS
+      }
+    }
+    loadCareers();
+  }, []);
+
+  // Overlay draft change items onto tracks
+  const activeTracks = useMemo(() => {
+    let list: CareerTrack[] = [...tracks];
+
+    if (isEditMode && !viewAsStudent) {
+      for (const item of pendingItems) {
+        if (item.table_name === 'career_tracks' && item.record_id) {
+          if (item.op === 'update' && item.after) {
+            const idx = list.findIndex((t) => t.slug === item.record_id);
+            if (idx !== -1) {
+              list[idx] = { ...list[idx], ...item.after };
+            }
+          }
+        }
+      }
+    }
+
+    return list;
+  }, [tracks, isEditMode, viewAsStudent, pendingItems]);
+
+  const handleMoveStage = (track: CareerTrack, index: number, direction: 'up' | 'down') => {
+    if (!canEdit) return;
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= track.stages.length) return;
+
+    const nextStages = [...track.stages];
+    const [removed] = nextStages.splice(index, 1);
+    nextStages.splice(newIndex, 0, removed);
+
+    saveDraftItem(
+      'careers',
+      'career_tracks',
+      track.slug,
+      { stages: nextStages },
+      'update',
+      `Reorder roadmap steps for "${track.title}"`
+    );
+
+    setTracks((prev) =>
+      prev.map((t) => (t.slug === track.slug ? { ...t, stages: nextStages } : t))
+    );
+    if (selectedTrack?.slug === track.slug) {
+      setSelectedTrack({ ...selectedTrack, stages: nextStages });
+    }
+  };
+
+  const handleAddStage = (track: CareerTrack) => {
+    if (!canEdit || !newStepText.trim()) return;
+    const nextStages = [...track.stages, newStepText.trim()];
+
+    saveDraftItem(
+      'careers',
+      'career_tracks',
+      track.slug,
+      { stages: nextStages },
+      'update',
+      `Add step "${newStepText.trim()}" to "${track.title}"`
+    );
+
+    setTracks((prev) =>
+      prev.map((t) => (t.slug === track.slug ? { ...t, stages: nextStages } : t))
+    );
+    if (selectedTrack?.slug === track.slug) {
+      setSelectedTrack({ ...selectedTrack, stages: nextStages });
+    }
+    setNewStepText('');
+  };
 
   const filtered = useMemo(() => {
-    return CAREER_TRACKS.filter((t) => {
+    return activeTracks.filter((t) => {
       const matchCat = activeCategory === 'All' || t.category === activeCategory;
       const q = search.toLowerCase();
       const matchSearch =
@@ -226,7 +329,7 @@ export default function CareerHubPage() {
         t.roles.some((r) => r.toLowerCase().includes(q));
       return matchCat && matchSearch;
     });
-  }, [search, activeCategory]);
+  }, [activeTracks, search, activeCategory]);
 
   return (
     <div className="inner-page">
@@ -442,21 +545,73 @@ export default function CareerHubPage() {
               </div>
             </div>
 
-            {/* Year-by-year stages */}
+            {/* Year-by-year stages / Learning Path */}
             <div>
-              <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
-                Learning Path
-              </p>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+                  Learning Path {canEdit && <span className="text-amber-400 font-mono">(Editable Roadmap)</span>}
+                </p>
+                {canEdit && (
+                  <span className="text-[10px] text-slate-400">Use arrows to reorder steps</span>
+                )}
+              </div>
+
               <ol className="space-y-2">
                 {selectedTrack.stages.map((stage, i) => (
-                  <li key={stage} className="flex items-start gap-3">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-500/20 text-xs font-bold text-indigo-300">
-                      {i + 1}
-                    </span>
-                    <span className="pt-0.5 text-slate-300">{stage}</span>
+                  <li
+                    key={i}
+                    className="flex items-center justify-between gap-3 p-2 rounded bg-slate-900/60 border border-slate-800"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-500/20 text-xs font-bold text-indigo-300">
+                        {i + 1}
+                      </span>
+                      <span className="text-slate-300">{stage}</span>
+                    </div>
+
+                    {canEdit && (
+                      <div className="flex items-center gap-1">
+                        <button
+                          disabled={i === 0}
+                          onClick={() => handleMoveStage(selectedTrack, i, 'up')}
+                          className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 hover:text-white disabled:opacity-20 text-xs"
+                          title="Move up"
+                        >
+                          ↑
+                        </button>
+                        <button
+                          disabled={i === selectedTrack.stages.length - 1}
+                          onClick={() => handleMoveStage(selectedTrack, i, 'down')}
+                          className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 hover:text-white disabled:opacity-20 text-xs"
+                          title="Move down"
+                        >
+                          ↓
+                        </button>
+                      </div>
+                    )}
                   </li>
                 ))}
               </ol>
+
+              {/* Add Step Form (Edit Mode Only) */}
+              {canEdit && (
+                <div className="mt-3 flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="New roadmap stage (e.g. Distributed Consensus & Raft)..."
+                    value={newStepText}
+                    onChange={(e) => setNewStepText(e.target.value)}
+                    className="flex-1 bg-[#162231] border border-slate-700 rounded px-2.5 py-1 text-xs text-slate-100 placeholder:text-slate-500"
+                  />
+                  <button
+                    disabled={!newStepText.trim()}
+                    onClick={() => handleAddStage(selectedTrack)}
+                    className="px-3 py-1 rounded bg-[#511030] hover:bg-[#6e1642] text-white font-medium text-xs disabled:opacity-40 transition-colors"
+                  >
+                    + Add Step
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Relevant NED Courses */}

@@ -16,6 +16,9 @@ import {
   Alert,
 } from '@educompass/ui';
 import { PageHeader } from '../../components/PageHeader';
+import { useEditMode } from '../../context/EditModeContext';
+import { Editable } from '../../components/edit-mode/Editable';
+import { AddProfessorModal } from '../../components/edit-mode/AddProfessorModal';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -146,10 +149,14 @@ function ProfessorCard({
   prof,
   onOpen,
   showMatchScore,
+  canEdit,
+  onUpdateField,
 }: {
   prof: Professor;
   onOpen: (p: Professor) => void;
   showMatchScore: boolean;
+  canEdit?: boolean;
+  onUpdateField?: (prof: Professor, field: string, val: any) => void;
 }) {
   const allTags = [...(prof.domain_tags ?? []), ...(prof.area_tags ?? [])];
   const nameStatusMeta = NAME_STATUS_BADGE[prof.name_status];
@@ -167,12 +174,32 @@ function ProfessorCard({
             {(prof.name ?? '?').replace(/^(Dr\.|Ms\.|Mr\.|Engr\.)\s*/i, '').charAt(0)}
           </div>
           <div className="min-w-0 flex-1">
-            <CardTitle className="text-sm font-extrabold leading-snug text-white group-hover:text-[#9bcbd0] transition-colors line-clamp-1">
-              {prof.name}
-            </CardTitle>
-            <p className="text-[11px] text-slate-400 font-medium mt-0.5">
-              {prof.rank ?? 'Faculty'} &bull; CISE, NED University
-            </p>
+            <div onClick={(e) => canEdit && e.stopPropagation()}>
+              <Editable
+                resource="professors"
+                tableName="professors"
+                recordId={prof.slug || prof.id}
+                field="name"
+                value={prof.name}
+                onSave={(val) => onUpdateField?.(prof, 'name', val)}
+                className="text-sm font-extrabold leading-snug text-white group-hover:text-[#9bcbd0] transition-colors line-clamp-1"
+              />
+            </div>
+            <div
+              className="text-[11px] text-slate-400 font-medium mt-0.5 flex items-center gap-1"
+              onClick={(e) => canEdit && e.stopPropagation()}
+            >
+              <Editable
+                resource="professors"
+                tableName="professors"
+                recordId={prof.slug || prof.id}
+                field="rank"
+                value={prof.rank ?? 'Faculty'}
+                onSave={(val) => onUpdateField?.(prof, 'rank', val)}
+                className="text-slate-300"
+              />
+              <span>&bull; CISE, NED University</span>
+            </div>
           </div>
         </div>
 
@@ -435,9 +462,13 @@ function ProfessorModal({
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function ProfessorDirectoryPage() {
+  const { isEditMode, viewAsStudent, can, pendingItems, saveDraftItem } = useEditMode();
+  const canEdit = isEditMode && !viewAsStudent && can('professors', 'edit');
+
   const [professors, setProfessors] = useState<Professor[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isAddProfOpen, setIsAddProfOpen] = useState(false);
 
   // Filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -447,6 +478,46 @@ export default function ProfessorDirectoryPage() {
 
   // Modal
   const [activeProf, setActiveProf] = useState<Professor | null>(null);
+
+  // Overlay draft items onto professors list
+  const activeProfessors = useMemo(() => {
+    let list = [...professors];
+    if (isEditMode && !viewAsStudent) {
+      for (const item of pendingItems) {
+        if (item.table_name === 'professors' && item.record_id) {
+          if (item.op === 'update' && item.after) {
+            const idx = list.findIndex((p) => p.slug === item.record_id || p.id === item.record_id);
+            if (idx !== -1) {
+              list[idx] = { ...list[idx], ...item.after };
+            }
+          } else if (item.op === 'insert' && item.after) {
+            const exists = list.some((p) => p.slug === item.record_id || p.id === item.record_id);
+            if (!exists) {
+              list.unshift(item.after as any);
+            }
+          } else if (item.op === 'delete') {
+            list = list.filter((p) => p.slug !== item.record_id && p.id !== item.record_id);
+          }
+        }
+      }
+    }
+    return list;
+  }, [professors, isEditMode, viewAsStudent, pendingItems]);
+
+  const handleUpdateField = (prof: Professor, field: string, val: any) => {
+    if (!canEdit) return;
+    saveDraftItem(
+      'professors',
+      'professors',
+      prof.slug || prof.id,
+      { [field]: val },
+      'update',
+      `Update ${field} for faculty ${prof.name}`
+    );
+    setProfessors((prev) =>
+      prev.map((p) => (p.id === prof.id ? { ...p, [field]: val } : p))
+    );
+  };
 
   // Fetch professors
   useEffect(() => {
@@ -474,16 +545,16 @@ export default function ProfessorDirectoryPage() {
 
   // Client-side search filter on name + research_areas + highlights
   const filtered = useMemo(() => {
-    if (!searchQuery.trim()) return professors;
+    if (!searchQuery.trim()) return activeProfessors;
     const q = searchQuery.toLowerCase();
-    return professors.filter(p =>
+    return activeProfessors.filter(p =>
       (p.name ?? '').toLowerCase().includes(q) ||
       (p.research_areas ?? []).some(r => r.toLowerCase().includes(q)) ||
       (p.highlights ?? '').toLowerCase().includes(q) ||
       (p.domain_tags ?? []).some(t => t.toLowerCase().includes(q)) ||
       (p.area_tags ?? []).some(t => t.toLowerCase().includes(q))
     );
-  }, [professors, searchQuery]);
+  }, [activeProfessors, searchQuery]);
 
   const showMatchScore = appliedInterests.length > 0;
 
@@ -509,6 +580,16 @@ export default function ProfessorDirectoryPage() {
         badge={`${filtered.length} Faculty Members`}
         description="Browse NED CISE faculty profiles, research areas, supervised FYDPs, and calculate alignment with your FYP interests."
         accent="var(--lavender)"
+        actions={
+          canEdit ? (
+            <button
+              onClick={() => setIsAddProfOpen(true)}
+              className="px-3.5 py-1.5 rounded bg-[#511030] hover:bg-[#6e1642] text-white font-medium text-xs shadow-sm transition-colors flex items-center gap-1.5"
+            >
+              <span>+ Add Faculty</span>
+            </button>
+          ) : undefined
+        }
       />
 
       <main className="inner-page-body space-y-6">
@@ -620,6 +701,8 @@ export default function ProfessorDirectoryPage() {
                     prof={prof}
                     onOpen={setActiveProf}
                     showMatchScore={showMatchScore}
+                    canEdit={canEdit}
+                    onUpdateField={handleUpdateField}
                   />
                 ))}
               </div>
@@ -635,6 +718,14 @@ export default function ProfessorDirectoryPage() {
             showMatchScore={showMatchScore}
           />
         )}
+
+        {/* Card E4: Add Professor Modal */}
+        <AddProfessorModal
+          isOpen={isAddProfOpen}
+          onClose={() => setIsAddProfOpen(false)}
+          existingProfessors={activeProfessors.map((p) => ({ name: p.name, slug: p.slug }))}
+          onProfessorAdded={(newP) => setProfessors((prev) => [newP, ...prev])}
+        />
       </main>
     </div>
   );
