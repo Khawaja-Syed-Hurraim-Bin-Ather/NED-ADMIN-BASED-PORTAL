@@ -15,6 +15,8 @@ import {
   Alert,
 } from '@educompass/ui';
 import { PageHeader } from '../../components/PageHeader';
+import { useEditMode } from '../../context/EditModeContext';
+import { SchemeRulesDrawer } from '../../components/edit-mode/SchemeRulesDrawer';
 
 interface Course {
   code: string;
@@ -80,6 +82,9 @@ const CATEGORY_COLORS: Record<string, { bg: string; text: string; border: string
 };
 
 export default function StudentPlannerPage() {
+  const { isEditMode, viewAsStudent, can } = useEditMode();
+  const canEdit = isEditMode && !viewAsStudent && can('curriculum', 'edit');
+
   const [coursesMap, setCoursesMap] = useState<Map<string, Course>>(new Map());
   const [allCoursesList, setAllCoursesList] = useState<Course[]>([]);
   const [slots, setSlots] = useState<SemesterSlot[]>([]);
@@ -93,6 +98,13 @@ export default function StudentPlannerPage() {
   const [targetGraduation, setTargetGraduation] = useState('Spring 2028');
   const [filterDrawerCategory, setFilterDrawerCategory] = useState<string>('all');
   const [searchDrawer, setSearchDrawer] = useState('');
+
+  // Scheme Rules & Degree Sandbox States (Card E5)
+  const [isSchemeRulesOpen, setIsSchemeRulesOpen] = useState(false);
+  const [isSandboxMode, setIsSandboxMode] = useState(false);
+  const [maxCreditsPerSem, setMaxCreditsPerSem] = useState(21);
+  const [passingGrade, setPassingGrade] = useState('D');
+  const [activeSyntheticScenario, setActiveSyntheticScenario] = useState<string | null>(null);
 
   // ── Load Template from API ────────────────────────────────────────────────
   const loadCurriculumTemplate = useCallback(async () => {
@@ -280,6 +292,41 @@ export default function StudentPlannerPage() {
     });
   }, [allCoursesList, scheduledCoursesSet, filterDrawerCategory, searchDrawer]);
 
+  // ── Synthetic Degree Sandbox Paths (Rule 2: Zero real student records read) ──
+  const handleLoadOnTrackSynthetic = () => {
+    setActiveSyntheticScenario('on-track');
+    loadCurriculumTemplate();
+  };
+
+  const handleLoadFailedCoreSynthetic = () => {
+    setActiveSyntheticScenario('failed-core');
+    // Move CS-218 from Semester 3 to Semester 4
+    setSlots((prev) =>
+      prev.map((s) => {
+        if (s.semesterNumber === 3) {
+          return { ...s, courseCodes: s.courseCodes.filter((c) => c !== 'CS-218') };
+        }
+        if (s.semesterNumber === 4) {
+          return { ...s, courseCodes: [...s.courseCodes, 'CS-218'] };
+        }
+        return s;
+      })
+    );
+  };
+
+  const handleLoadTransferSynthetic = () => {
+    setActiveSyntheticScenario('transfer');
+    // Exempt Semesters 1 and 2 (30 transfer credits)
+    setSlots((prev) =>
+      prev.map((s) => {
+        if (s.semesterNumber <= 2) {
+          return { ...s, courseCodes: [] };
+        }
+        return s;
+      })
+    );
+  };
+
   // ── Metrics ───────────────────────────────────────────────────────────────
   const totalDegreeCredits = validation?.totalCredits ?? 0;
   const targetCredits = validation?.degreeTargetCredits ?? 136;
@@ -296,7 +343,27 @@ export default function StudentPlannerPage() {
         description="Plan your 8-semester course sequence, balance workload, and validate prerequisite compliance under NED CISE regulations."
         accent="var(--cyan)"
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            {canEdit && (
+              <>
+                <button
+                  onClick={() => setIsSchemeRulesOpen(true)}
+                  className="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs border border-slate-700 transition-colors"
+                >
+                  Scheme Rules
+                </button>
+                <button
+                  onClick={() => setIsSandboxMode(!isSandboxMode)}
+                  className={`px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
+                    isSandboxMode
+                      ? 'bg-amber-400 text-slate-950 shadow'
+                      : 'bg-slate-800 text-slate-200 border border-slate-700 hover:bg-slate-700'
+                  }`}
+                >
+                  🧪 {isSandboxMode ? 'Exit Sandbox' : 'Degree Sandbox'}
+                </button>
+              </>
+            )}
             <button
               onClick={handleResetToOfficial}
               className="button button-secondary"
@@ -321,6 +388,61 @@ export default function StudentPlannerPage() {
       />
 
       <div className="inner-page-body space-y-6">
+        {/* Degree Sandbox Panel (Card E5) */}
+        {isSandboxMode && (
+          <div className="p-4 rounded-xl bg-amber-950/40 border border-amber-500/50 space-y-3 shadow-lg animate-in fade-in">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🧪</span>
+                <div>
+                  <h3 className="text-sm font-semibold text-amber-300">
+                    Degree Planning Sandbox (In-Memory Simulation)
+                  </h3>
+                  <p className="text-[11px] text-slate-300">
+                    Golden Rule #2: Tests rule compliance on synthetic student paths. Zero real student database records are accessed.
+                  </p>
+                </div>
+              </div>
+              <span className="text-[10px] px-2 py-0.5 rounded bg-amber-900/60 text-amber-200 border border-amber-700 font-mono">
+                Max {maxCreditsPerSem} Cr / Min {passingGrade}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2 flex-wrap pt-1 border-t border-amber-900/40 text-xs">
+              <span className="text-slate-400 font-medium">Test Typical Student Paths:</span>
+              <button
+                onClick={handleLoadOnTrackSynthetic}
+                className={`px-2.5 py-1 rounded text-[11px] transition-colors ${
+                  activeSyntheticScenario === 'on-track'
+                    ? 'bg-emerald-700 text-white font-bold'
+                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                }`}
+              >
+                1. On-Track Student (4 Yrs)
+              </button>
+              <button
+                onClick={handleLoadFailedCoreSynthetic}
+                className={`px-2.5 py-1 rounded text-[11px] transition-colors ${
+                  activeSyntheticScenario === 'failed-core'
+                    ? 'bg-rose-700 text-white font-bold'
+                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                }`}
+              >
+                2. Failed 1 Core in Year 2 (CS-218)
+              </button>
+              <button
+                onClick={handleLoadTransferSynthetic}
+                className={`px-2.5 py-1 rounded text-[11px] transition-colors ${
+                  activeSyntheticScenario === 'transfer'
+                    ? 'bg-purple-700 text-white font-bold'
+                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                }`}
+              >
+                3. Transfer Student (30 Transfer Cr)
+              </button>
+            </div>
+          </div>
+        )}
         {/* ── Rule #13 Legal Disclaimer Banner ────────────────────────────── */}
         <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 text-xs text-amber-200/90 flex items-start gap-2.5">
           <span className="text-base flex-shrink-0">⚠️</span>
@@ -439,14 +561,20 @@ export default function StudentPlannerPage() {
                 const workload = semSummary?.workload ?? 'balanced';
                 const semViolations = semSummary?.violations ?? [];
 
+                const isOverSchemeLimit = semCredits > maxCreditsPerSem;
                 let workloadBadgeColor = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
-                if (workload === 'light') workloadBadgeColor = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
-                if (workload === 'overload') workloadBadgeColor = 'bg-rose-500/10 text-rose-400 border-rose-500/30';
+                if (isOverSchemeLimit) workloadBadgeColor = 'bg-rose-950 text-rose-300 border-rose-500 font-bold';
+                else if (workload === 'light') workloadBadgeColor = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
+                else if (workload === 'overload') workloadBadgeColor = 'bg-rose-500/10 text-rose-400 border-rose-500/30';
 
                 return (
                   <div
                     key={slot.semesterNumber}
-                    className="bg-slate-900/90 border border-slate-800 rounded-xl flex flex-col overflow-hidden shadow-sm hover:border-slate-700 transition-colors"
+                    className={`rounded-xl flex flex-col overflow-hidden shadow-sm transition-colors ${
+                      isOverSchemeLimit
+                        ? 'border-2 border-rose-500 bg-rose-950/20'
+                        : 'bg-slate-900/90 border border-slate-800 hover:border-slate-700'
+                    }`}
                   >
                     {/* ── Semester Column Header ─────────────────────── */}
                     <div className="p-3 border-b border-slate-800 bg-slate-950/40">
@@ -756,6 +884,18 @@ export default function StudentPlannerPage() {
           </div>
         </Modal>
       )}
+
+      {/* Scheme Rules Drawer (Card E5) */}
+      <SchemeRulesDrawer
+        isOpen={isSchemeRulesOpen}
+        onClose={() => setIsSchemeRulesOpen(false)}
+        currentMaxCredits={maxCreditsPerSem}
+        currentPassingGrade={passingGrade}
+        onRulesUpdated={(newMax, newPass) => {
+          setMaxCreditsPerSem(newMax);
+          setPassingGrade(newPass);
+        }}
+      />
     </div>
   );
 }
