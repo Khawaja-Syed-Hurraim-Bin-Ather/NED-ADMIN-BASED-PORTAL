@@ -80,6 +80,8 @@ import { chatRouter } from './routes/chat';
 import { prereqRouter } from './routes/prereq';
 import { professorsRouter } from './routes/professors';
 import { plannerRouter } from './routes/planner';
+import { batchesRouter } from './routes/batches';
+import { curriculumRouter } from './routes/curriculum';
 
 // ── API v1 health (read limiter) ─────────────────────────────────────────
 app.get('/api/v1/health', readLimiter, (_req, res) => {
@@ -101,6 +103,8 @@ app.use('/api/v1/careers', readLimiter, careersRouter);
 app.use('/api/v1/prereq', readLimiter, prereqRouter);
 app.use('/api/v1/professors', readLimiter, professorsRouter);
 app.use('/api/v1/planner', readLimiter, plannerRouter);
+app.use('/api/v1/batches', readLimiter, batchesRouter);
+app.use('/api/v1/curriculum', readLimiter, curriculumRouter);
 
 // ── 404 handler ──────────────────────────────────────────────────────────
 app.use((_req, res) => {

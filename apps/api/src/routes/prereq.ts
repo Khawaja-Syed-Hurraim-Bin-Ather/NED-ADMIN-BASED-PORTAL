@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import { apiError } from '@educompass/shared';
+import { supabaseAdmin } from '../lib/supabase';
 import {
   PrereqGraph,
   CourseNode,
@@ -8,7 +9,6 @@ import {
   StudentAcademicState,
   validateDAG,
   evaluateAllCourses,
-  evaluateCourseEligibility,
   simulateCourseFailure,
   calculateCourseImportance,
   findCriticalPath,
@@ -100,10 +100,9 @@ export function buildDefaultCurriculumGraph(): PrereqGraph {
       'CS-406',
       {
         type: 'and',
-        children: [
+        rules: [
           { type: 'course', courseCode: 'CS-218', minGrade: 'D' },
-          { type: 'course', courseCode: 'CS-222', minGrade: 'D' },
-          { type: 'course', courseCode: 'CS-326', minGrade: 'D' },
+          { type: 'min_credits', credits: 80 },
         ],
       },
     ],
@@ -114,18 +113,89 @@ export function buildDefaultCurriculumGraph(): PrereqGraph {
 
 const defaultGraph = buildDefaultCurriculumGraph();
 
-// ─── Input Schemas ────────────────────────────────────────────────────────────
+// ─── Dynamic Curriculum Graph Builder ─────────────────────────────────────────
+
+export async function buildCurriculumGraphForVersion(versionId?: string, programCode: string = 'CSE'): Promise<PrereqGraph> {
+  if (!versionId) return defaultGraph;
+
+  try {
+    const { data: ccList, error: ccErr } = await supabaseAdmin
+      .from('curriculum_courses')
+      .select(`
+        semester,
+        credits,
+        category,
+        slot,
+        course_id,
+        course:course_master!inner(
+          id,
+          code,
+          title,
+          credits_theory,
+          credits_practical
+        )
+      `)
+      .eq('version_id', versionId);
+
+    if (ccErr || !ccList || ccList.length === 0) {
+      return defaultGraph;
+    }
+
+    const { data: rulesList } = await supabaseAdmin
+      .from('prerequisite_rules')
+      .select('course_id, rule_tree')
+      .eq('version_id', versionId);
+
+    const courses = new Map<string, CourseNode>();
+    const courseIdToCode = new Map<string, string>();
+
+    for (const item of ccList) {
+      const cm = (item as any).course;
+      if (!cm) continue;
+      courseIdToCode.set(cm.id, cm.code);
+
+      courses.set(cm.code, {
+        code: cm.code,
+        title: cm.title,
+        credits: Number(item.credits) || (cm.credits_theory + cm.credits_practical) || 3,
+        theoryCredits: cm.credits_theory ?? 3,
+        practicalCredits: cm.credits_practical ?? 0,
+        semester: item.semester,
+        category: item.category as any,
+        isElective: item.category === 'elective',
+      });
+    }
+
+    const rules = new Map<string, PrereqRule>();
+    if (rulesList) {
+      for (const r of rulesList) {
+        const targetCode = courseIdToCode.get(r.course_id);
+        if (targetCode && r.rule_tree) {
+          rules.set(targetCode, r.rule_tree as PrereqRule);
+        }
+      }
+    }
+
+    return { courses, rules };
+  } catch (_) {
+    return defaultGraph;
+  }
+}
+
+// ─── Input Validation Schemas ─────────────────────────────────────────────────
 
 const EvaluateSchema = z.object({
   completedCourses: z.array(
     z.object({
       code: z.string().trim(),
-      grade: z.string().trim(),
+      grade: z.string().trim().optional().default('D'),
       creditHours: z.number().optional().default(4),
     })
-  ),
+  ).default([]),
   inProgressCourses: z.array(z.string().trim()).optional().default([]),
   currentSemester: z.number().int().min(1).max(8).optional().default(1),
+  versionId: z.string().uuid().optional(),
+  batch: z.string().optional(),
 });
 
 const SimulateFailureSchema = z.object({
@@ -133,55 +203,91 @@ const SimulateFailureSchema = z.object({
   completedCourses: z.array(
     z.object({
       code: z.string().trim(),
-      grade: z.string().trim(),
+      grade: z.string().trim().optional().default('D'),
       creditHours: z.number().optional().default(4),
     })
-  ),
+  ).default([]),
   currentSemester: z.number().int().min(1).max(8).optional().default(1),
+  versionId: z.string().uuid().optional(),
+  batch: z.string().optional(),
 });
+
+async function resolveVersionId(versionId?: string, batch?: string): Promise<string | undefined> {
+  if (versionId) return versionId;
+  if (batch) {
+    try {
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(batch);
+      const query = supabaseAdmin.from('batches').select('curriculum_version_id');
+      if (isUuid) {
+        query.eq('id', batch);
+      } else {
+        query.or(`label.ilike.%${batch}%,admission_year.eq.${parseInt(batch, 10) || 0}`);
+      }
+      const { data } = await query.limit(1).maybeSingle();
+      if (data?.curriculum_version_id) return data.curriculum_version_id;
+    } catch (_) {}
+  }
+  return undefined;
+}
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 
 /**
  * GET /api/v1/prereq/graph
- * Returns all courses with credits, prerequisite rules, and DAG cycle status.
  */
-prereqRouter.get('/graph', (_req: Request, res: Response) => {
-  const dagCheck = validateDAG(defaultGraph);
+prereqRouter.get('/graph', async (req: Request, res: Response) => {
+  try {
+    const versionId = req?.query?.versionId;
+    const batch = req?.query?.batch;
+    const resolvedVersionId = await resolveVersionId(
+      typeof versionId === 'string' ? versionId : undefined,
+      typeof batch === 'string' ? batch : undefined
+    );
 
-  const courseList = Array.from(defaultGraph.courses.values()).map((c) => {
-    const rule = defaultGraph.rules.get(c.code);
-    return {
-      ...c,
-      prerequisites: rule ? rule : null,
-    };
-  });
+    const graph = resolvedVersionId ? await buildCurriculumGraphForVersion(resolvedVersionId) : defaultGraph;
+    const dagCheck = validateDAG(graph);
 
-  res.json({
-    data: {
-      program: 'BE Computer Systems Engineering',
-      batch: '2018 Onwards',
-      totalCourses: courseList.length,
-      isValidDAG: dagCheck.isValidDAG,
-      topologicalOrder: dagCheck.topologicalOrder || [],
-      courses: courseList,
-      disclaimer: 'Guidance estimates, not official university decisions.',
-    },
-  });
+    const courseList = Array.from(graph.courses.values()).map((c) => {
+      const rule = graph.rules.get(c.code);
+      return {
+        ...c,
+        prerequisites: rule ? rule : null,
+      };
+    });
+
+    res.json({
+      data: {
+        program: 'BE Computer Systems Engineering',
+        batch: (typeof batch === 'string' && batch) ? batch : '2018 Onwards',
+        versionId: resolvedVersionId || 'default-scheme2022',
+        totalCourses: courseList.length,
+        isValidDAG: dagCheck.isValidDAG,
+        topologicalOrder: dagCheck.topologicalOrder || [],
+        courses: courseList,
+        disclaimer: 'Guidance estimates, not official university decisions.',
+      },
+    });
+  } catch (err) {
+    const error = apiError('INTERNAL_ERROR', 'Failed to generate curriculum graph', [
+      { field: 'graph', message: (err as Error).message },
+    ]);
+    (res.status ? res.status(500) : res).json(error);
+  }
 });
 
 /**
  * POST /api/v1/prereq/evaluate
- * Evaluates student course eligibility against curriculum rules.
  */
-prereqRouter.post('/evaluate', (req: Request, res: Response) => {
+prereqRouter.post('/evaluate', async (req: Request, res: Response) => {
   const parsed = EvaluateSchema.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid academic state payload', parsed.error.errors));
+    (res.status ? res.status(400) : res).json(apiError('VALIDATION_ERROR', 'Invalid academic state payload', parsed.error.errors));
     return;
   }
 
-  const { completedCourses, inProgressCourses, currentSemester } = parsed.data;
+  const { completedCourses, inProgressCourses, currentSemester, versionId, batch } = parsed.data;
+  const resolvedVersionId = await resolveVersionId(versionId, batch);
+  const graph = resolvedVersionId ? await buildCurriculumGraphForVersion(resolvedVersionId) : defaultGraph;
 
   const completedMap = new Map<string, { grade: string; creditHours: number }>();
   let totalCredits = 0;
@@ -198,7 +304,7 @@ prereqRouter.post('/evaluate', (req: Request, res: Response) => {
     currentSemester,
   };
 
-  const results = evaluateAllCourses(defaultGraph, state);
+  const results = evaluateAllCourses(graph, state);
 
   res.json({
     data: {
@@ -212,16 +318,17 @@ prereqRouter.post('/evaluate', (req: Request, res: Response) => {
 
 /**
  * POST /api/v1/prereq/simulate-failure
- * Simulates failing one or more courses in memory (Rule #8).
  */
-prereqRouter.post('/simulate-failure', (req: Request, res: Response) => {
+prereqRouter.post('/simulate-failure', async (req: Request, res: Response) => {
   const parsed = SimulateFailureSchema.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json(apiError('VALIDATION_ERROR', 'Invalid simulation payload', parsed.error.errors));
+    (res.status ? res.status(400) : res).json(apiError('VALIDATION_ERROR', 'Invalid simulation payload', parsed.error.errors));
     return;
   }
 
-  const { failedCourseCodes, completedCourses, currentSemester } = parsed.data;
+  const { failedCourseCodes, completedCourses, currentSemester, versionId, batch } = parsed.data;
+  const resolvedVersionId = await resolveVersionId(versionId, batch);
+  const graph = resolvedVersionId ? await buildCurriculumGraphForVersion(resolvedVersionId) : defaultGraph;
 
   const completedMap = new Map<string, { grade: string; creditHours: number }>();
   let totalCredits = 0;
@@ -237,8 +344,7 @@ prereqRouter.post('/simulate-failure', (req: Request, res: Response) => {
     currentSemester,
   };
 
-  // Run simulation in memory (Rule #8)
-  const simulationResults = simulateCourseFailure(failedCourseCodes, defaultGraph, baseState);
+  const simulationResults = simulateCourseFailure(failedCourseCodes, graph, baseState);
 
   res.json({
     data: {
@@ -250,16 +356,23 @@ prereqRouter.post('/simulate-failure', (req: Request, res: Response) => {
 
 /**
  * GET /api/v1/prereq/importance/:code
- * Returns importance score with full 4-part breakdown labeled as Estimate (Rule #7).
  */
-prereqRouter.get('/importance/:code', (req: Request, res: Response) => {
+prereqRouter.get('/importance/:code', async (req: Request, res: Response) => {
   const code = req.params.code as string;
-  if (!defaultGraph.courses.has(code)) {
-    res.status(404).json(apiError('NOT_FOUND', `Course code ${code} not found in curriculum`));
+  const versionId = req?.query?.versionId;
+  const batch = req?.query?.batch;
+  const resolvedVersionId = await resolveVersionId(
+    typeof versionId === 'string' ? versionId : undefined,
+    typeof batch === 'string' ? batch : undefined
+  );
+  const graph = resolvedVersionId ? await buildCurriculumGraphForVersion(resolvedVersionId) : defaultGraph;
+
+  if (!graph.courses.has(code)) {
+    (res.status ? res.status(404) : res).json(apiError('NOT_FOUND', `Course code ${code} not found in curriculum`));
     return;
   }
 
-  const score = calculateCourseImportance(defaultGraph, code);
+  const score = calculateCourseImportance(graph, code);
 
   res.json({
     data: {
@@ -270,11 +383,17 @@ prereqRouter.get('/importance/:code', (req: Request, res: Response) => {
 });
 
 /**
- * GET /api/v1/prereq/critical-path
- * Returns the longest prerequisite dependency chain leading to FYP (CS-406).
+ * GET /api/v1/critical-path
  */
-prereqRouter.get('/critical-path', (_req: Request, res: Response) => {
-  const path = findCriticalPath(defaultGraph, 'CS-406');
+prereqRouter.get('/critical-path', async (req: Request, res: Response) => {
+  const versionId = req?.query?.versionId;
+  const batch = req?.query?.batch;
+  const resolvedVersionId = await resolveVersionId(
+    typeof versionId === 'string' ? versionId : undefined,
+    typeof batch === 'string' ? batch : undefined
+  );
+  const graph = resolvedVersionId ? await buildCurriculumGraphForVersion(resolvedVersionId) : defaultGraph;
+  const path = findCriticalPath(graph, 'CS-406');
 
   res.json({
     data: {

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { BatchPicker, BatchNoticeBanner } from './BatchPicker';
 
 interface BreadcrumbItem {
   label: string;
@@ -127,6 +128,7 @@ export function PageHeader({
 
         {/* ── Right: Actions + Theme toggle + Dashboard ── */}
         <div className="page-header-right" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <BatchPicker />
           {actions}
 
           <button
@@ -147,6 +149,7 @@ export function PageHeader({
 
       {/* Hairline subtle accent */}
       <div style={{ height: 2, background: accent, opacity: 0.8 }} aria-hidden="true" />
+      <BatchNoticeBanner />
     </header>
   );
 }
