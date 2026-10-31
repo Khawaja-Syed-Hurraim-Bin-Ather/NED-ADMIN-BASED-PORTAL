@@ -88,6 +88,7 @@ import { adminAuthRouter, bootstrapAdminAccounts } from './routes/admin-auth';
 import { workflowRouter } from './routes/workflow';
 import { adminContentRouter } from './routes/admin-content';
 import { adminCurriculumRouter } from './routes/admin-curriculum';
+import { releasesJobsRouter } from './routes/releases-jobs';
 
 // ── API v1 health (read limiter) ─────────────────────────────────────────
 app.get('/api/v1/health', readLimiter, (_req, res) => {
@@ -104,6 +105,7 @@ app.use('/api/v1/chat', chatRateLimiter, chatRouter);
 app.use('/api/v1/admin/auth', authRateLimiter, adminAuthRouter);
 app.use('/api/v1/admin/content', writeLimiter, adminContentRouter);
 app.use('/api/v1/admin/curriculum', writeLimiter, adminCurriculumRouter);
+app.use('/api/v1/admin', writeLimiter, releasesJobsRouter);
 app.use('/api/v1/admin', writeLimiter, workflowRouter);
 app.use('/api/v1/admin', writeLimiter, adminRouter);
 

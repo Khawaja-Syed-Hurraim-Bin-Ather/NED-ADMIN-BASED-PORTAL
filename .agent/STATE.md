@@ -2,6 +2,22 @@
 Last updated: 2026-10-28
 
 ## Latest Updates
+- **Institutional Admin Panel — Publish Cascade Execution & VC Rollback (Card A9)**:
+  - Built background cascade execution engine `apps/api/src/lib/publish-cascade.ts`:
+    - Handles sequential steps 3 to 10 (`rebuild_graph`, `recompute_scores`, `refresh_caches`, `reembed_chatbot`, `faq_staleness`, `career_links`, `student_notice`, `health_report`).
+    - Full idempotency: skips already completed jobs without duplicate runs or data corruption.
+    - Side job failure isolation: failures record error details in `publish_jobs.detail` without aborting or rolling back the live publish (Section 8).
+    - Batch runner `runPendingJobs()` for release processing.
+  - Built router `apps/api/src/routes/releases-jobs.ts` mounted under `/api/v1/admin`:
+    - `GET /releases`: Paginated release list with department scoping.
+    - `GET /releases/:id`: Release detail view displaying snapshot and associated cascade jobs.
+    - `POST /releases/:id/rollback`: Atomic rollback endpoint requiring step-up token and VC role authorization; creates immutable `rollback-*` release tag and enqueues cascade steps 3-10 without rewriting history.
+    - `GET /jobs`: Cascade job monitoring queue with status and release filters.
+    - `POST /jobs/:id/retry`: Re-executes failed or queued jobs.
+    - `POST /jobs/run`: Manual trigger for pending queue execution.
+  - Tests-first test suite in `apps/api/src/lib/publish-cascade.test.ts` (4 tests) and `apps/api/src/routes/releases-jobs.test.ts` (4 tests).
+  - Monorepo validation: **160/160 Vitest tests green**, 0 TypeScript errors across all 6 workspace packages.
+
 - **Institutional Admin Panel — Curriculum Admin & Validation Engine (Card A8)**:
   - Built router `apps/api/src/routes/admin-curriculum.ts` mounted under `/api/v1/admin/curriculum`:
     - Strict role access guard (`requireCurriculumRole`) blocking data-entry operators with 403 (Section 3).
@@ -113,6 +129,7 @@ Last updated: 2026-10-28
 | A6 | done | main | Change sets, deterministic diff message generator, approvals queue & atomic apply_change_set |
 | A7 | done | main | Content modules (FYP, professors, career, chatbot, imports queue) & draft transformers |
 | A8 | done | main | Curriculum admin module (scheme cloning, validation DAG engine, impact preview, equivalences) |
+| A9 | done | main | Publish cascade background runner (steps 3-10), status monitoring panel, and VC rollback |
 | F1 | done | main | Scaffolded monorepo, secrets, localhost web (3000) & api (4000) |
 | F2 | done | main | Base schema + FYP v2 + roadmap progress migrations applied to Supabase |
 | F3 | done | main | Supabase Auth + Next.js middleware + requireRole('enrolled'|'admin') + deletion requests (Rule 9) |
