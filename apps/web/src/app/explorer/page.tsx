@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import {
   ReactFlow,
@@ -15,6 +15,7 @@ import {
   useNodesState,
   useEdgesState,
   MarkerType,
+  Connection,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -24,32 +25,13 @@ import {
   Modal,
 } from '@educompass/ui';
 import { PageHeader } from '../../components/PageHeader';
+import { useEditMode } from '../../context/EditModeContext';
+import { CourseEditDrawer, CourseData } from '../../components/edit-mode/CourseEditDrawer';
+import { AddCourseWizard } from '../../components/edit-mode/AddCourseWizard';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// ─── Default Fallback Curriculum (Detailed Syllabi BE CS 2018 Onwards) ────────
 
-interface CourseData {
-  code: string;
-  title: string;
-  credits: number;
-  theoryCredits: number;
-  practicalCredits: number;
-  semester: number;
-  category: 'core_computing' | 'mathematics' | 'science' | 'humanities' | 'fyp' | 'elective';
-  prereqs: string[];
-  isElective?: boolean;
-}
-
-type NodeStatus = 'completed' | 'in_progress' | 'unlocked' | 'locked' | 'simulated_failed' | 'blocked_cascade';
-
-interface CustomNodeData extends CourseData {
-  status: NodeStatus;
-  isCriticalPath: boolean;
-  onSelectCourse: (course: CourseData) => void;
-}
-
-// ─── Official Curriculum Definition (Detailed Syllabi BE CS 2018 Onwards) ─────
-
-const CURRICULUM_COURSES: CourseData[] = [
+const DEFAULT_CURRICULUM_COURSES: CourseData[] = [
   // Semester 1 (Fall)
   { code: 'CS-114', title: 'Fundamentals of Computer Engineering', credits: 4, theoryCredits: 3, practicalCredits: 1, semester: 1, category: 'core_computing', prereqs: [] },
   { code: 'CS-115', title: 'Computer Programming', credits: 4, theoryCredits: 3, practicalCredits: 1, semester: 1, category: 'core_computing', prereqs: [] },
@@ -119,6 +101,15 @@ const CATEGORY_STYLES = {
   elective: 'border-cyan-500/50 bg-cyan-950/40 text-cyan-200',
 };
 
+type NodeStatus = 'completed' | 'in_progress' | 'unlocked' | 'locked' | 'simulated_failed' | 'blocked_cascade';
+
+interface CustomNodeData extends CourseData {
+  status: NodeStatus;
+  isCriticalPath: boolean;
+  isEditModeActive: boolean;
+  onSelectCourse: (course: CourseData) => void;
+}
+
 // ─── Custom Course Node Component ─────────────────────────────────────────────
 
 function CourseNodeCard({ data }: NodeProps) {
@@ -156,13 +147,16 @@ function CourseNodeCard({ data }: NodeProps) {
           : nodeData.isCriticalPath
           ? 'border-amber-400 bg-amber-950/30 ring-2 ring-amber-400/40 shadow-amber-900/20'
           : CATEGORY_STYLES[nodeData.category]
-      }`}
+      } ${nodeData.isEditModeActive ? 'ring-1 ring-amber-400/40 hover:ring-amber-300' : ''}`}
     >
-      <Handle type="target" position={Position.Left} className="!w-2 !h-2 !bg-blue-400 !border-slate-900" />
+      <Handle type="target" position={Position.Left} className="!w-2.5 !h-2.5 !bg-amber-400 !border-slate-900" />
 
       {/* Top Header */}
       <div className="flex items-center justify-between mb-1.5">
-        <span className="font-mono text-xs font-bold tracking-tight text-white">{nodeData.code}</span>
+        <span className="font-mono text-xs font-bold tracking-tight text-white flex items-center gap-1.5">
+          {nodeData.code}
+          {nodeData.isEditModeActive && <span className="text-[9px] text-amber-300">✎</span>}
+        </span>
         {statusBadge()}
       </div>
 
@@ -177,25 +171,213 @@ function CourseNodeCard({ data }: NodeProps) {
         <span className="font-mono text-slate-300 font-semibold">{nodeData.credits} Cr ({nodeData.theoryCredits}+{nodeData.practicalCredits})</span>
       </div>
 
-      <Handle type="source" position={Position.Right} className="!w-2 !h-2 !bg-blue-400 !border-slate-900" />
+      <Handle type="source" position={Position.Right} className="!w-2.5 !h-2.5 !bg-amber-400 !border-slate-900" />
     </div>
   );
 }
 
 const nodeTypes = { courseNode: CourseNodeCard };
 
+// ─── Live DAG Validation Engine (Pure Function) ───────────────────────────────
+
+interface DAGValidationReport {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+  cycleCourseCodes: string[];
+}
+
+function validateCurriculumGraphLocally(courses: CourseData[]): DAGValidationReport {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  const courseMap = new Map<string, CourseData>();
+  const semesterCredits = new Map<number, number>();
+
+  for (const c of courses) {
+    courseMap.set(c.code, c);
+    semesterCredits.set(c.semester, (semesterCredits.get(c.semester) || 0) + c.credits);
+  }
+
+  // 1. Credit limits (max 21 per semester)
+  for (const [sem, totalCr] of semesterCredits.entries()) {
+    if (totalCr > 21) {
+      errors.push(`Semester ${sem} has ${totalCr} credit hours, exceeding the maximum limit of 21.`);
+    }
+  }
+
+  // 2. Backward prerequisite check
+  for (const c of courses) {
+    for (const pCode of c.prereqs) {
+      const prereqCourse = courseMap.get(pCode);
+      if (prereqCourse) {
+        if (c.semester <= prereqCourse.semester) {
+          errors.push(
+            `Backward prerequisite: ${c.code} (Semester ${c.semester}) requires ${prereqCourse.code} (Semester ${prereqCourse.semester}). Prerequisites must be taken in an earlier semester.`
+          );
+        }
+      } else {
+        warnings.push(`Prerequisite ${pCode} required by ${c.code} is not currently in the curriculum.`);
+      }
+    }
+  }
+
+  // 3. DFS Cycle Detection
+  const adj = new Map<string, string[]>();
+  for (const c of courses) {
+    adj.set(c.code, []);
+  }
+  for (const c of courses) {
+    for (const p of c.prereqs) {
+      if (adj.has(p)) {
+        adj.get(p)!.push(c.code);
+      }
+    }
+  }
+
+  const visited = new Map<string, number>(); // 0=unvisited, 1=visiting, 2=visited
+  const cycleNodes: string[] = [];
+  let foundCycle = false;
+
+  function dfs(node: string, path: string[]) {
+    visited.set(node, 1);
+    path.push(node);
+
+    for (const next of adj.get(node) || []) {
+      const state = visited.get(next) || 0;
+      if (state === 1) {
+        foundCycle = true;
+        const cycleStartIndex = path.indexOf(next);
+        const subPath = path.slice(cycleStartIndex).concat(next);
+        errors.push(`Circular prerequisite dependency detected: ${subPath.join(' → ')}`);
+        subPath.forEach((cn) => cycleNodes.push(cn));
+      } else if (state === 0) {
+        dfs(next, path);
+      }
+    }
+
+    path.pop();
+    visited.set(node, 2);
+  }
+
+  for (const c of courses) {
+    if (!visited.has(c.code)) {
+      dfs(c.code, []);
+    }
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+    warnings,
+    cycleCourseCodes: Array.from(new Set(cycleNodes)),
+  };
+}
+
 // ─── Main Explorer Page ───────────────────────────────────────────────────────
 
 export default function ExplorerPage() {
+  const { isEditMode, viewAsStudent, can, pendingItems, saveDraftItem } = useEditMode();
+
+  // Base courses fetched from API or fallback
+  const [baseCourses, setBaseCourses] = useState<CourseData[]>(DEFAULT_CURRICULUM_COURSES);
+  const [selectedBatch, setSelectedBatch] = useState<string>('2022');
+
+  // Student academic state
   const [completedSet, setCompletedSet] = useState<Set<string>>(
-    new Set(['CS-114', 'CS-115', 'EE-120', 'MT-114', 'HS-111', 'HS-106']) // Default: Passed 1st sem
+    new Set(['CS-114', 'CS-115', 'EE-120', 'MT-114', 'HS-111', 'HS-106'])
   );
-  const [inProgressSet, setInProgressSet] = useState<Set<string>>(new Set(['CS-116', 'CS-117', 'PH-122', 'EL-103', 'HS-205']));
+  const [inProgressSet, setInProgressSet] = useState<Set<string>>(
+    new Set(['CS-116', 'CS-117', 'PH-122', 'EL-103', 'HS-205'])
+  );
   const [simulatedFailedSet, setSimulatedFailedSet] = useState<Set<string>>(new Set());
   const [isSimulationMode, setIsSimulationMode] = useState<boolean>(false);
   const [showCriticalPath, setShowCriticalPath] = useState<boolean>(false);
-  const [selectedCourse, setSelectedCourse] = useState<CourseData | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
+
+  // Modals & Drawers
+  const [selectedCourseForModal, setSelectedCourseForModal] = useState<CourseData | null>(null);
+  const [selectedCourseForDrawer, setSelectedCourseForDrawer] = useState<CourseData | null>(null);
+  const [isAddCourseOpen, setIsAddCourseOpen] = useState(false);
+
+  // Line drawing confirmation state
+  const [pendingConnect, setPendingConnect] = useState<{ source: string; target: string } | null>(null);
+
+  const canEdit = isEditMode && !viewAsStudent && can('curriculum', 'edit');
+
+  // Fetch live curriculum from API
+  useEffect(() => {
+    async function loadCurriculum() {
+      try {
+        const res = await fetch(`/api/v1/curriculum?batch=${selectedBatch}&program=CSE`);
+        if (res.ok) {
+          const json = await res.json();
+          if (json.data?.courses && Array.isArray(json.data.courses) && json.data.courses.length > 0) {
+            setBaseCourses(json.data.courses);
+          }
+        }
+      } catch {
+        // Fallback to default courses already set
+      }
+    }
+    loadCurriculum();
+  }, [selectedBatch]);
+
+  // Compute active courses with draft overlays applied
+  const activeCourses = useMemo(() => {
+    // Clone base courses
+    let courses: CourseData[] = baseCourses.map((c) => ({
+      ...c,
+      prereqs: [...c.prereqs],
+      syllabus: c.syllabus ? { ...c.syllabus } : undefined,
+    }));
+
+    if (isEditMode && !viewAsStudent) {
+      for (const item of pendingItems) {
+        if (item.table_name === 'curriculum_courses' && item.record_id) {
+          if (item.op === 'update' && item.after) {
+            const idx = courses.findIndex((c) => c.code === item.record_id);
+            if (idx !== -1) {
+              courses[idx] = { ...courses[idx], ...item.after };
+            }
+          } else if (item.op === 'insert' && item.after) {
+            const exists = courses.some((c) => c.code === item.record_id);
+            if (!exists) {
+              const p = item.after;
+              courses.push({
+                code: item.record_id,
+                title: p.title || item.record_id,
+                credits: Number(p.credits) || 3,
+                theoryCredits: Number(p.credits_theory) || 3,
+                practicalCredits: Number(p.credits_practical) || 0,
+                semester: Number(p.semester) || 1,
+                category: p.category || 'core_computing',
+                prereqs: Array.isArray(p.prerequisites) ? p.prerequisites : [],
+                description: p.description,
+                syllabus: p.syllabus,
+              });
+            }
+          }
+        } else if (item.table_name === 'course_prerequisites' && item.record_id) {
+          const [sourceCode, targetCode] = item.record_id.split('->');
+          const targetCourse = courses.find((c) => c.code === targetCode);
+          if (targetCourse) {
+            if (item.op === 'insert' && !targetCourse.prereqs.includes(sourceCode)) {
+              targetCourse.prereqs.push(sourceCode);
+            } else if (item.op === 'delete') {
+              targetCourse.prereqs = targetCourse.prereqs.filter((p) => p !== sourceCode);
+            }
+          }
+        }
+      }
+    }
+
+    return courses;
+  }, [baseCourses, isEditMode, viewAsStudent, pendingItems]);
+
+  // Live DAG validation
+  const validationReport = useMemo(() => {
+    return validateCurriculumGraphLocally(activeCourses);
+  }, [activeCourses]);
 
   // ─── Cascade Calculation for Failed Courses (Rule #8 in-memory) ────────────
   const { cascadeBlockedSet, delayedCredits, estimatedDelaySemesters } = useMemo(() => {
@@ -204,10 +386,10 @@ export default function ExplorerPage() {
     }
 
     const dependentsMap = new Map<string, string[]>();
-    for (const c of CURRICULUM_COURSES) {
+    for (const c of activeCourses) {
       dependentsMap.set(c.code, []);
     }
-    for (const c of CURRICULUM_COURSES) {
+    for (const c of activeCourses) {
       for (const p of c.prereqs) {
         if (dependentsMap.has(p)) {
           dependentsMap.get(p)!.push(c.code);
@@ -230,7 +412,7 @@ export default function ExplorerPage() {
     }
 
     const totalDelayed = Array.from(blocked).reduce((acc, code) => {
-      const course = CURRICULUM_COURSES.find((c) => c.code === code);
+      const course = activeCourses.find((c) => c.code === code);
       return acc + (course?.credits || 0);
     }, 0);
 
@@ -238,7 +420,7 @@ export default function ExplorerPage() {
     const delaySems = reachesFYP ? (blocked.size >= 5 ? 2 : 1) : blocked.size > 0 ? 1 : 0;
 
     return { cascadeBlockedSet: blocked, delayedCredits: totalDelayed, estimatedDelaySemesters: delaySems };
-  }, [simulatedFailedSet]);
+  }, [simulatedFailedSet, activeCourses]);
 
   // ─── Node Status Resolver ──────────────────────────────────────────────────
   const getNodeStatus = useCallback(
@@ -256,13 +438,11 @@ export default function ExplorerPage() {
 
   // ─── Build Graph Nodes ──────────────────────────────────────────────────────
   const initialNodes: Node[] = useMemo(() => {
-    // Layout courses along semester columns
-    // Column spacing: 320px
-    // Row spacing: 130px
     const semesterCounters: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 };
 
-    return CURRICULUM_COURSES.map((course) => {
-      const rowIndex = semesterCounters[course.semester]++;
+    return activeCourses.map((course) => {
+      const rowIndex = semesterCounters[course.semester] || 0;
+      semesterCounters[course.semester] = rowIndex + 1;
       const x = (course.semester - 1) * 320 + 40;
       const y = rowIndex * 135 + 80;
 
@@ -272,12 +452,16 @@ export default function ExplorerPage() {
         id: course.code,
         type: 'courseNode',
         position: { x, y },
+        draggable: canEdit,
         data: {
           ...course,
           status: getNodeStatus(course.code, course.prereqs),
           isCriticalPath: isCrit,
+          isEditModeActive: canEdit,
           onSelectCourse: (c: CourseData) => {
-            if (isSimulationMode) {
+            if (canEdit) {
+              setSelectedCourseForDrawer(c);
+            } else if (isSimulationMode) {
               setSimulatedFailedSet((prev) => {
                 const next = new Set(prev);
                 if (next.has(c.code)) next.delete(c.code);
@@ -285,19 +469,19 @@ export default function ExplorerPage() {
                 return next;
               });
             } else {
-              setSelectedCourse(c);
+              setSelectedCourseForModal(c);
             }
           },
         },
       };
     });
-  }, [getNodeStatus, showCriticalPath, isSimulationMode]);
+  }, [activeCourses, getNodeStatus, showCriticalPath, canEdit, isSimulationMode]);
 
   // ─── Build Graph Edges ──────────────────────────────────────────────────────
   const initialEdges: Edge[] = useMemo(() => {
     const edges: Edge[] = [];
 
-    for (const course of CURRICULUM_COURSES) {
+    for (const course of activeCourses) {
       for (const prereq of course.prereqs) {
         const isCritEdge =
           showCriticalPath &&
@@ -308,18 +492,22 @@ export default function ExplorerPage() {
           simulatedFailedSet.has(prereq) ||
           (cascadeBlockedSet.has(prereq) && cascadeBlockedSet.has(course.code));
 
+        const isCycleEdge =
+          validationReport.cycleCourseCodes.includes(prereq) &&
+          validationReport.cycleCourseCodes.includes(course.code);
+
         edges.push({
           id: `e-${prereq}-${course.code}`,
           source: prereq,
           target: course.code,
-          animated: isCritEdge || isBlockedEdge,
+          animated: isCritEdge || isBlockedEdge || isCycleEdge,
           style: {
-            stroke: isBlockedEdge ? '#f43f5e' : isCritEdge ? '#f59e0b' : '#475569',
-            strokeWidth: isBlockedEdge ? 2.5 : isCritEdge ? 2.5 : 1.5,
+            stroke: isCycleEdge ? '#ef4444' : isBlockedEdge ? '#f43f5e' : isCritEdge ? '#f59e0b' : '#475569',
+            strokeWidth: isCycleEdge ? 3 : isBlockedEdge ? 2.5 : isCritEdge ? 2.5 : 1.5,
           },
           markerEnd: {
             type: MarkerType.ArrowClosed,
-            color: isBlockedEdge ? '#f43f5e' : isCritEdge ? '#f59e0b' : '#64748b',
+            color: isCycleEdge ? '#ef4444' : isBlockedEdge ? '#f43f5e' : isCritEdge ? '#f59e0b' : '#64748b',
             width: 15,
             height: 15,
           },
@@ -328,38 +516,108 @@ export default function ExplorerPage() {
     }
 
     return edges;
-  }, [showCriticalPath, simulatedFailedSet, cascadeBlockedSet]);
+  }, [activeCourses, showCriticalPath, simulatedFailedSet, cascadeBlockedSet, validationReport.cycleCourseCodes]);
 
-  const [nodes, , onNodesChange] = useNodesState(initialNodes);
-  const [edges, , onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
-  // Sync state changes with nodes
-  React.useEffect(() => {
-    // Trigger react-flow node update on status changes
-  }, [initialNodes, initialEdges]);
+  // Sync react-flow state whenever initial nodes/edges change
+  useEffect(() => {
+    setNodes(initialNodes);
+    setEdges(initialEdges);
+  }, [initialNodes, initialEdges, setNodes, setEdges]);
+
+  // ─── Handle Node Drag Stop (Semester Reassignment) ─────────────────────────
+  const handleNodeDragStop = useCallback(
+    (_event: any, node: Node) => {
+      if (!canEdit) return;
+
+      const course = activeCourses.find((c) => c.code === node.id);
+      if (!course) return;
+
+      // Calculate target semester from X coordinate (each column is 320px wide, starting at x=40)
+      const targetSemester = Math.max(1, Math.min(8, Math.floor((node.position.x - 40 + 160) / 320) + 1));
+
+      if (targetSemester !== course.semester) {
+        saveDraftItem(
+          'curriculum',
+          'curriculum_courses',
+          course.code,
+          { semester: targetSemester },
+          'update',
+          `Move ${course.code} from Semester ${course.semester} to Semester ${targetSemester}`
+        );
+
+        // Update local base course state immediately
+        setBaseCourses((prev) =>
+          prev.map((c) => (c.code === course.code ? { ...c, semester: targetSemester } : c))
+        );
+      }
+    },
+    [canEdit, activeCourses, saveDraftItem]
+  );
+
+  // ─── Handle Line Drawing (onConnect) ──────────────────────────────────────
+  const handleConnect = useCallback(
+    (params: Connection) => {
+      if (!canEdit || !params.source || !params.target) return;
+      if (params.source === params.target) return;
+
+      const targetCourse = activeCourses.find((c) => c.code === params.target);
+      if (targetCourse?.prereqs.includes(params.source)) {
+        return; // Already a prereq
+      }
+
+      setPendingConnect({
+        source: params.source,
+        target: params.target,
+      });
+    },
+    [canEdit, activeCourses]
+  );
+
+  const confirmPendingConnect = () => {
+    if (!pendingConnect || !canEdit) return;
+    const { source, target } = pendingConnect;
+
+    saveDraftItem(
+      'curriculum',
+      'course_prerequisites',
+      `${source}->${target}`,
+      { course_code: target, prerequisite_code: source },
+      'insert',
+      `Add prerequisite: ${source} for ${target}`
+    );
+
+    setBaseCourses((prev) =>
+      prev.map((c) => (c.code === target ? { ...c, prereqs: [...c.prereqs, source] } : c))
+    );
+
+    setPendingConnect(null);
+  };
 
   // ─── Importance Score Calculator (Rule #7) ──────────────────────────────────
   const selectedCourseImportance = useMemo(() => {
-    if (!selectedCourse) return null;
+    if (!selectedCourseForModal) return null;
 
-    const code = selectedCourse.code;
-    const directUnlocks = CURRICULUM_COURSES.filter((c) => c.prereqs.includes(code)).length;
+    const code = selectedCourseForModal.code;
+    const directUnlocks = activeCourses.filter((c) => c.prereqs.includes(code)).length;
 
-    // BFS transitive reach
+    // Transitive reach
     const reachSet = new Set<string>();
-    const queue = CURRICULUM_COURSES.filter((c) => c.prereqs.includes(code)).map((c) => c.code);
+    const queue = activeCourses.filter((c) => c.prereqs.includes(code)).map((c) => c.code);
     while (queue.length > 0) {
       const cur = queue.shift()!;
       if (!reachSet.has(cur)) {
         reachSet.add(cur);
-        CURRICULUM_COURSES.filter((c) => c.prereqs.includes(cur)).forEach((d) => queue.push(d.code));
+        activeCourses.filter((c) => c.prereqs.includes(cur)).forEach((d) => queue.push(d.code));
       }
     }
 
     const directScore = Math.min(1.0, directUnlocks / 4) * 40;
     const reachScore = Math.min(1.0, reachSet.size / 12) * 25;
-    const creditScore = Math.min(1.0, selectedCourse.credits / 4) * 20;
-    const earlinessScore = Math.max(0, (9 - selectedCourse.semester) / 8) * 15;
+    const creditScore = Math.min(1.0, selectedCourseForModal.credits / 4) * 20;
+    const earlinessScore = Math.max(0, (9 - selectedCourseForModal.semester) / 8) * 15;
 
     const total = Math.min(100, Math.round(directScore + reachScore + creditScore + earlinessScore));
 
@@ -373,7 +631,7 @@ export default function ExplorerPage() {
       },
       unlockedCourses: Array.from(reachSet),
     };
-  }, [selectedCourse]);
+  }, [selectedCourseForModal, activeCourses]);
 
   return (
     <div className="h-screen w-screen bg-[#0b1119] text-slate-100 flex flex-col overflow-hidden">
@@ -381,18 +639,31 @@ export default function ExplorerPage() {
       <PageHeader
         title="Prerequisite DAG Explorer"
         breadcrumbs={[{ label: 'Prerequisite Explorer' }]}
-        badge="Batch 2018 Onwards"
+        badge={`Batch ${selectedBatch} Onwards`}
         description="Directed acyclic graph of NED CISE degree requirements, critical paths, and failure cascades."
         accent="var(--cyan)"
         actions={
           <div className="flex items-center gap-2.5 flex-wrap text-xs">
+            {/* Batch Selector */}
+            <select
+              value={selectedBatch}
+              onChange={(e) => setSelectedBatch(e.target.value)}
+              className="bg-[#0f1823] border border-[rgba(213,228,236,0.15)] rounded-lg px-2.5 py-1 text-xs text-slate-200 focus:outline-none focus:border-[#9bcbd0]"
+            >
+              <option value="2022">Batch 2022</option>
+              <option value="2023">Batch 2023</option>
+              <option value="2024">Batch 2024</option>
+              <option value="2025">Batch 2025</option>
+              <option value="2026">Batch 2026</option>
+            </select>
+
             {/* Search Box */}
             <input
               type="text"
               placeholder="Search code/title..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-[#0f1823] border border-[rgba(213,228,236,0.15)] rounded-lg px-2.5 py-1 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-[#9bcbd0] w-36 sm:w-44"
+              className="bg-[#0f1823] border border-[rgba(213,228,236,0.15)] rounded-lg px-2.5 py-1 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-[#9bcbd0] w-32 sm:w-40"
             />
 
             {/* Critical Path Toggle */}
@@ -417,12 +688,13 @@ export default function ExplorerPage() {
               <span>{isSimulationMode ? 'Exit Simulation' : 'What-If Failure Sim'}</span>
             </button>
 
-            {isSimulationMode && simulatedFailedSet.size > 0 && (
+            {/* Add Course Button (Edit Mode Only) */}
+            {canEdit && (
               <button
-                onClick={() => setSimulatedFailedSet(new Set())}
-                className="text-xs text-[#d9a29d] hover:underline"
+                onClick={() => setIsAddCourseOpen(true)}
+                className="px-3 py-1 rounded bg-[#511030] hover:bg-[#6e1642] text-white font-medium text-xs transition-colors shadow-sm flex items-center gap-1.5"
               >
-                Reset
+                <span>+ Add Course</span>
               </button>
             )}
           </div>
@@ -441,6 +713,30 @@ export default function ExplorerPage() {
           Terms
         </Link>
       </div>
+
+      {/* Live DAG Validation Error Banner */}
+      {!validationReport.isValid && (
+        <div className="bg-rose-950/90 border-b border-rose-500 px-4 py-2 text-xs flex items-center justify-between z-20 shrink-0 text-rose-100 animate-in fade-in">
+          <div className="flex items-center gap-2 flex-1">
+            <span className="text-base">⚠️</span>
+            <div>
+              <strong className="font-semibold text-rose-200">Validation Issue:</strong>{' '}
+              <span>{validationReport.errors[0]}</span>
+              {validationReport.errors.length > 1 && (
+                <span className="text-rose-300 ml-1.5">
+                  (+{validationReport.errors.length - 1} more issues)
+                </span>
+              )}
+              <span className="text-rose-300/80 text-[11px] block">
+                Changes cannot be published until all cycles and backward prerequisites are resolved.
+              </span>
+            </div>
+          </div>
+          <Badge variant="danger" className="text-[10px] tracking-wider uppercase shrink-0">
+            Invalid Graph
+          </Badge>
+        </div>
+      )}
 
       {/* Simulation Active Float Banner (Rule #7 & #8) */}
       {isSimulationMode && (
@@ -483,10 +779,12 @@ export default function ExplorerPage() {
       {/* React Flow Canvas */}
       <div className="flex-1 w-full h-full relative">
         <ReactFlow
-          nodes={initialNodes}
-          edges={initialEdges}
+          nodes={nodes}
+          edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
+          onNodeDragStop={handleNodeDragStop}
+          onConnect={handleConnect}
           nodeTypes={nodeTypes}
           fitView
           fitViewOptions={{ padding: 0.15 }}
@@ -509,20 +807,84 @@ export default function ExplorerPage() {
         </ReactFlow>
       </div>
 
-      {/* Course Detail Modal */}
-      {selectedCourse && (
+      {/* Prerequisite Line Drawing Confirmation Popover Modal */}
+      {pendingConnect && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in"
+        >
+          <div className="w-full max-w-md bg-[#0f1823] border border-amber-500/40 rounded-xl p-5 shadow-2xl space-y-4 text-xs">
+            <h3 className="text-sm font-semibold text-amber-300">Add Prerequisite Rule</h3>
+            <p className="text-slate-200 leading-relaxed">
+              Are you sure you want to require{' '}
+              <strong className="font-mono text-amber-400">{pendingConnect.source}</strong> as a prerequisite for{' '}
+              <strong className="font-mono text-amber-400">{pendingConnect.target}</strong>?
+            </p>
+            <p className="text-[11px] text-slate-400">
+              Students will be required to pass {pendingConnect.source} before enrolling in {pendingConnect.target}.
+            </p>
+
+            <div className="flex justify-end gap-2.5 pt-2 border-t border-slate-800">
+              <button
+                onClick={() => setPendingConnect(null)}
+                className="px-3.5 py-1.5 rounded text-slate-400 hover:text-slate-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmPendingConnect}
+                className="px-4 py-1.5 rounded bg-[#511030] hover:bg-[#6e1642] text-white font-semibold shadow-sm transition-colors"
+              >
+                Confirm &amp; Add Rule
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 4-Tab Course Edit Drawer (Edit Mode) */}
+      <CourseEditDrawer
+        course={selectedCourseForDrawer}
+        allCourses={activeCourses}
+        isOpen={!!selectedCourseForDrawer}
+        onClose={() => setSelectedCourseForDrawer(null)}
+        onUpdateCourse={(updated) => {
+          setBaseCourses((prev) =>
+            prev.map((c) => (c.code === updated.code ? updated : c))
+          );
+          setSelectedCourseForDrawer(updated);
+        }}
+        onSelectCourseByCode={(code) => {
+          const target = activeCourses.find((c) => c.code === code);
+          if (target) setSelectedCourseForDrawer(target);
+        }}
+      />
+
+      {/* + Add Course 4-Step Wizard */}
+      <AddCourseWizard
+        isOpen={isAddCourseOpen}
+        onClose={() => setIsAddCourseOpen(false)}
+        allCourses={activeCourses}
+        onCourseAdded={(newCourse) => {
+          setBaseCourses((prev) => [...prev, newCourse]);
+        }}
+      />
+
+      {/* Student View Course Modal */}
+      {selectedCourseForModal && (
         <Modal
-          isOpen={!!selectedCourse}
-          onClose={() => setSelectedCourse(null)}
-          title={`${selectedCourse.code}: ${selectedCourse.title}`}
-          description={`Semester ${selectedCourse.semester} • ${selectedCourse.credits} Credit Hours (${selectedCourse.theoryCredits} Theory + ${selectedCourse.practicalCredits} Practical)`}
+          isOpen={!!selectedCourseForModal}
+          onClose={() => setSelectedCourseForModal(null)}
+          title={`${selectedCourseForModal.code}: ${selectedCourseForModal.title}`}
+          description={`Semester ${selectedCourseForModal.semester} • ${selectedCourseForModal.credits} Credit Hours (${selectedCourseForModal.theoryCredits} Theory + ${selectedCourseForModal.practicalCredits} Practical)`}
         >
           <div className="space-y-4 text-xs">
             {/* Category and Status Bar */}
             <div className="flex items-center justify-between p-2.5 rounded-lg bg-slate-900 border border-slate-800">
               <span className="text-slate-400">Category:</span>
               <span className="capitalize font-semibold text-slate-200">
-                {selectedCourse.category.replace('_', ' ')}
+                {selectedCourseForModal.category.replace('_', ' ')}
               </span>
             </div>
 
@@ -553,9 +915,9 @@ export default function ExplorerPage() {
             {/* Direct Prerequisites */}
             <div>
               <span className="font-semibold text-slate-300 block mb-1">Direct Prerequisites:</span>
-              {selectedCourse.prereqs.length > 0 ? (
+              {selectedCourseForModal.prereqs.length > 0 ? (
                 <div className="flex flex-wrap gap-1.5">
-                  {selectedCourse.prereqs.map((p) => (
+                  {selectedCourseForModal.prereqs.map((p) => (
                     <Badge
                       key={p}
                       variant={completedSet.has(p) ? 'success' : 'danger'}
@@ -586,23 +948,23 @@ export default function ExplorerPage() {
               )}
             </div>
 
-            {/* Quick State Toggle Actions */}
+            {/* Actions */}
             <div className="pt-3 border-t border-slate-800 flex items-center justify-between gap-2">
               <Button
-                variant={completedSet.has(selectedCourse.code) ? 'outline' : 'primary'}
+                variant={completedSet.has(selectedCourseForModal.code) ? 'outline' : 'primary'}
                 size="sm"
                 className="flex-1"
                 onClick={() => {
                   setCompletedSet((prev) => {
                     const next = new Set(prev);
-                    if (next.has(selectedCourse.code)) next.delete(selectedCourse.code);
-                    else next.add(selectedCourse.code);
+                    if (next.has(selectedCourseForModal.code)) next.delete(selectedCourseForModal.code);
+                    else next.add(selectedCourseForModal.code);
                     return next;
                   });
-                  setSelectedCourse(null);
+                  setSelectedCourseForModal(null);
                 }}
               >
-                {completedSet.has(selectedCourse.code) ? 'Mark as Not Passed' : 'Mark as Passed'}
+                {completedSet.has(selectedCourseForModal.code) ? 'Mark as Not Passed' : 'Mark as Passed'}
               </Button>
 
               <Button
@@ -611,8 +973,8 @@ export default function ExplorerPage() {
                 className="flex-1"
                 onClick={() => {
                   setIsSimulationMode(true);
-                  setSimulatedFailedSet(new Set([selectedCourse.code]));
-                  setSelectedCourse(null);
+                  setSimulatedFailedSet(new Set([selectedCourseForModal.code]));
+                  setSelectedCourseForModal(null);
                 }}
               >
                 Simulate Failure (Rule #8)
