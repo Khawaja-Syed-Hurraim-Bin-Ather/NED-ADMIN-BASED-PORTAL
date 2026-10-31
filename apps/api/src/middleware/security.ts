@@ -15,12 +15,13 @@ import { apiError } from '@educompass/shared';
 // ─── 1. Tiered Rate Limiters ─────────────────────────────────────────────────
 
 /**
- * Auth routes: very strict — 10 attempts per 15 minutes per IP.
+ * Auth routes: strict in production — 10 attempts per 15 minutes per IP.
+ * Generous in development (200) to allow local testing.
  * Prevents brute-force on login / signup.
  */
 export const authRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10,
+  max: process.env.NODE_ENV === 'production' ? 10 : 200,
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => req.ip ?? 'unknown',
@@ -30,7 +31,7 @@ export const authRateLimiter = rateLimit({
       message: 'Too many authentication attempts. Please wait 15 minutes.',
     },
   },
-  skip: () => process.env.NODE_ENV === 'test',
+  skip: (req) => process.env.NODE_ENV === 'test' || req.path === '/demo-session',
 });
 
 /**
