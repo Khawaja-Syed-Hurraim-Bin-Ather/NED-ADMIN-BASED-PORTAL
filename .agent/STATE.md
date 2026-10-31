@@ -2,6 +2,21 @@
 Last updated: 2026-10-28
 
 ## Latest Updates
+- **Institutional Admin Panel — Curriculum Admin & Validation Engine (Card A8)**:
+  - Built router `apps/api/src/routes/admin-curriculum.ts` mounted under `/api/v1/admin/curriculum`:
+    - Strict role access guard (`requireCurriculumRole`) blocking data-entry operators with 403 (Section 3).
+    - Pure TypeScript curriculum validation engine (`validateCurriculumDraft`) verifying Section 14 Test 5 criteria:
+      - Circular prerequisite dependency detection via directed graph DFS traversal.
+      - Backward prerequisite detection (flagging prerequisites placed in same or later semester).
+      - Semester credit hour limit validation (flagging terms exceeding max credits, e.g. 21).
+      - Grade scale validity checks (ensuring passing grade exists in scale).
+    - Scheme cloning endpoint `POST /versions/:id/clone` duplicating published schemes into isolated draft revisions with course placements.
+    - Draft validation endpoint `POST /versions/:id/validate`.
+    - Impact preview endpoint `GET /versions/:id/impact` analyzing courses added, removed, shifted between terms, and estimating affected student batch counts with privacy-preserving small group suppression (<5).
+    - Course equivalences listing endpoint `GET /equivalences`.
+  - Tests-first test suite in `apps/api/src/routes/admin-curriculum.test.ts` (7/7 tests passing).
+  - Monorepo validation: **152/152 Vitest tests green**, 0 TypeScript errors across all 6 workspace packages.
+
 - **Institutional Admin Panel — Content Modules & Draft Transformers (Card A7)**:
   - Built router `apps/api/src/routes/admin-content.ts` mounted under `/api/v1/admin/content`:
     - Strict module entitlement middleware checking operator `allowed_modules` from institutional session.
@@ -97,6 +112,7 @@ Last updated: 2026-10-28
 | A5 | done | main | Dynamic permission matrix checks (admin_permissions.json) & 16 unit tests |
 | A6 | done | main | Change sets, deterministic diff message generator, approvals queue & atomic apply_change_set |
 | A7 | done | main | Content modules (FYP, professors, career, chatbot, imports queue) & draft transformers |
+| A8 | done | main | Curriculum admin module (scheme cloning, validation DAG engine, impact preview, equivalences) |
 | F1 | done | main | Scaffolded monorepo, secrets, localhost web (3000) & api (4000) |
 | F2 | done | main | Base schema + FYP v2 + roadmap progress migrations applied to Supabase |
 | F3 | done | main | Supabase Auth + Next.js middleware + requireRole('enrolled'|'admin') + deletion requests (Rule 9) |
