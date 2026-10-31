@@ -298,7 +298,7 @@ workflowRouter.post('/change-sets/:id/submit', requireAdminAuth, async (req: Req
     // Generate public ref e.g. CIS-2026-0042
     const deptCode = (cs.department as any)?.code || 'GEN';
     const year = new Date().getFullYear();
-    const shortId = id.slice(0, 4).toUpperCase();
+    const shortId = (Array.isArray(id) ? id[0] : id).slice(0, 4).toUpperCase();
     const publicRef = `${deptCode}-${year}-${shortId}`;
 
     // Generate single-use approval code (72 hour expiry)
@@ -617,3 +617,4 @@ workflowRouter.post('/approvals/:id/reject', requireAdminAuth, requireStepUp, as
     ]));
   }
 });
+

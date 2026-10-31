@@ -86,6 +86,7 @@ import { batchesRouter } from './routes/batches';
 import { curriculumRouter } from './routes/curriculum';
 import { adminAuthRouter, bootstrapAdminAccounts } from './routes/admin-auth';
 import { workflowRouter } from './routes/workflow';
+import { adminContentRouter } from './routes/admin-content';
 
 // ── API v1 health (read limiter) ─────────────────────────────────────────
 app.get('/api/v1/health', readLimiter, (_req, res) => {
@@ -100,6 +101,7 @@ app.use('/api/v1/chat', chatRateLimiter, chatRouter);
 
 // Admin — write limiter (protected by requireRole('admin') inside router)
 app.use('/api/v1/admin/auth', authRateLimiter, adminAuthRouter);
+app.use('/api/v1/admin/content', writeLimiter, adminContentRouter);
 app.use('/api/v1/admin', writeLimiter, workflowRouter);
 app.use('/api/v1/admin', writeLimiter, adminRouter);
 

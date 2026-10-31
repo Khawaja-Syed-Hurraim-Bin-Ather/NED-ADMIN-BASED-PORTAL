@@ -146,3 +146,4 @@ export async function requireStepUp(req: Request, res: Response, next: NextFunct
 export function hashAuditIdentifier(val: string): string {
   return crypto.createHash('sha256').update(val.toLowerCase().trim()).digest('hex');
 }
+

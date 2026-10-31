@@ -100,9 +100,9 @@ export function buildDefaultCurriculumGraph(): PrereqGraph {
       'CS-406',
       {
         type: 'and',
-        rules: [
+        children: [
           { type: 'course', courseCode: 'CS-218', minGrade: 'D' },
-          { type: 'min_credits', credits: 80 },
+          { type: 'min_credits', minCredits: 80 },
         ],
       },
     ],

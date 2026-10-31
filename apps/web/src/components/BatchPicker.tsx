@@ -184,3 +184,4 @@ export function BatchNoticeBanner() {
     </div>
   );
 }
+

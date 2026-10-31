@@ -2,6 +2,16 @@
 Last updated: 2026-10-28
 
 ## Latest Updates
+- **Institutional Admin Panel — Content Modules & Draft Transformers (Card A7)**:
+  - Built router `apps/api/src/routes/admin-content.ts` mounted under `/api/v1/admin/content`:
+    - Strict module entitlement middleware checking operator `allowed_modules` from institutional session.
+    - Department-scoped paginated reads (`GET /:module`) with hard 100-record cap and zero student PII exposure.
+    - Golden Rule 1 enforcement: `POST /:module/draft` never writes to live tables directly; fetches `before_state`, classifies impact (`minor` vs `major`), and stages insertions/updates/deletions into `change_items` under a draft `change_set`.
+    - Single item inspection `GET /:module/:id` overlaying pending draft change requests.
+    - Data imports queue (`GET /imports/queue`) and staging endpoint (`POST /imports/:id/stage`) adhering to Rule 2 (extracted -> approved -> published).
+  - Tests-first test suite in `apps/api/src/routes/admin-content.test.ts` (10/10 tests passing).
+  - Monorepo validation: **145/145 Vitest tests green**, 0 TypeScript errors across all 6 workspace packages.
+
 - **FAQ Preload & Grounded LLM Chatbot Enhancement (H3.1)**:
   - Executed full 5-phase implementation specified in `EDUCOMPASS_FAQ_PRELOAD.md`:
     - **Phase 0 (Answerability Inventory)**: Audited all 100 questions in `faq_seed.json` against published database and codebase; produced [`docs/data/faq/reports/answerability.md`](file:///c:/Users/syedh/.gemini/antigravity/scratch/educompass/docs/data/faq/reports/answerability.md) (90 Answerable, 7 Partial, 3 Blocked).
@@ -86,6 +96,7 @@ Last updated: 2026-10-28
 | A4 | done | main | Admin auth (2-step OTP, 8h sessions, lockout, step-up, invitations, security panel) |
 | A5 | done | main | Dynamic permission matrix checks (admin_permissions.json) & 16 unit tests |
 | A6 | done | main | Change sets, deterministic diff message generator, approvals queue & atomic apply_change_set |
+| A7 | done | main | Content modules (FYP, professors, career, chatbot, imports queue) & draft transformers |
 | F1 | done | main | Scaffolded monorepo, secrets, localhost web (3000) & api (4000) |
 | F2 | done | main | Base schema + FYP v2 + roadmap progress migrations applied to Supabase |
 | F3 | done | main | Supabase Auth + Next.js middleware + requireRole('enrolled'|'admin') + deletion requests (Rule 9) |

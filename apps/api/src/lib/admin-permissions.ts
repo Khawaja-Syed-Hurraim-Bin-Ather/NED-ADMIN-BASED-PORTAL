@@ -183,3 +183,4 @@ export function checkPermission(
 
   return { allowed: false, decision: 'deny', reason: 'Action not permitted.' };
 }
+

@@ -102,3 +102,4 @@ Expires: ${expiresAt}
 To approve: log in to the EduCompass admin panel, open Approvals, and enter code ${code}.
 This message does not give anyone permission by itself.`;
 }
+
