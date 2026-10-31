@@ -105,3 +105,4 @@ If an unintended curriculum or prerequisite error goes live:
 3. Click **Emergency Rollback**. Enter the mandatory justification reason.
 4. Provide a fresh email step-up verification code.
 5. The system creates a new immutable release tagged `rollback-<target>-<id>`, points active batches back to the previous snapshot, and immediately enqueues cascade steps 3 to 10. Historical audit records are never rewritten.
+

@@ -1,7 +1,18 @@
 # EduCompass State
-Last updated: 2026-10-28
+Last updated: 2026-10-31
 
 ## Latest Updates
+- **Institutional Admin Panel — University Leadership Pitch & Live Demo Script (Card A13)**:
+  - Authored complete leadership pitch document and live demonstration script in [`docs/admin/UNIVERSITY_PITCH_DEMO_SCRIPT.md`](file:///c:/Users/syedh/.gemini/antigravity/scratch/educompass/docs/admin/UNIVERSITY_PITCH_DEMO_SCRIPT.md).
+  - Designed for presentation to the Vice Chancellor, Dean of ECE, Department Chairmen, and CISE Faculty.
+  - Formatted into an executive narrative highlighting 5 non-negotiable Golden Rules, a structured 12-minute 4-act live demonstration:
+    - **Act 1: The New Batch Arrival & Scheme Cloning** (2 min) — demonstrating curriculum scheme cloning (`POST /api/v1/admin/curriculum/versions/:id/clone`), DAG acyclic integrity check, and student batch view isolation.
+    - **Act 2: The Approval Choke Point & Section 4.3 Deterministic Diff** (3.5 min) — demonstrating operator draft submission, automated diff generation with impact badge, live side-by-side modal, and Chairman email step-up sign-off (`POST /api/v1/admin/change-sets/:id/approve`).
+    - **Act 3: The Deletion Lifecycle & Cooling-Off Recovery** (3 min) — demonstrating soft deletion staging (`POST /api/v1/admin/deletions`), immediate hiding from students, cooling-off countdown timer, instant one-click restoration (`POST /:id/restore`), and VC-only final purge with daily rate cap (max 5/day) and immutable tombstone.
+    - **Act 4: Institutional Privacy, Data Health & Immutable Audit** (2.5 min) — demonstrating mathematical student grade zero-exposure, small cohort suppression (<5 students), Department Data Health diagnostics (`GET /api/v1/admin/health/report`), and database trigger-enforced immutable audit trail.
+  - Complete contingency and institutional leadership Q&A handling (covering accreditation, registrar SIS sync, server failure during publish, and student privacy guarantees).
+  - All 14 Institutional Admin Cards (A0 through A13) are now complete and verified.
+
 - **Institutional Admin Panel — Hardening, Section 14 Test Suite & Handbook (Card A12)**:
   - Authored comprehensive governance test suite `apps/api/src/tests/institutional-governance.test.ts` covering all Section 14 verification categories (matrix rules, DAG cycle detection, backward prerequisite rejection, credit limit overflow, cooling-off timelines, and zero student PII leaks).
   - Executed automated client bundle secret audit asserting zero server secrets or credentials (`SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_JWT_SECRET`, `NEXTAUTH_SECRET`, hard-coded passwords) exist in any web client component (Rule 11).
