@@ -18,6 +18,11 @@ import {
   DisclaimerBanner,
 } from '@educompass/ui';
 import { PageHeader } from '../../components/PageHeader';
+import { useEditMode } from '../../context/EditModeContext';
+import { Editable } from '../../components/edit-mode/Editable';
+import { AddFypModal } from '../../components/edit-mode/AddFypModal';
+import { ManageBranchesDrawer, FypBranch } from '../../components/edit-mode/ManageBranchesDrawer';
+import { FypCsvImporterModal } from '../../components/edit-mode/FypCsvImporterModal';
 
 interface FYPProject {
   id: string;
@@ -74,13 +79,31 @@ const DOMAIN_OPTIONS = [
   { value: 'cybersecurity', label: 'Cybersecurity' },
 ];
 
-const YEAR_OPTIONS = ['all', '2025', '2024', '2023', '2022'];
+const YEAR_OPTIONS = ['all', '2026', '2025', '2024', '2023', '2022'];
+
+const DEFAULT_BRANCHES: FypBranch[] = [
+  { id: 'b1', name: 'AI & Machine Learning', slug: 'ai-ml', isActive: true, projectCount: 0 },
+  { id: 'b2', name: 'Healthcare & MedTech', slug: 'healthcare-tech', isActive: true, projectCount: 0 },
+  { id: 'b3', name: 'Robotics & Embedded / IoT', slug: 'robotics-embedded', isActive: true, projectCount: 0 },
+  { id: 'b4', name: 'Software Systems & Cloud', slug: 'software-cloud', isActive: true, projectCount: 0 },
+  { id: 'b5', name: 'Networks & Cyber Security', slug: 'cybersecurity', isActive: true, projectCount: 0 },
+  { id: 'b6', name: 'Web & Mobile Platforms', slug: 'web-mobile', isActive: true, projectCount: 0 },
+];
 
 export default function FYPPortalPage() {
+  const { isEditMode, viewAsStudent, can, pendingItems, saveDraftItem } = useEditMode();
+  const canEdit = isEditMode && !viewAsStudent && can('fyp', 'edit');
+
   const [activeTab, setActiveTab] = useState<'archive' | 'teamboard'>('archive');
   const [projects, setProjects] = useState<FYPProject[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Modals for Edit Mode
+  const [isAddFypOpen, setIsAddFypOpen] = useState(false);
+  const [isBranchesOpen, setIsBranchesOpen] = useState(false);
+  const [isCsvImporterOpen, setIsCsvImporterOpen] = useState(false);
+  const [branches, setBranches] = useState<FypBranch[]>(DEFAULT_BRANCHES);
 
   // Filters for Archive
   const [searchQuery, setSearchQuery] = useState('');
@@ -123,6 +146,45 @@ export default function FYPPortalPage() {
   const [newContact, setNewContact] = useState('');
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+
+  // Overlay draft change items onto projects when in edit mode
+  const activeProjects = useMemo(() => {
+    let list: FYPProject[] = [...projects];
+
+    if (isEditMode && !viewAsStudent) {
+      for (const item of pendingItems) {
+        if (item.table_name === 'fyp_projects' && item.record_id) {
+          if (item.op === 'update' && item.after) {
+            const idx = list.findIndex((p) => p.id === item.record_id);
+            if (idx !== -1) {
+              list[idx] = { ...list[idx], ...item.after };
+            }
+          } else if (item.op === 'insert' && item.after) {
+            const exists = list.some((p) => p.id === item.record_id);
+            if (!exists) {
+              list.unshift(item.after as any);
+            }
+          } else if (item.op === 'delete') {
+            list = list.filter((p) => p.id !== item.record_id);
+          }
+        }
+      }
+    }
+
+    return list;
+  }, [projects, isEditMode, viewAsStudent, pendingItems]);
+
+  // Update branch project counts based on active projects
+  useEffect(() => {
+    setBranches((prev) =>
+      prev.map((b) => {
+        const count = activeProjects.filter((p) =>
+          (p.domain_tags || []).some((t) => t.toLowerCase().includes(b.slug.toLowerCase()))
+        ).length;
+        return { ...b, projectCount: count };
+      })
+    );
+  }, [activeProjects]);
 
   useEffect(() => {
     async function fetchFYPs() {
@@ -359,9 +421,60 @@ export default function FYPPortalPage() {
     setTimeout(() => setCopiedId(null), 2500);
   }
 
+  const handleUpdateField = (project: FYPProject, field: string, value: any) => {
+    if (!canEdit) return;
+
+    const patch: Record<string, any> = { [field]: value };
+    saveDraftItem(
+      'fyp',
+      'fyp_projects',
+      project.id,
+      patch,
+      'update',
+      `Update ${field} for "${project.title}"`
+    );
+
+    setProjects((prev) =>
+      prev.map((p) => (p.id === project.id ? { ...p, [field]: value } : p))
+    );
+  };
+
+  const handleMoveBranch = (project: FYPProject, newBranchSlug: string) => {
+    if (!canEdit) return;
+
+    const newTags = [newBranchSlug];
+    saveDraftItem(
+      'fyp',
+      'fyp_projects',
+      project.id,
+      { domain_tags: newTags },
+      'update',
+      `Move "${project.title}" to ${newBranchSlug}`
+    );
+
+    setProjects((prev) =>
+      prev.map((p) => (p.id === project.id ? { ...p, domain_tags: newTags } : p))
+    );
+  };
+
+  const handleMergeBranch = (sourceSlug: string, targetSlug: string) => {
+    if (!canEdit) return;
+
+    // Update all projects matching sourceSlug
+    setProjects((prev) =>
+      prev.map((p) => {
+        if ((p.domain_tags || []).some((t) => t.toLowerCase().includes(sourceSlug.toLowerCase()))) {
+          return { ...p, domain_tags: [targetSlug] };
+        }
+        return p;
+      })
+    );
+    setIsBranchesOpen(false);
+  };
+
   // Filtered Archive dataset
   const filteredProjects = useMemo(() => {
-    return projects.filter((p) => {
+    return activeProjects.filter((p) => {
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
         const matchesTitle = p.title.toLowerCase().includes(query);
@@ -379,7 +492,7 @@ export default function FYPPortalPage() {
       if (selectedOutcome !== 'all' && p.proposal_outcome !== selectedOutcome) return false;
       return true;
     });
-  }, [projects, searchQuery, selectedYear, selectedDomain, selectedOutcome]);
+  }, [activeProjects, searchQuery, selectedYear, selectedDomain, selectedOutcome]);
 
   // Filtered Team Board Ideas
   const filteredTeamIdeas = useMemo(() => {
@@ -407,9 +520,33 @@ export default function FYPPortalPage() {
         description="68 reviewed NED CISE final year projects. Semantic similarity search, domain filters, and student team formation board."
         accent="var(--cyan)"
         actions={
-          <Link href="/recommendations" className="button button-secondary" style={{ minHeight: 34, padding: '0 12px', fontSize: 11 }}>
-            GitHub Ideas →
-          </Link>
+          <div className="flex items-center gap-2 flex-wrap">
+            {canEdit && (
+              <>
+                <button
+                  onClick={() => setIsAddFypOpen(true)}
+                  className="px-3 py-1.5 rounded bg-[#511030] hover:bg-[#6e1642] text-white font-medium text-xs shadow-sm transition-colors"
+                >
+                  + Add Project
+                </button>
+                <button
+                  onClick={() => setIsBranchesOpen(true)}
+                  className="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs border border-slate-700 transition-colors"
+                >
+                  Manage Branches
+                </button>
+                <button
+                  onClick={() => setIsCsvImporterOpen(true)}
+                  className="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs border border-slate-700 transition-colors"
+                >
+                  Import CSV
+                </button>
+              </>
+            )}
+            <Link href="/recommendations" className="button button-secondary" style={{ minHeight: 34, padding: '0 12px', fontSize: 11 }}>
+              GitHub Ideas →
+            </Link>
+          </div>
         }
       />
 
@@ -431,7 +568,9 @@ export default function FYPPortalPage() {
               className={`toolbar-tab${activeTab === 'teamboard' ? ' active' : ''}`}
             >
               🤝 Team Board
-              <span className="demo-chip" style={{ marginLeft: 8 }}>M1</span>
+              <span className="pill pill-muted" style={{ marginLeft: 8, minHeight: 18, padding: '0 7px', fontSize: 9 }}>
+                Proposals
+              </span>
             </button>
           </div>
         </div>
@@ -586,12 +725,32 @@ export default function FYPPortalPage() {
                           </button>
                         </div>
 
-                        <CardTitle className="text-sm font-extrabold line-clamp-2 leading-snug text-white group-hover:text-[#9bcbd0] transition-colors">
-                          {project.title}
-                        </CardTitle>
+                        <div onClick={(e) => canEdit && e.stopPropagation()}>
+                          <Editable
+                            resource="fyp"
+                            tableName="fyp_projects"
+                            recordId={project.id}
+                            field="title"
+                            value={project.title}
+                            onSave={(newVal) => handleUpdateField(project, 'title', newVal)}
+                            className="text-sm font-extrabold line-clamp-2 leading-snug text-white group-hover:text-[#9bcbd0] transition-colors"
+                          />
+                        </div>
 
-                        <CardDescription className="text-xs text-slate-400 mt-2">
-                          Supervisor: <span className="text-slate-200 font-medium">{project.supervisor || 'Department Assigned'}</span>
+                        <CardDescription
+                          className="text-xs text-slate-400 mt-2"
+                          onClick={(e) => canEdit && e.stopPropagation()}
+                        >
+                          Supervisor:{' '}
+                          <Editable
+                            resource="fyp"
+                            tableName="fyp_projects"
+                            recordId={project.id}
+                            field="supervisor"
+                            value={project.supervisor || 'Department Assigned'}
+                            onSave={(newVal) => handleUpdateField(project, 'supervisor', newVal)}
+                            className="text-slate-200 font-medium"
+                          />
                         </CardDescription>
                       </CardHeader>
 
@@ -603,6 +762,26 @@ export default function FYPPortalPage() {
                                 {tag}
                               </span>
                             ))}
+                          </div>
+                        )}
+
+                        {canEdit && (
+                          <div
+                            className="flex items-center justify-between text-[11px] pt-2 border-t border-slate-800/80"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <span className="text-slate-400">Branch:</span>
+                            <select
+                              value={project.domain_tags?.[0] || 'ai-ml'}
+                              onChange={(e) => handleMoveBranch(project, e.target.value)}
+                              className="bg-[#0f1823] border border-slate-700 rounded px-1.5 py-0.5 text-amber-300 text-[10px]"
+                            >
+                              {branches.map((b) => (
+                                <option key={b.slug} value={b.slug}>
+                                  {b.name}
+                                </option>
+                              ))}
+                            </select>
                           </div>
                         )}
                       </CardContent>
@@ -1092,6 +1271,29 @@ export default function FYPPortalPage() {
         {/* Rule 13 Disclaimer Notice */}
         <DisclaimerBanner />
       </main>
+
+      {/* Card E3: Add FYP Modal */}
+      <AddFypModal
+        isOpen={isAddFypOpen}
+        onClose={() => setIsAddFypOpen(false)}
+        onProjectAdded={(newP) => setProjects((prev) => [newP, ...prev])}
+      />
+
+      {/* Card E3: Manage Branches Drawer */}
+      <ManageBranchesDrawer
+        isOpen={isBranchesOpen}
+        onClose={() => setIsBranchesOpen(false)}
+        branches={branches}
+        onUpdateBranches={setBranches}
+        onMergeBranch={handleMergeBranch}
+      />
+
+      {/* Card E3: FYP Spreadsheet CSV Importer Modal */}
+      <FypCsvImporterModal
+        isOpen={isCsvImporterOpen}
+        onClose={() => setIsCsvImporterOpen(false)}
+        onImportComplete={() => {}}
+      />
     </div>
   );
 }
