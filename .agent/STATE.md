@@ -2,6 +2,17 @@
 Last updated: 2026-10-28
 
 ## Latest Updates
+- **Institutional Admin Panel — Dashboards & Help System (Card A11)**:
+  - Built endpoint `GET /api/v1/admin/health/report` in `apps/api/src/routes/health-report.ts` computing data health diagnostics across catalog courses, unreviewed FYPs, cooling-off items, and prerequisite DAG acyclic integrity.
+  - Upgraded frontend console in `apps/web/src/app/admin/page.tsx` into a multi-role institutional experience (Section 11):
+    - **Operator Workspace**: "My Drafts" table, "My Submitted Requests" tracker with deterministic message generation popups (Section 4.3), allowed modules entry tiles, and locked modules tooltips ("Why can't I do this?").
+    - **Chairman Console**: Department-scoped overview, Approvals Queue with live diff previews, One-time email step-up sign-off modal, Department Data Health dashboard, and Scheme Cloning wizard.
+    - **Vice Chancellor Executive Console**: University-wide oversight, Major Escalations queue, Immutable Releases & Emergency Rollback manager, Final Purge queue with 5/day daily quota tracker, and System Security panel.
+    - **Data Map**: Plain-language interactive visualizer of the 34 tables, versioned curriculum architecture, and publish choke point.
+    - **Batch Preview Toggle**: Switch between Batch 2022 to 2026 to preview live student views with draft changes overlaid.
+  - Tests-first test suite in `apps/api/src/routes/health-report.test.ts` (3/3 tests passing).
+  - Monorepo validation: **171/171 Vitest tests green**, 0 TypeScript errors across all 6 workspace packages.
+
 - **Institutional Admin Panel — Deletion Lifecycle & Schedule (Card A10)**:
   - Built router `apps/api/src/routes/deletions.ts` mounted under `/api/v1/admin/deletions`:
     - Resource cooling-off duration resolver (`getCoolingOffDays`): Career/Chatbot (7 days), FYP/Professors (14 days), Curriculum (30 days), Schemes (90 days).
@@ -141,6 +152,7 @@ Last updated: 2026-10-28
 | A8 | done | main | Curriculum admin module (scheme cloning, validation DAG engine, impact preview, equivalences) |
 | A9 | done | main | Publish cascade background runner (steps 3-10), status monitoring panel, and VC rollback |
 | A10 | done | main | Deletion lifecycle (cooling-off timer, soft-delete hiding, restore before purge, VC-only 5/day purge cap) |
+| A11 | done | main | Multi-role admin consoles (Operator, Chairman, VC), Data Health report, and Data Map visualizer |
 | F1 | done | main | Scaffolded monorepo, secrets, localhost web (3000) & api (4000) |
 | F2 | done | main | Base schema + FYP v2 + roadmap progress migrations applied to Supabase |
 | F3 | done | main | Supabase Auth + Next.js middleware + requireRole('enrolled'|'admin') + deletion requests (Rule 9) |

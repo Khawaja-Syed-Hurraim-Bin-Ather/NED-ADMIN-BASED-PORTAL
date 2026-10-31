@@ -128,7 +128,9 @@ export function PageHeader({
 
         {/* ── Right: Actions + Theme toggle + Dashboard ── */}
         <div className="page-header-right" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <BatchPicker />
+          <React.Suspense fallback={null}>
+            <BatchPicker />
+          </React.Suspense>
           {actions}
 
           <button
@@ -149,7 +151,9 @@ export function PageHeader({
 
       {/* Hairline subtle accent */}
       <div style={{ height: 2, background: accent, opacity: 0.8 }} aria-hidden="true" />
-      <BatchNoticeBanner />
+      <React.Suspense fallback={null}>
+        <BatchNoticeBanner />
+      </React.Suspense>
     </header>
   );
 }
