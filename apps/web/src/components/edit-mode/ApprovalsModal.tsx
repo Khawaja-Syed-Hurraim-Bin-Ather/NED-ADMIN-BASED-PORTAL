@@ -331,18 +331,28 @@ export function ApprovalsModal({
               </p>
 
               <div>
-                <label className="block text-[11px] font-semibold text-slate-300 mb-1">
-                  Department Chairman Step-Up Authorization Code
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-[11px] font-semibold text-slate-300">
+                    Department Chairman Step-Up Authorization Code
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setStepUpOtp('123456')}
+                    className="text-[10px] text-amber-400 hover:text-amber-300 underline cursor-pointer"
+                  >
+                    Auto-fill Demo Code (123456)
+                  </button>
+                </div>
                 <input
-                  type="password"
-                  placeholder="Enter 6-digit OTP or demo bypass token..."
+                  type="text"
+                  maxLength={6}
+                  placeholder="e.g. 123456"
                   value={stepUpOtp}
                   onChange={(e) => setStepUpOtp(e.target.value)}
-                  className="w-full bg-[#162231] border border-slate-700 rounded px-2.5 py-1.5 text-slate-100 font-mono focus:border-amber-400"
+                  className="w-full bg-[#162231] border border-slate-700 rounded px-2.5 py-1.5 text-slate-100 font-mono tracking-widest text-sm focus:border-amber-400"
                 />
-                <span className="text-[10px] text-slate-500">
-                  Golden Rule 1: Publish operations require one-time email step-up sign-off.
+                <span className="text-[10px] text-slate-400 block mt-1">
+                  💡 In local/demo mode, enter <strong className="text-amber-300 font-mono">123456</strong> (or leave empty for demo bypass token).
                 </span>
               </div>
 
