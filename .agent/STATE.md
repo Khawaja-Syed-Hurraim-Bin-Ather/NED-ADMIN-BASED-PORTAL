@@ -1,18 +1,26 @@
 # EduCompass State
-Last updated: 2026-10-31
+Last updated: 2026-11-02
 
 ## Latest Updates
-- **EduCompass Admin v3 (Edit Mode) — Audit of Current Build (Card E0)**:
-  - Reviewed and incorporated `docs/admin/EDUCOMPASS_ADMIN_PANEL_SPEC_v3_EDIT_MODE.md` and `docs/admin/EDUCOMPASS_ADMIN_FUNCTIONALITY.md`.
-  - Conducted comprehensive audit across all student views (`/explorer`, `/fyp`, `/professors`, `/careers`, `/chat`, `/planner`), backend admin assets, and header navigation.
-  - Documented complete findings in [`docs/admin/audit.md`](file:///c:/Users/syedh/.gemini/antigravity/scratch/educompass/docs/admin/audit.md):
-    - Identified in-file static mock datasets in `/explorer` (53 courses) and `/careers` (5 tracks) to be connected to live database queries.
-    - Audited dead controls and unlinked actions (e.g. Explorer temporary sets, unlinked invite modal).
-    - Cataloged developer jargon (`DAG Acyclic Integrity`, `Graph DFS Depth`) and raw IDs (`cs-demo-1`, `del-demo-1`) with plain-language replacements.
-    - Designed decoupling of the monolithic `/admin` dashboard into in-place Edit Mode overlays on student pages and lightweight Admin Menu modals (Approvals, Uploads, History, People, Settings).
-    - Designed Demo Mode drawer to replace public role chips with seeded real accounts.
-    - Mapped implementation roadmap (Steps E1 through E9).
-  - Status: E0 complete. Awaiting Ram's sign-off on `docs/admin/audit.md` before starting Step E1.
+- **EduCompass Admin v3 (Edit Mode) — Full Multi-Module Overhaul & Modal Governance (Cards E1–E9 Completed)**:
+  - **Zero Student Footprint**: Fixed student privacy leakage by strictly gating all admin controls (`Edit mode`, `Pending (N)`, `Admin` menu) behind authenticated institutional sessions. Students browsing the portal see 0 admin controls.
+  - **Discrete Institutional Gate**: Added discrete institutional sign-in modal on `/login` and `/admin` with role selection (**Vice Chancellor**, **Department Chairman**, **Data Entry Operator**), password validation, and Step-Up OTP verification.
+  - **8 Core Modules Tailored Edit Modes**:
+    1. **Prerequisite Explorer (`/explorer`)**: Cross-semester dragging, line drawing, 4-tab course drawer, `+ Add Course` wizard, live DAG acyclic cycle validation.
+    2. **FYP Archive (`/fyp`)**: Inline titles and supervisor editing, `+ Stage New Project` strictly enforcing Rule 119 (zero student PII), `Manage Branches` drawer, CSV uploader with automated PII scanner.
+    3. **Faculty Directory (`/professors`)**: Inline profile editing, `+ Add Faculty Profile` with Levenshtein name similarity duplicate check, mailto-only routing (Rule 12).
+    4. **Career Hub (`/careers`)**: Roadmap milestone step reordering (`↑`/`↓`), `+ Add Milestone Step` modal, course linkage editor.
+    5. **Degree Planner (`/planner`)**: Scheme rules drawer (credit caps, passing grade), in-memory Degree Sandbox with 3 synthetic student test paths.
+    6. **Academic Assistant (`/chat`)**: `[ ✎ Edit Answer ]` on verified FAQ messages, Unanswered Questions drawer.
+    7. **GPA Calculator (`/gpa`)**: Grade scale and passing criteria editor drawer (`SchemeRulesDrawer`).
+    8. **Dashboard (`/dashboard`)**: Batch announcements banner editor, scheme status overview.
+  - **Institutional Modals**: Built native EduCompass-themed modals replacing legacy dashboard redirects:
+    - `UploadsModal.tsx` (Lane A draft parser with Rule 119 PII scrubbing; Lane B developer pipeline inbox).
+    - `PeopleModal.tsx` (Operator invitations with module scoping and account suspension).
+    - `SettingsModal.tsx` (AI token budgets, security lockout policies, and audit log JSON exporter).
+    - `BatchManagerModal.tsx` (Admission batch to curriculum scheme version mapping).
+    - `ApprovalsModal.tsx` & `HistoryReleasesModal.tsx` (Deterministic diffs, Step-Up sign-off, emergency rollback).
+  - Monorepo validation: **187/187 Vitest tests passing**, 0 TypeScript errors across all 6 packages.
 
 - **Institutional Admin Panel — University Leadership Pitch & Live Demo Script (Card A13)**:
   - Authored complete leadership pitch document and live demonstration script in [`docs/admin/UNIVERSITY_PITCH_DEMO_SCRIPT.md`](file:///c:/Users/syedh/.gemini/antigravity/scratch/educompass/docs/admin/UNIVERSITY_PITCH_DEMO_SCRIPT.md).
