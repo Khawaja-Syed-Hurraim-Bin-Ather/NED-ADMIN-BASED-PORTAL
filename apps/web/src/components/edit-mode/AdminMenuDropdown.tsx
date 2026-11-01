@@ -9,6 +9,7 @@ import { AdminLoginModal } from './AdminLoginModal';
 import { UploadsModal } from './UploadsModal';
 import { PeopleModal } from './PeopleModal';
 import { SettingsModal } from './SettingsModal';
+import { BatchManagerModal } from './BatchManagerModal';
 
 export function AdminMenuDropdown() {
   const {
@@ -26,6 +27,7 @@ export function AdminMenuDropdown() {
   const [uploadsModalOpen, setUploadsModalOpen] = useState(false);
   const [peopleModalOpen, setPeopleModalOpen] = useState(false);
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+  const [batchModalOpen, setBatchModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on outside click
@@ -113,17 +115,31 @@ export function AdminMenuDropdown() {
 
           {/* People & Access — chairman/vc only */}
           {(activeRole === 'chairman' || activeRole === 'vc') && (
-            <button
-              type="button"
-              onClick={() => { setIsOpen(false); setPeopleModalOpen(true); }}
-              className="w-full text-left flex items-center gap-2.5 px-3 py-2 hover:bg-[var(--page)] text-[var(--text)] transition-colors cursor-pointer"
-            >
-              <span>👥</span>
-              <div>
-                <span className="font-medium block">People &amp; Access</span>
-                <span className="text-[10px] text-[var(--muted)] block">Manage operator invitations</span>
-              </div>
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={() => { setIsOpen(false); setPeopleModalOpen(true); }}
+                className="w-full text-left flex items-center gap-2.5 px-3 py-2 hover:bg-[var(--page)] text-[var(--text)] transition-colors cursor-pointer"
+              >
+                <span>👥</span>
+                <div>
+                  <span className="font-medium block">People &amp; Access</span>
+                  <span className="text-[10px] text-[var(--muted)] block">Manage operator invitations</span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { setIsOpen(false); setBatchModalOpen(true); }}
+                className="w-full text-left flex items-center gap-2.5 px-3 py-2 hover:bg-[var(--page)] text-[var(--text)] transition-colors cursor-pointer"
+              >
+                <span>🎓</span>
+                <div>
+                  <span className="font-medium block">Batches &amp; Schemes</span>
+                  <span className="text-[10px] text-[var(--muted)] block">Map admission years to curriculum</span>
+                </div>
+              </button>
+            </>
           )}
 
           {/* System Settings — vc only */}
@@ -194,6 +210,7 @@ export function AdminMenuDropdown() {
       <UploadsModal isOpen={uploadsModalOpen} onClose={() => setUploadsModalOpen(false)} />
       <PeopleModal isOpen={peopleModalOpen} onClose={() => setPeopleModalOpen(false)} />
       <SettingsModal isOpen={settingsModalOpen} onClose={() => setSettingsModalOpen(false)} />
+      <BatchManagerModal isOpen={batchModalOpen} onClose={() => setBatchModalOpen(false)} />
     </div>
   );
 }

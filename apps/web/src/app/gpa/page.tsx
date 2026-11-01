@@ -23,6 +23,8 @@ import {
   Alert,
 } from '@educompass/ui';
 import { PageHeader } from '../../components/PageHeader';
+import { useEditMode } from '../../context/EditModeContext';
+import { SchemeRulesDrawer } from '../../components/edit-mode/SchemeRulesDrawer';
 
 interface CourseRow {
   id: string;
@@ -32,7 +34,11 @@ interface CourseRow {
 }
 
 export default function GPACalculatorPage() {
+  const { isEditMode, viewAsStudent } = useEditMode();
   const [activeTab, setActiveTab] = useState<'calculator' | 'whatif' | 'upload'>('calculator');
+  const [isSchemeRulesOpen, setIsSchemeRulesOpen] = useState(false);
+  const [maxCredits, setMaxCredits] = useState(21);
+  const [passingGrade, setPassingGrade] = useState('D');
 
   // ── Transcript Parser State (Card E6) ──────────────────────────
   const [rawTranscriptText, setRawTranscriptText] = useState('');
@@ -126,7 +132,7 @@ export default function GPACalculatorPage() {
 
       <div className="inner-page-body">
         {/* Tab selector */}
-        <div style={{ marginBottom: 24 }}>
+        <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div className="toolbar-tabs" style={{ display: 'inline-flex' }}>
             {[
               { key: 'calculator', label: '📊 Semester GPA' },
@@ -142,6 +148,28 @@ export default function GPACalculatorPage() {
               </button>
             ))}
           </div>
+
+          {isEditMode && !viewAsStudent && (
+            <button
+              onClick={() => setIsSchemeRulesOpen(true)}
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                padding: '6px 14px',
+                borderRadius: 8,
+                border: '1px solid rgba(245, 158, 11, 0.5)',
+                background: 'rgba(245, 158, 11, 0.1)',
+                color: '#f59e0b',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
+            >
+              <span>⚖️ Grade Scale &amp; Scheme Rules</span>
+            </button>
+          )}
+        </div>
         </div>
 
         {/* TAB 1: Semester GPA Calculator */}
@@ -524,6 +552,17 @@ export default function GPACalculatorPage() {
           </div>
         )}
       </div>
+
+      <SchemeRulesDrawer
+        isOpen={isSchemeRulesOpen}
+        onClose={() => setIsSchemeRulesOpen(false)}
+        currentMaxCredits={maxCredits}
+        currentPassingGrade={passingGrade}
+        onRulesUpdated={(newMax, newPass) => {
+          setMaxCredits(newMax);
+          setPassingGrade(newPass);
+        }}
+      />
     </div>
   );
 }

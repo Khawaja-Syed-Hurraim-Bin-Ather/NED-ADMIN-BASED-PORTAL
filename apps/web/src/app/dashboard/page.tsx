@@ -4,6 +4,10 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../../lib/supabase/client';
+import { useEditMode } from '../../context/EditModeContext';
+import { AdminMenuDropdown } from '../../components/edit-mode/AdminMenuDropdown';
+import { EditModeBanner } from '../../components/edit-mode/EditModeBanner';
+import { PendingDrawer } from '../../components/edit-mode/PendingDrawer';
 
 // ─── SVG Line Icons (1.5px stroke, no 3D or cartoon illustrations) ───────────
 
@@ -145,8 +149,24 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [isDark, setIsDark] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  const {
+    isEditMode,
+    toggleEditMode,
+    pendingCount,
+    setIsPendingDrawerOpen,
+    currentUser,
+    viewAsStudent,
+    activeScheme,
+    saveDraftItem,
+  } = useEditMode();
+
+  const [announcementText, setAnnouncementText] = useState('Scheme 2026 elective choices and course schedules are currently in administrative review.');
+  const [isEditingAnnouncement, setIsEditingAnnouncement] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const stored = (localStorage.getItem('educompass-theme') as 'dark' | 'light') || 'light';
     document.documentElement.dataset.theme = stored;
     setIsDark(stored === 'dark');
@@ -368,6 +388,39 @@ export default function DashboardPage() {
               Guidance engine online
             </div>
 
+            {mounted && currentUser && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <button
+                  type="button"
+                  onClick={toggleEditMode}
+                  className={`px-2.5 py-1 rounded-md text-xs font-semibold border transition-all flex items-center gap-1.5 cursor-pointer ${
+                    isEditMode
+                      ? 'bg-amber-500 text-black border-amber-600 shadow-sm'
+                      : 'bg-[var(--surface)] text-[var(--text)] border-[var(--border)] hover:bg-[var(--page)]'
+                  }`}
+                  title="Toggle institutional edit mode"
+                >
+                  <span>Edit mode</span>
+                  <span className={`w-2 h-2 rounded-full ${isEditMode ? 'bg-black animate-pulse' : 'bg-slate-400'}`} />
+                </button>
+
+                {pendingCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setIsPendingDrawerOpen(true)}
+                    className="px-2 py-1 rounded-md text-xs font-medium border border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 cursor-pointer flex items-center gap-1"
+                  >
+                    <span>Pending</span>
+                    <span className="bg-amber-500 text-black px-1.5 rounded-full text-[10px] font-bold">
+                      {pendingCount}
+                    </span>
+                  </button>
+                )}
+
+                <AdminMenuDropdown />
+              </div>
+            )}
+
             <button
               className="button button-icon"
               onClick={toggleTheme}
@@ -388,6 +441,9 @@ export default function DashboardPage() {
           </div>
         </header>
 
+        <EditModeBanner />
+        <PendingDrawer />
+
         {/* Content Area (Max width 1360px per spec) */}
         <div className="dashboard-content" style={{ maxWidth: 1360, margin: '0 auto', paddingTop: 28 }}>
           {/* Greeting per spec: Good {timeOfDay}, {firstName} */}
@@ -402,6 +458,90 @@ export default function DashboardPage() {
               Here is where you stand this semester.
             </p>
           </div>
+
+          {/* Institutional Announcement Editor (Module 8 Edit Mode) */}
+          {isEditMode && !viewAsStudent && (
+            <div
+              style={{
+                marginBottom: 24,
+                padding: '14px 18px',
+                borderRadius: 10,
+                background: 'rgba(245, 158, 11, 0.08)',
+                border: '1px solid rgba(245, 158, 11, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 16,
+                flexWrap: 'wrap',
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 260 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#f59e0b' }}>📢 Batch Announcement Banner</span>
+                  <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 4, background: 'rgba(245, 158, 11, 0.2)', color: '#f59e0b', fontWeight: 600 }}>Edit Mode</span>
+                </div>
+                {!isEditingAnnouncement ? (
+                  <p style={{ margin: 0, fontSize: 13, color: 'var(--text)' }}>
+                    &ldquo;{announcementText}&rdquo;
+                  </p>
+                ) : (
+                  <input
+                    type="text"
+                    value={announcementText}
+                    onChange={(e) => setAnnouncementText(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '6px 10px',
+                      borderRadius: 6,
+                      border: '1px solid var(--border)',
+                      background: 'var(--surface)',
+                      color: 'var(--text)',
+                      fontSize: 12,
+                    }}
+                  />
+                )}
+              </div>
+
+              <div style={{ display: 'flex', gap: 8 }}>
+                {!isEditingAnnouncement ? (
+                  <button
+                    onClick={() => setIsEditingAnnouncement(true)}
+                    className="button button-secondary"
+                    style={{ fontSize: 12, padding: '4px 12px' }}
+                  >
+                    ✎ Edit Announcement
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      onClick={async () => {
+                        await saveDraftItem(
+                          'dashboard',
+                          'system_announcements',
+                          'announcement-main',
+                          { text: announcementText, scheme: activeScheme },
+                          'update',
+                          'Update batch announcement message'
+                        );
+                        setIsEditingAnnouncement(false);
+                      }}
+                      className="button button-primary"
+                      style={{ fontSize: 12, padding: '4px 12px' }}
+                    >
+                      Save Draft
+                    </button>
+                    <button
+                      onClick={() => setIsEditingAnnouncement(false)}
+                      className="button button-ghost"
+                      style={{ fontSize: 12, padding: '4px 10px' }}
+                    >
+                      Cancel
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* 4 Stat Cards per spec */}
           <section className="metric-grid" aria-label="Academic statistics">
