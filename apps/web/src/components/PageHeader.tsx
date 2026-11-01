@@ -149,7 +149,8 @@ export function PageHeader({
 
           {/* Edit Mode Switch & Admin Controls (v3 Section 2.1) */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            {mounted && (activeRole || currentUser) && (
+            {/* Edit mode + Pending: only visible to signed-in admins */}
+            {mounted && currentUser && (
               <>
                 <button
                   type="button"
@@ -157,7 +158,7 @@ export function PageHeader({
                   className={`px-2.5 py-1 rounded-md text-xs font-semibold border transition-all flex items-center gap-1.5 cursor-pointer ${
                     isEditMode
                       ? 'bg-amber-500 text-black border-amber-600 shadow-sm'
-                      : 'bg-[var(--color-surface)] text-[var(--color-text)] border-[var(--color-border)] hover:bg-[var(--color-bg)]'
+                      : 'bg-[var(--surface)] text-[var(--text)] border-[var(--border)] hover:bg-[var(--page)]'
                   }`}
                   title="Toggle institutional edit mode"
                 >
@@ -177,10 +178,10 @@ export function PageHeader({
                     </span>
                   </button>
                 )}
+
+                <AdminMenuDropdown />
               </>
             )}
-
-            {mounted && <AdminMenuDropdown />}
           </div>
 
           {actions}

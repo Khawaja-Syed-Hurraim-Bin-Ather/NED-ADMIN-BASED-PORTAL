@@ -1,11 +1,14 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import Link from 'next/link';
 import { useEditMode, AdminRole } from '../../context/EditModeContext';
 import { Badge } from '@educompass/ui';
 import { ApprovalsModal } from './ApprovalsModal';
 import { HistoryReleasesModal } from './HistoryReleasesModal';
+import { AdminLoginModal } from './AdminLoginModal';
+import { UploadsModal } from './UploadsModal';
+import { PeopleModal } from './PeopleModal';
+import { SettingsModal } from './SettingsModal';
 
 export function AdminMenuDropdown() {
   const {
@@ -17,8 +20,12 @@ export function AdminMenuDropdown() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [demoMenuOpen, setDemoMenuOpen] = useState(false);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [approvalsModalOpen, setApprovalsModalOpen] = useState(false);
   const [historyModalOpen, setHistoryModalOpen] = useState(false);
+  const [uploadsModalOpen, setUploadsModalOpen] = useState(false);
+  const [peopleModalOpen, setPeopleModalOpen] = useState(false);
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on outside click
@@ -33,12 +40,19 @@ export function AdminMenuDropdown() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // ── Not signed in: completely hide from students ──
+  if (!currentUser) {
+    return null;
+  }
+
+  // ── Signed in: show full Admin dropdown ──
   return (
     <div className="relative inline-block text-left" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen((prev) => !prev)}
-        className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] hover:bg-[var(--color-bg)] transition-colors text-[var(--color-text)] shadow-sm cursor-pointer"
+        className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-md border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--page)] transition-colors text-[var(--text)] shadow-sm cursor-pointer"
         aria-expanded={isOpen}
+        aria-haspopup="true"
       >
         <span>Admin</span>
         {activeRole && (
@@ -50,95 +64,92 @@ export function AdminMenuDropdown() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-2xl py-2 z-50 text-xs">
-          {currentUser && (
-            <div className="px-3 py-2 border-b border-[var(--color-border)] mb-1">
-              <span className="text-[10px] text-[var(--color-muted)] uppercase tracking-wider block">Signed in as:</span>
-              <strong className="block text-slate-100 font-medium truncate">{currentUser.fullName}</strong>
-              <span className="text-[10px] text-amber-400 font-mono capitalize">{currentUser.role} Account</span>
-            </div>
-          )}
+        <div className="absolute right-0 mt-2 w-60 rounded-xl border border-[var(--border)] bg-[var(--surface)] shadow-2xl py-2 z-50 text-xs">
+          {/* User identity section */}
+          <div className="px-3 py-2 border-b border-[var(--border)] mb-1">
+            <span className="text-[10px] text-[var(--muted)] uppercase tracking-wider block">Signed in as</span>
+            <strong className="block text-[var(--text)] font-medium truncate">{currentUser.fullName}</strong>
+            <span className="text-[10px] text-amber-400 font-mono capitalize">{currentUser.role} Account</span>
+          </div>
 
-          {/* Core Admin Modals & Controls per v3 Section 4 */}
+          {/* Approvals Queue */}
           <button
             type="button"
-            onClick={() => {
-              setIsOpen(false);
-              setApprovalsModalOpen(true);
-            }}
-            className="w-full text-left flex items-center gap-2.5 px-3 py-2 hover:bg-[var(--color-bg)] text-[var(--color-text)] transition-colors cursor-pointer"
+            onClick={() => { setIsOpen(false); setApprovalsModalOpen(true); }}
+            className="w-full text-left flex items-center gap-2.5 px-3 py-2 hover:bg-[var(--page)] text-[var(--text)] transition-colors cursor-pointer"
           >
             <span>📋</span>
             <div>
               <span className="font-medium block">Approvals Queue</span>
-              <span className="text-[10px] text-[var(--color-muted)] block">Review & sign off pending drafts</span>
+              <span className="text-[10px] text-[var(--muted)] block">Review &amp; sign off pending drafts</span>
             </div>
           </button>
 
-          <Link
-            href="/admin"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-2.5 px-3 py-2 hover:bg-[var(--color-bg)] text-[var(--color-text)] transition-colors"
+          {/* Uploads & Imports */}
+          <button
+            type="button"
+            onClick={() => { setIsOpen(false); setUploadsModalOpen(true); }}
+            className="w-full text-left flex items-center gap-2.5 px-3 py-2 hover:bg-[var(--page)] text-[var(--text)] transition-colors cursor-pointer"
           >
             <span>📤</span>
             <div>
-              <span className="font-medium block">Uploads & Imports</span>
-              <span className="text-[10px] text-[var(--color-muted)] block">Spreadsheet data & dev inbox</span>
-            </div>
-          </Link>
-
-          <button
-            type="button"
-            onClick={() => {
-              setIsOpen(false);
-              setHistoryModalOpen(true);
-            }}
-            className="w-full text-left flex items-center gap-2.5 px-3 py-2 hover:bg-[var(--color-bg)] text-[var(--color-text)] transition-colors cursor-pointer"
-          >
-            <span>📜</span>
-            <div>
-              <span className="font-medium block">History & Releases</span>
-              <span className="text-[10px] text-[var(--color-muted)] block">Version snapshots & rollbacks</span>
+              <span className="font-medium block">Uploads &amp; Imports</span>
+              <span className="text-[10px] text-[var(--muted)] block">Spreadsheet data &amp; dev inbox</span>
             </div>
           </button>
 
+          {/* History & Releases */}
+          <button
+            type="button"
+            onClick={() => { setIsOpen(false); setHistoryModalOpen(true); }}
+            className="w-full text-left flex items-center gap-2.5 px-3 py-2 hover:bg-[var(--page)] text-[var(--text)] transition-colors cursor-pointer"
+          >
+            <span>📜</span>
+            <div>
+              <span className="font-medium block">History &amp; Releases</span>
+              <span className="text-[10px] text-[var(--muted)] block">Version snapshots &amp; rollbacks</span>
+            </div>
+          </button>
+
+          {/* People & Access — chairman/vc only */}
           {(activeRole === 'chairman' || activeRole === 'vc') && (
-            <Link
-              href="/admin"
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2.5 px-3 py-2 hover:bg-[var(--color-bg)] text-[var(--color-text)] transition-colors"
+            <button
+              type="button"
+              onClick={() => { setIsOpen(false); setPeopleModalOpen(true); }}
+              className="w-full text-left flex items-center gap-2.5 px-3 py-2 hover:bg-[var(--page)] text-[var(--text)] transition-colors cursor-pointer"
             >
               <span>👥</span>
               <div>
-                <span className="font-medium block">People & Access</span>
-                <span className="text-[10px] text-[var(--color-muted)] block">Manage operator invitations</span>
+                <span className="font-medium block">People &amp; Access</span>
+                <span className="text-[10px] text-[var(--muted)] block">Manage operator invitations</span>
               </div>
-            </Link>
+            </button>
           )}
 
+          {/* System Settings — vc only */}
           {activeRole === 'vc' && (
-            <Link
-              href="/admin"
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2.5 px-3 py-2 hover:bg-[var(--color-bg)] text-[var(--color-text)] transition-colors"
+            <button
+              type="button"
+              onClick={() => { setIsOpen(false); setSettingsModalOpen(true); }}
+              className="w-full text-left flex items-center gap-2.5 px-3 py-2 hover:bg-[var(--page)] text-[var(--text)] transition-colors cursor-pointer"
             >
               <span>⚙️</span>
               <div>
                 <span className="font-medium block">System Settings</span>
-                <span className="text-[10px] text-[var(--color-muted)] block">Chatbot budgets & security</span>
+                <span className="text-[10px] text-[var(--muted)] block">Chatbot budgets &amp; security</span>
               </div>
-            </Link>
+            </button>
           )}
 
-          <div className="border-t border-[var(--color-border)] my-1 pt-1" />
+          <div className="border-t border-[var(--border)] my-1 pt-1" />
 
-          {/* Demo Persona Switcher (v3 Section 5.5) */}
+          {/* Demo Persona Switcher — visible only when signed in */}
           <div className="px-3 py-1">
             <button
               onClick={() => setDemoMenuOpen((prev) => !prev)}
               className="w-full text-left font-semibold text-[11px] text-amber-400 flex items-center justify-between py-1 hover:underline"
             >
-              <span>🧪 Demo Mode Personas</span>
+              <span>🧪 Switch Demo Role</span>
               <span>{demoMenuOpen ? '▲' : '▼'}</span>
             </button>
 
@@ -155,23 +166,20 @@ export function AdminMenuDropdown() {
                     className={`block w-full text-left py-1 text-[11px] rounded transition-colors ${
                       activeRole === role
                         ? 'font-bold text-amber-300'
-                        : 'text-[var(--color-muted)] hover:text-white'
+                        : 'text-[var(--muted)] hover:text-[var(--text)]'
                     }`}
                   >
-                    Switch to {role === 'operator' ? 'Data Operator' : role === 'chairman' ? 'Department Chairman (CIS)' : 'Vice Chancellor'}
+                    {role === 'operator' ? 'Data Operator' : role === 'chairman' ? 'Department Chairman (CIS)' : 'Vice Chancellor'}
                   </button>
                 ))}
               </div>
             )}
           </div>
 
-          <div className="border-t border-[var(--color-border)] my-1 pt-1" />
+          <div className="border-t border-[var(--border)] my-1 pt-1" />
 
           <button
-            onClick={() => {
-              signOutAdmin();
-              setIsOpen(false);
-            }}
+            onClick={() => { signOutAdmin(); setIsOpen(false); }}
             className="w-full text-left px-3 py-2 text-rose-400 hover:bg-rose-950/20 text-xs transition-colors"
           >
             🚪 Sign Out of Admin
@@ -179,16 +187,13 @@ export function AdminMenuDropdown() {
         </div>
       )}
 
-      {/* Auxiliary Modals (v3 Section 4) */}
-      <ApprovalsModal
-        isOpen={approvalsModalOpen}
-        onClose={() => setApprovalsModalOpen(false)}
-      />
-      <HistoryReleasesModal
-        isOpen={historyModalOpen}
-        onClose={() => setHistoryModalOpen(false)}
-      />
+      {/* Modals */}
+      <AdminLoginModal isOpen={loginModalOpen} onClose={() => setLoginModalOpen(false)} />
+      <ApprovalsModal isOpen={approvalsModalOpen} onClose={() => setApprovalsModalOpen(false)} />
+      <HistoryReleasesModal isOpen={historyModalOpen} onClose={() => setHistoryModalOpen(false)} />
+      <UploadsModal isOpen={uploadsModalOpen} onClose={() => setUploadsModalOpen(false)} />
+      <PeopleModal isOpen={peopleModalOpen} onClose={() => setPeopleModalOpen(false)} />
+      <SettingsModal isOpen={settingsModalOpen} onClose={() => setSettingsModalOpen(false)} />
     </div>
   );
 }
-

@@ -63,6 +63,8 @@ export interface EditModeContextType {
   refreshWorkingSet: () => Promise<void>;
   setDemoAccount: (role: AdminRole) => Promise<void>;
   signOutAdmin: () => void;
+  loginAdmin: (credentials: { email: string; password: string }) => Promise<{ success: boolean; otpRequired?: boolean; email?: string; otpHint?: string; error?: string }>;
+  verifyAdminOtp: (email: string, code: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 const EditModeContext = createContext<EditModeContextType | null>(null);
@@ -136,6 +138,58 @@ export function EditModeProvider({ children }: { children: React.ReactNode }) {
         }
       }
     } catch (_) {}
+  }, []);
+
+  // Two-step login: Step 1 — email + password → receives sessionId + OTP hint
+  const loginAdmin = useCallback(async (credentials: { email: string; password: string }) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/admin/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(credentials),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        return { success: false, error: json.error?.message || 'Login failed' };
+      }
+      return {
+        success: true,
+        otpRequired: true,
+        email: json.data?.email as string | undefined,
+        otpHint: json.data?.testCodeHint as string | undefined,
+      };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Network error' };
+    }
+  }, []);
+
+  // Step 2 — OTP verification → receives token + user, persists session
+  const verifyAdminOtp = useCallback(async (email: string, code: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/admin/auth/verify-code`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), code: code.trim() }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        return { success: false, error: json.error?.message || 'Invalid code' };
+      }
+      const token: string = json.data?.token;
+      const user = json.data?.user;
+      if (token && user) {
+        setAdminToken(token);
+        setCurrentUser(user);
+        setActiveRoleState(user.role);
+        setIsEditMode(true);
+        localStorage.setItem('educompass_admin_token', token);
+        localStorage.setItem('educompass_admin_user', JSON.stringify(user));
+        localStorage.setItem('educompass_edit_mode', 'true');
+      }
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Network error' };
+    }
   }, []);
 
   const signOutAdmin = () => {
@@ -307,6 +361,8 @@ export function EditModeProvider({ children }: { children: React.ReactNode }) {
         refreshWorkingSet,
         setDemoAccount,
         signOutAdmin,
+        loginAdmin,
+        verifyAdminOtp,
       }}
     >
       {children}

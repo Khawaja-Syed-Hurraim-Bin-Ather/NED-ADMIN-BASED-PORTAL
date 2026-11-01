@@ -4,6 +4,7 @@ import React, { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '../../lib/supabase/client';
+import { AdminLoginModal } from '../../components/edit-mode/AdminLoginModal';
 
 function LoginForm() {
   const router = useRouter();
@@ -14,6 +15,7 @@ function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(
     callbackError ? 'Authentication failed or session expired. Please sign in again.' : null
   );
@@ -195,7 +197,31 @@ function LoginForm() {
                 </Link>
               </p>
             </div>
+
+            <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid var(--border)', textAlign: 'center' }}>
+              <button
+                type="button"
+                onClick={() => setIsAdminModalOpen(true)}
+                style={{
+                  background: 'transparent',
+                  border: '1px solid var(--border)',
+                  color: 'var(--muted)',
+                  borderRadius: 6,
+                  padding: '6px 14px',
+                  fontSize: 12,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s',
+                }}
+              >
+                🔐 Institutional Admin Sign In (VC, Chairman, Operator)
+              </button>
+            </div>
           </form>
+
+          <AdminLoginModal
+            isOpen={isAdminModalOpen}
+            onClose={() => setIsAdminModalOpen(false)}
+          />
         </div>
       </div>
 
