@@ -373,3 +373,4 @@ export function BatchManagerModal({ isOpen, onClose }: BatchManagerModalProps) {
     </div>
   );
 }
+
