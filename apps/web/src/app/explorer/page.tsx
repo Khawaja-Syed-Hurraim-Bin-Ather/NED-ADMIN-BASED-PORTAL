@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import {
   ReactFlow,
   Background,
@@ -275,12 +276,15 @@ function validateCurriculumGraphLocally(courses: CourseData[]): DAGValidationRep
 
 // ─── Main Explorer Page ───────────────────────────────────────────────────────
 
-export default function ExplorerPage() {
+function ExplorerPageContent() {
   const { isEditMode, viewAsStudent, can, pendingItems, saveDraftItem } = useEditMode();
+  const searchParams = useSearchParams();
+  const urlBatch = searchParams?.get('batch');
 
   // Base courses fetched from API or fallback
   const [baseCourses, setBaseCourses] = useState<CourseData[]>(DEFAULT_CURRICULUM_COURSES);
-  const [selectedBatch, setSelectedBatch] = useState<string>('2022');
+  const [selectedBatch, setSelectedBatch] = useState<string>('2026');
+  const activeBatch = urlBatch || selectedBatch;
 
   // Student academic state
   const [completedSet, setCompletedSet] = useState<Set<string>>(
@@ -308,7 +312,7 @@ export default function ExplorerPage() {
   useEffect(() => {
     async function loadCurriculum() {
       try {
-        const res = await fetch(`/api/v1/curriculum?batch=${selectedBatch}&program=CSE`);
+        const res = await fetch(`/api/v1/curriculum?batch=${activeBatch}&program=CSE`);
         if (res.ok) {
           const json = await res.json();
           if (json.data?.courses && Array.isArray(json.data.courses) && json.data.courses.length > 0) {
@@ -320,7 +324,7 @@ export default function ExplorerPage() {
       }
     }
     loadCurriculum();
-  }, [selectedBatch]);
+  }, [activeBatch]);
 
   // Compute active courses with draft overlays applied
   const activeCourses = useMemo(() => {
@@ -639,38 +643,25 @@ export default function ExplorerPage() {
       <PageHeader
         title="Prerequisite DAG Explorer"
         breadcrumbs={[{ label: 'Prerequisite Explorer' }]}
-        badge={`Batch ${selectedBatch} Onwards`}
-        description="Directed acyclic graph of NED CISE degree requirements, critical paths, and failure cascades."
+        badge={`Batch ${activeBatch} Onwards`}
         accent="var(--cyan)"
+        fluid={true}
         actions={
-          <div className="flex items-center gap-2.5 flex-wrap text-xs">
-            {/* Batch Selector */}
-            <select
-              value={selectedBatch}
-              onChange={(e) => setSelectedBatch(e.target.value)}
-              className="bg-[#0f1823] border border-[rgba(213,228,236,0.15)] rounded-lg px-2.5 py-1 text-xs text-slate-200 focus:outline-none focus:border-[#9bcbd0]"
-            >
-              <option value="2022">Batch 2022</option>
-              <option value="2023">Batch 2023</option>
-              <option value="2024">Batch 2024</option>
-              <option value="2025">Batch 2025</option>
-              <option value="2026">Batch 2026</option>
-            </select>
-
+          <div className="flex items-center gap-2 flex-wrap text-xs">
             {/* Search Box */}
             <input
               type="text"
-              placeholder="Search code/title..."
+              placeholder="Search courses..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-[#0f1823] border border-[rgba(213,228,236,0.15)] rounded-lg px-2.5 py-1 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-[#9bcbd0] w-32 sm:w-40"
+              className="bg-[#0f1823] border border-[rgba(213,228,236,0.15)] rounded-lg px-2.5 py-1 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-[#9bcbd0] w-36"
             />
 
             {/* Critical Path Toggle */}
             <button
               onClick={() => setShowCriticalPath(!showCriticalPath)}
               className={`button ${showCriticalPath ? 'button-primary' : 'button-secondary'}`}
-              style={showCriticalPath ? { background: 'var(--amber)', color: '#0b1119' } : {}}
+              style={showCriticalPath ? { background: 'var(--amber)', color: '#0b1119' } : { fontSize: 12, padding: '5px 10px' }}
             >
               ⭐ Critical Path
             </button>
@@ -682,7 +673,7 @@ export default function ExplorerPage() {
                 if (isSimulationMode) setSimulatedFailedSet(new Set());
               }}
               className={`button ${isSimulationMode ? 'button-primary' : 'button-secondary'}`}
-              style={isSimulationMode ? { background: 'var(--coral)', color: '#fff' } : {}}
+              style={isSimulationMode ? { background: 'var(--coral)', color: '#fff' } : { fontSize: 12, padding: '5px 10px' }}
             >
               <span>⚠️</span>
               <span>{isSimulationMode ? 'Exit Simulation' : 'What-If Failure Sim'}</span>
@@ -692,7 +683,7 @@ export default function ExplorerPage() {
             {canEdit && (
               <button
                 onClick={() => setIsAddCourseOpen(true)}
-                className="px-3 py-1 rounded bg-[#511030] hover:bg-[#6e1642] text-white font-medium text-xs transition-colors shadow-sm flex items-center gap-1.5"
+                className="px-2.5 py-1 rounded bg-[#511030] hover:bg-[#6e1642] text-white font-medium text-xs transition-colors shadow-sm flex items-center gap-1 cursor-pointer"
               >
                 <span>+ Add Course</span>
               </button>
@@ -984,5 +975,13 @@ export default function ExplorerPage() {
         </Modal>
       )}
     </div>
+  );
+}
+
+export default function ExplorerPage() {
+  return (
+    <Suspense fallback={<div className="h-screen w-screen bg-[#0b1119]" />}>
+      <ExplorerPageContent />
+    </Suspense>
   );
 }

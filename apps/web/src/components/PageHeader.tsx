@@ -21,6 +21,8 @@ interface PageHeaderProps {
   actions?: React.ReactNode;
   /** Page accent colour token, e.g. '#511030' */
   accent?: string;
+  /** Full bleed layout for studio/canvas pages (Explorer, Planner) */
+  fluid?: boolean;
 }
 
 /** Inline SVG icons — 1.5px stroke, no external dependency */
@@ -58,6 +60,7 @@ export function PageHeader({
   description,
   actions,
   accent = '#511030',
+  fluid = false,
 }: PageHeaderProps) {
   const [theme, setTheme] = useState<'dark' | 'light'>('light');
   const [mounted, setMounted] = useState(false);
@@ -86,28 +89,49 @@ export function PageHeader({
 
   return (
     <header className="page-header" style={{ borderBottom: '1px solid var(--border)', background: 'var(--surface)' }}>
-      <div className="page-header-inner" style={{ maxWidth: 1360, margin: '0 auto', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20 }}>
+      <div
+        className="page-header-inner"
+        style={{
+          maxWidth: fluid ? '100%' : 1440,
+          margin: '0 auto',
+          padding: fluid ? '8px 20px' : '10px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 16,
+          flexWrap: 'wrap',
+        }}
+      >
         {/* ── Left: Official NED Brand + Crumbs + Title ── */}
-        <div className="page-header-left" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+        <div
+          className="page-header-left"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 4,
+            flexShrink: 0,
+            minWidth: 260,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'nowrap' }}>
             {/* Official Brand */}
-            <Link href="/" className="brand" aria-label="EduCompass home">
+            <Link href="/" className="brand" aria-label="EduCompass home" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
               <img
                 src="/assets/brand/ned-logo.png"
                 alt="NED University of Engineering & Technology"
                 className="brand-logo-img"
-                style={{ height: 36, width: 'auto' }}
+                style={{ height: 32, width: 'auto' }}
               />
               <div className="brand-text-block">
-                <span className="brand-title">EduCompass</span>
-                <span className="brand-dept">NED CISE</span>
+                <span className="brand-title" style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', whiteSpace: 'nowrap' }}>EduCompass</span>
+                <span className="brand-dept" style={{ fontSize: 10, color: 'var(--muted)', whiteSpace: 'nowrap' }}>NED CISE</span>
               </div>
             </Link>
 
             <span style={{ color: 'var(--border)' }}>|</span>
 
             {/* Breadcrumb trail */}
-            <nav className="page-crumbs" aria-label="Breadcrumb" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13 }}>
+            <nav className="page-crumbs" aria-label="Breadcrumb" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, whiteSpace: 'nowrap' }}>
               <Link href="/dashboard" style={{ color: 'var(--muted)', textDecoration: 'none' }}>Dashboard</Link>
               {breadcrumbs.map((crumb) => (
                 <React.Fragment key={crumb.label}>
@@ -123,26 +147,38 @@ export function PageHeader({
           </div>
 
           {/* Page title row */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-            <h1 style={{ fontSize: 22, fontWeight: 600, margin: 0, color: 'var(--text)' }}>{title}</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            <h1 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: 'var(--text)', whiteSpace: 'nowrap' }}>{title}</h1>
             {badge && (
-              <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 6, background: 'var(--primary-tint)', color: 'var(--primary)', fontWeight: 500 }}>
+              <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 6, background: 'var(--primary-tint)', color: 'var(--primary)', fontWeight: 600, whiteSpace: 'nowrap' }}>
                 {badge}
               </span>
             )}
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--muted)', border: '1px solid var(--border)', borderRadius: 6, padding: '2px 8px' }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 10, color: 'var(--muted)', border: '1px solid var(--border)', borderRadius: 6, padding: '2px 7px', whiteSpace: 'nowrap' }}>
               <span className="live-dot" style={{ width: 6, height: 6 }} />
               Guidance engine online
             </span>
           </div>
 
           {description && (
-            <p style={{ margin: 0, fontSize: 13, color: 'var(--muted)', maxWidth: 720 }}>{description}</p>
+            <p style={{ margin: 0, fontSize: 12, color: 'var(--muted)', maxWidth: 640, lineHeight: 1.35 }}>
+              {description}
+            </p>
           )}
         </div>
 
         {/* ── Right: Actions + Edit Mode Switch + Theme toggle + Dashboard ── */}
-        <div className="page-header-right" style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        <div
+          className="page-header-right"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            flexWrap: 'wrap',
+            justifyContent: 'flex-end',
+            minWidth: 0,
+          }}
+        >
           <React.Suspense fallback={null}>
             <BatchPicker />
           </React.Suspense>
@@ -195,7 +231,7 @@ export function PageHeader({
             {theme === 'dark' ? Ic.sun : Ic.moon}
           </button>
 
-          <Link href="/dashboard" className="button button-secondary" style={{ fontSize: 13, padding: '6px 14px' }}>
+          <Link href="/dashboard" className="button button-secondary" style={{ fontSize: 12, padding: '5px 12px', whiteSpace: 'nowrap' }}>
             {Ic.dashboard}
             <span>Dashboard</span>
           </Link>

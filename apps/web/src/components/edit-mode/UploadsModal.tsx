@@ -344,7 +344,7 @@ export function UploadsModal({ isOpen, onClose }: UploadsModalProps) {
                 </a>
               </div>
               <p style={{ margin: '0 0 12px', fontSize: 11, color: 'var(--warning)' }}>
-                Note: Clicking "Notify Developer Team" opens your email client (mailto:). No email is sent automatically.
+                Note: Clicking &quot;Notify Developer Team&quot; opens your email client (mailto:). No email is sent automatically.
               </p>
 
               <div style={{ borderRadius: 8, border: '1px solid var(--border)', overflow: 'hidden' }}>

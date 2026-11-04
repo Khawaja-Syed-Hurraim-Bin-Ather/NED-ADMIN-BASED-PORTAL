@@ -1657,16 +1657,17 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
-  width: min(1400px, calc(100% - 40px));
+  gap: 16px;
+  width: min(1440px, calc(100% - 32px));
   margin: 0 auto;
-  padding: 14px 0;
+  padding: 10px 0;
 }
 .page-header-left {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  min-width: 0;
+  min-width: 260px;
+  flex-shrink: 0;
 }
 .page-header-brand {
   display: none; /* hidden on desktop — sidebar already shows brand */
@@ -1694,10 +1695,11 @@
 }
 .page-title {
   margin: 0;
-  font-size: clamp(18px, 2.2vw, 26px);
-  font-weight: 900;
-  letter-spacing: -.045em;
-  line-height: 1.1;
+  font-size: clamp(16px, 1.8vw, 22px);
+  font-weight: 800;
+  letter-spacing: -.03em;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 .page-badge {
   padding: 0 9px;
@@ -1709,26 +1711,29 @@
   align-items: center;
   gap: 7px;
   padding: 0 10px;
-  height: 26px;
+  height: 24px;
   border: 1px solid var(--line);
   border-radius: 999px;
   color: var(--muted);
   background: var(--panel-soft);
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 700;
+  white-space: nowrap;
 }
 .page-header-desc {
   margin: 0;
   color: var(--muted);
   font-size: 12px;
-  font-weight: 600;
-  max-width: 640px;
+  font-weight: 500;
+  max-width: 680px;
+  line-height: 1.35;
 }
 .page-header-right {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 .page-dashboard-btn {
   min-height: 34px;

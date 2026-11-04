@@ -170,7 +170,6 @@ export default function GPACalculatorPage() {
             </button>
           )}
         </div>
-        </div>
 
         {/* TAB 1: Semester GPA Calculator */}
         {activeTab === 'calculator' && (
